@@ -13,6 +13,8 @@ import { InterviewsModule } from './interviews/interviews.module.js';
 import { JobsModule } from './jobs/jobs.module.js';
 import { SchedulingModule } from './scheduling/scheduling.module.js';
 import { UsersModule } from './users/users.module.js';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/guards/roles.guard.js';
 
 ConfigModule.forRoot({
   isGlobal: true,
@@ -36,6 +38,9 @@ ConfigModule.forRoot({
     CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },],
 })
 export class AppModule {}
