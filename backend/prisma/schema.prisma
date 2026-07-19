@@ -11,3 +11,109 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id       String @id @default(uuid())
+  fullName String
+  email    String @unique
+  password String
+
+  jobs         Job[]
+  availability Availability[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Job {
+  id String @id @default(uuid())
+
+  title        String
+  description  String
+  requirements String
+
+  shareToken String @unique
+
+  managerId String
+  manager   User   @relation(fields: [managerId], references: [id])
+
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Candidate {
+  id          String @id @default(uuid())
+
+  fullName    String
+  email       String @unique
+  phone       String
+
+  applications Application[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Application {
+  id            String @id @default(uuid())
+
+  jobId         String
+  candidateId   String
+
+  cvUrl         String
+
+  status        String @default("PENDING")
+
+  job           Job @relation(fields: [jobId], references: [id])
+  candidate     Candidate @relation(fields: [candidateId], references: [id])
+
+  aiScore       AIScore?
+
+  interview     Interview?
+
+  createdAt     DateTime @default(now())
+}
+
+
+model AIScore {
+  id              String @id @default(uuid())
+
+  applicationId   String @unique
+
+  cvScore         Float
+  interviewScore  Float
+  overallScore    Float
+
+  summary         String
+
+  application      Application @relation(fields: [applicationId], references: [id])
+
+  createdAt       DateTime @default(now())
+}
+
+model Availability {
+  id          String @id @default(uuid())
+
+  managerId   String
+
+  date        DateTime
+
+  startTime   String
+  endTime     String
+
+  manager      User @relation(fields: [managerId], references: [id])
+}
+
+model Interview {
+  id              String @id @default(uuid())
+
+  applicationId   String @unique
+
+  scheduledAt     DateTime
+
+  status          String @default("SCHEDULED")
+
+  application      Application @relation(fields: [applicationId], references: [id])
+}
