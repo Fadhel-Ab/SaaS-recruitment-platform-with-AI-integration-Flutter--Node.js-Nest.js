@@ -11,9 +11,29 @@ import { AvailabilityModule } from './availability/availability.module';
 import { SchedulingModule } from './scheduling/scheduling.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
+import { ConfigModule } from '@nestjs/config';
 
+ConfigModule.forRoot({
+  isGlobal: true,
+});
 @Module({
-  imports: [AuthModule, UsersModule, JobsModule, ApplicationsModule, AiModule, InterviewsModule, AvailabilityModule, SchedulingModule, PrismaModule, CommonModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    JobsModule,
+    ApplicationsModule,
+    AiModule,
+    InterviewsModule,
+    AvailabilityModule,
+    SchedulingModule,
+    PrismaModule,
+    CommonModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
