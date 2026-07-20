@@ -15,7 +15,7 @@ import { SchedulingModule } from './scheduling/scheduling.module.js';
 import { UsersModule } from './users/users.module.js';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard.js';
-import { StorageModule } from 'common/storage/storage.module.js';
+import { StorageModule } from './common/storage/storage.module.js';
 
 ConfigModule.forRoot({
   isGlobal: true,

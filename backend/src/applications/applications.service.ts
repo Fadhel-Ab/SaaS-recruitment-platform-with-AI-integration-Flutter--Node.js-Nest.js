@@ -6,7 +6,7 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
-import { AiService } from 'ai/ai.service.js';
+import { AiService } from '../ai/ai.service.js';
 
 @Injectable()
 export class ApplicationsService {

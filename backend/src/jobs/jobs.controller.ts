@@ -1,8 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { CurrentUser } from 'auth/decorators/current-user.decorator.js';
-import { Roles } from 'auth/decorators/roles.decorator.js';
-import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard.js';
-import { UserRole } from 'generated/prisma/enums.js';
+import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { UserRole } from '../generated/prisma/enums.js';
 import { JobsService } from './jobs.service.js';
 
 @Controller('jobs')

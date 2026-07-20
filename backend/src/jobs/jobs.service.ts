@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { v4 as uuid } from 'uuid';
 import { CreateJobDto } from './dto/create-job.dto.js';
 

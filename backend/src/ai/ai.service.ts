@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { OpenAIService } from './openai.service.js';
-import { PrismaService } from 'prisma/prisma.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { ResumeParserService } from './resume-parser.service.js';
 import { join } from 'path';
-import { StorageService } from 'common/storage/storage.service.js';
+import { StorageService } from '../common/storage/storage.service.js';
 
 @Injectable()
 export class AiService {
   constructor(
     private prisma: PrismaService,
-    private openAI: OpenAIService,
     private parser: ResumeParserService,
-     private storageService: StorageService,
+    private openAI: OpenAIService,
+    private storage: StorageService,
   ) {}
 
   async processApplication(applicationId: string) {
@@ -24,12 +24,35 @@ export class AiService {
         job: true,
       },
     });
-    const filePath =
-  this.storageService.getResumePath(
-    application!.candidate.resumeFileName!,
-  );
+    const filePath = this.storage.getResumePath(
+      application!.candidate.resumeFileName!,
+    );
 
-const resumeText =
-  await this.parser.extractText(filePath);
+    const resumeText = await this.parser.extractText(filePath);
+
+    const analysis = await this.openAI.analyzeResume(
+      resumeText,
+      application!.job.description,
+    );
+
+    await this.prisma.aIScore.create({
+      data: {
+        applicationId: application!.id,
+
+        cvScore: analysis.score,
+
+        overallScore: analysis.score,
+
+        strengths: analysis.strengths,
+
+        weaknesses: analysis.weaknesses,
+
+        summary: analysis.summary,
+
+        recommendation: analysis.recommendation,
+      },
+    });
+
+    return analysis;
   }
 }
