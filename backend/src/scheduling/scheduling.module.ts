@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { SchedulerService } from './scheduling.service.js'; 
 import { SchedulingController } from './scheduling.controller.js';
-import { SchedulingService } from './scheduling.service.js';
 
 @Module({
   controllers: [SchedulingController],
-  providers: [SchedulingService]
+  providers: [SchedulingService],
 })
 export class SchedulingModule {}

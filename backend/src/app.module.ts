@@ -17,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 import { StorageModule } from './common/storage/storage.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
+import { AiInterviewModule } from './ai-interview/ai-interview.module';
 
 ConfigModule.forRoot({
   isGlobal: true,
@@ -38,6 +39,7 @@ ConfigModule.forRoot({
     SchedulingModule,
     PrismaModule,
     CommonModule,
+    AiInterviewModule,
   ],
   controllers: [AppController],
   providers: [
