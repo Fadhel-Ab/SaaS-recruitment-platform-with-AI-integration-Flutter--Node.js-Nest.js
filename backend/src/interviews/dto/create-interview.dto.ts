@@ -1,4 +1,4 @@
-import { IsDateString, IsOptional, IsInt } from 'class-validator';
+import { IsDateString, IsOptional, IsInt, IsUUID } from 'class-validator';
 
 export class CreateInterviewDto {
   @IsDateString()

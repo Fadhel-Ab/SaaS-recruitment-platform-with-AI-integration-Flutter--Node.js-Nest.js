@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "AIScore" ALTER COLUMN "updatedAt" DROP DEFAULT;

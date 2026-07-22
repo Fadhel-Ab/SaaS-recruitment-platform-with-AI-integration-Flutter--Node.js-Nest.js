@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OpenAIService } from './openai.service.js';
+import { AIProviderService } from './ai.provider.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ResumeParserService } from './resume-parser.service.js';
 import { StorageService } from '../common/storage/storage.service.js';
@@ -9,7 +9,7 @@ export class AiService {
   constructor(
     private prisma: PrismaService,
     private parser: ResumeParserService,
-    private openAI: OpenAIService,
+    private aiProvider: AIProviderService,
     private storage: StorageService,
   ) {}
 
@@ -25,7 +25,9 @@ export class AiService {
     });
 
     if (!application || !application.candidate.resumeFileName) {
-      throw new Error('Application or candidate resume path could not be found.');
+      throw new Error(
+        'Application or candidate resume path could not be found.',
+      );
     }
 
     const filePath = this.storage.getResumePath(
@@ -36,12 +38,12 @@ export class AiService {
     const resumeText = await this.parser.extractText(filePath);
 
     // 2. Fetch the strict JSON response object from the API service
-    const analysis = await this.openAI.analyzeResume(
+    const analysis = await this.aiProvider.analyzeResume(
       resumeText,
       application.job.description,
     );
 
-    // 3. Map values directly to your database fields 
+    // 3. Map values directly to your database fields
     await this.prisma.aIScore.create({
       data: {
         applicationId: application.id,
@@ -55,5 +57,8 @@ export class AiService {
     });
 
     return analysis;
+  }
+  async evaluateInterview(transcript: string) {
+    return this.aiProvider.analyzeInterview(transcript);
   }
 }

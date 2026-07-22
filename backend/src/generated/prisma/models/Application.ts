@@ -202,7 +202,7 @@ export type ApplicationWhereInput = {
   job?: Prisma.XOR<Prisma.JobScalarRelationFilter, Prisma.JobWhereInput>
   aiScore?: Prisma.XOR<Prisma.AIScoreNullableScalarRelationFilter, Prisma.AIScoreWhereInput> | null
   interview?: Prisma.XOR<Prisma.InterviewNullableScalarRelationFilter, Prisma.InterviewWhereInput> | null
-  aiinterview?: Prisma.XOR<Prisma.AIInterviewNullableScalarRelationFilter, Prisma.AIInterviewWhereInput> | null
+  aiInterview?: Prisma.XOR<Prisma.AIInterviewSessionNullableScalarRelationFilter, Prisma.AIInterviewSessionWhereInput> | null
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -217,7 +217,7 @@ export type ApplicationOrderByWithRelationInput = {
   job?: Prisma.JobOrderByWithRelationInput
   aiScore?: Prisma.AIScoreOrderByWithRelationInput
   interview?: Prisma.InterviewOrderByWithRelationInput
-  aiinterview?: Prisma.AIInterviewOrderByWithRelationInput
+  aiInterview?: Prisma.AIInterviewSessionOrderByWithRelationInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -235,7 +235,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   job?: Prisma.XOR<Prisma.JobScalarRelationFilter, Prisma.JobWhereInput>
   aiScore?: Prisma.XOR<Prisma.AIScoreNullableScalarRelationFilter, Prisma.AIScoreWhereInput> | null
   interview?: Prisma.XOR<Prisma.InterviewNullableScalarRelationFilter, Prisma.InterviewWhereInput> | null
-  aiinterview?: Prisma.XOR<Prisma.AIInterviewNullableScalarRelationFilter, Prisma.AIInterviewWhereInput> | null
+  aiInterview?: Prisma.XOR<Prisma.AIInterviewSessionNullableScalarRelationFilter, Prisma.AIInterviewSessionWhereInput> | null
 }, "id">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -274,7 +274,7 @@ export type ApplicationCreateInput = {
   job: Prisma.JobCreateNestedOneWithoutApplicationsInput
   aiScore?: Prisma.AIScoreCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateInput = {
@@ -287,7 +287,7 @@ export type ApplicationUncheckedCreateInput = {
   updatedAt?: Date | string
   aiScore?: Prisma.AIScoreUncheckedCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewUncheckedCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewUncheckedCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUpdateInput = {
@@ -300,7 +300,7 @@ export type ApplicationUpdateInput = {
   job?: Prisma.JobUpdateOneRequiredWithoutApplicationsNestedInput
   aiScore?: Prisma.AIScoreUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
@@ -313,7 +313,7 @@ export type ApplicationUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiScore?: Prisma.AIScoreUncheckedUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUncheckedUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUncheckedUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationCreateManyInput = {
@@ -505,18 +505,18 @@ export type ApplicationUpdateOneRequiredWithoutInterviewNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutInterviewInput, Prisma.ApplicationUpdateWithoutInterviewInput>, Prisma.ApplicationUncheckedUpdateWithoutInterviewInput>
 }
 
-export type ApplicationCreateNestedOneWithoutAiinterviewInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAiinterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiinterviewInput>
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAiinterviewInput
+export type ApplicationCreateNestedOneWithoutAiInterviewInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAiInterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiInterviewInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAiInterviewInput
   connect?: Prisma.ApplicationWhereUniqueInput
 }
 
-export type ApplicationUpdateOneRequiredWithoutAiinterviewNestedInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAiinterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiinterviewInput>
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAiinterviewInput
-  upsert?: Prisma.ApplicationUpsertWithoutAiinterviewInput
+export type ApplicationUpdateOneRequiredWithoutAiInterviewNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutAiInterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiInterviewInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutAiInterviewInput
+  upsert?: Prisma.ApplicationUpsertWithoutAiInterviewInput
   connect?: Prisma.ApplicationWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutAiinterviewInput, Prisma.ApplicationUpdateWithoutAiinterviewInput>, Prisma.ApplicationUncheckedUpdateWithoutAiinterviewInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutAiInterviewInput, Prisma.ApplicationUpdateWithoutAiInterviewInput>, Prisma.ApplicationUncheckedUpdateWithoutAiInterviewInput>
 }
 
 export type ApplicationCreateWithoutJobInput = {
@@ -528,7 +528,7 @@ export type ApplicationCreateWithoutJobInput = {
   candidate: Prisma.CandidateCreateNestedOneWithoutApplicationsInput
   aiScore?: Prisma.AIScoreCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutJobInput = {
@@ -540,7 +540,7 @@ export type ApplicationUncheckedCreateWithoutJobInput = {
   updatedAt?: Date | string
   aiScore?: Prisma.AIScoreUncheckedCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewUncheckedCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewUncheckedCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutJobInput = {
@@ -591,7 +591,7 @@ export type ApplicationCreateWithoutCandidateInput = {
   job: Prisma.JobCreateNestedOneWithoutApplicationsInput
   aiScore?: Prisma.AIScoreCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutCandidateInput = {
@@ -603,7 +603,7 @@ export type ApplicationUncheckedCreateWithoutCandidateInput = {
   updatedAt?: Date | string
   aiScore?: Prisma.AIScoreUncheckedCreateNestedOneWithoutApplicationInput
   interview?: Prisma.InterviewUncheckedCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewUncheckedCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutCandidateInput = {
@@ -641,7 +641,7 @@ export type ApplicationCreateWithoutAiScoreInput = {
   candidate: Prisma.CandidateCreateNestedOneWithoutApplicationsInput
   job: Prisma.JobCreateNestedOneWithoutApplicationsInput
   interview?: Prisma.InterviewCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutAiScoreInput = {
@@ -653,7 +653,7 @@ export type ApplicationUncheckedCreateWithoutAiScoreInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   interview?: Prisma.InterviewUncheckedCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewUncheckedCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutAiScoreInput = {
@@ -681,7 +681,7 @@ export type ApplicationUpdateWithoutAiScoreInput = {
   candidate?: Prisma.CandidateUpdateOneRequiredWithoutApplicationsNestedInput
   job?: Prisma.JobUpdateOneRequiredWithoutApplicationsNestedInput
   interview?: Prisma.InterviewUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutAiScoreInput = {
@@ -693,7 +693,7 @@ export type ApplicationUncheckedUpdateWithoutAiScoreInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   interview?: Prisma.InterviewUncheckedUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUncheckedUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationCreateWithoutInterviewInput = {
@@ -705,7 +705,7 @@ export type ApplicationCreateWithoutInterviewInput = {
   candidate: Prisma.CandidateCreateNestedOneWithoutApplicationsInput
   job: Prisma.JobCreateNestedOneWithoutApplicationsInput
   aiScore?: Prisma.AIScoreCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutInterviewInput = {
@@ -717,7 +717,7 @@ export type ApplicationUncheckedCreateWithoutInterviewInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   aiScore?: Prisma.AIScoreUncheckedCreateNestedOneWithoutApplicationInput
-  aiinterview?: Prisma.AIInterviewUncheckedCreateNestedOneWithoutApplicationInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedCreateNestedOneWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutInterviewInput = {
@@ -745,7 +745,7 @@ export type ApplicationUpdateWithoutInterviewInput = {
   candidate?: Prisma.CandidateUpdateOneRequiredWithoutApplicationsNestedInput
   job?: Prisma.JobUpdateOneRequiredWithoutApplicationsNestedInput
   aiScore?: Prisma.AIScoreUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutInterviewInput = {
@@ -757,10 +757,10 @@ export type ApplicationUncheckedUpdateWithoutInterviewInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiScore?: Prisma.AIScoreUncheckedUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUncheckedUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedUpdateOneWithoutApplicationNestedInput
 }
 
-export type ApplicationCreateWithoutAiinterviewInput = {
+export type ApplicationCreateWithoutAiInterviewInput = {
   id?: string
   status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
@@ -772,7 +772,7 @@ export type ApplicationCreateWithoutAiinterviewInput = {
   interview?: Prisma.InterviewCreateNestedOneWithoutApplicationInput
 }
 
-export type ApplicationUncheckedCreateWithoutAiinterviewInput = {
+export type ApplicationUncheckedCreateWithoutAiInterviewInput = {
   id?: string
   candidateId: string
   jobId: string
@@ -784,23 +784,23 @@ export type ApplicationUncheckedCreateWithoutAiinterviewInput = {
   interview?: Prisma.InterviewUncheckedCreateNestedOneWithoutApplicationInput
 }
 
-export type ApplicationCreateOrConnectWithoutAiinterviewInput = {
+export type ApplicationCreateOrConnectWithoutAiInterviewInput = {
   where: Prisma.ApplicationWhereUniqueInput
-  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAiinterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiinterviewInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAiInterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiInterviewInput>
 }
 
-export type ApplicationUpsertWithoutAiinterviewInput = {
-  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutAiinterviewInput, Prisma.ApplicationUncheckedUpdateWithoutAiinterviewInput>
-  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAiinterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiinterviewInput>
+export type ApplicationUpsertWithoutAiInterviewInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutAiInterviewInput, Prisma.ApplicationUncheckedUpdateWithoutAiInterviewInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutAiInterviewInput, Prisma.ApplicationUncheckedCreateWithoutAiInterviewInput>
   where?: Prisma.ApplicationWhereInput
 }
 
-export type ApplicationUpdateToOneWithWhereWithoutAiinterviewInput = {
+export type ApplicationUpdateToOneWithWhereWithoutAiInterviewInput = {
   where?: Prisma.ApplicationWhereInput
-  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutAiinterviewInput, Prisma.ApplicationUncheckedUpdateWithoutAiinterviewInput>
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutAiInterviewInput, Prisma.ApplicationUncheckedUpdateWithoutAiInterviewInput>
 }
 
-export type ApplicationUpdateWithoutAiinterviewInput = {
+export type ApplicationUpdateWithoutAiInterviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -812,7 +812,7 @@ export type ApplicationUpdateWithoutAiinterviewInput = {
   interview?: Prisma.InterviewUpdateOneWithoutApplicationNestedInput
 }
 
-export type ApplicationUncheckedUpdateWithoutAiinterviewInput = {
+export type ApplicationUncheckedUpdateWithoutAiInterviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   candidateId?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -842,7 +842,7 @@ export type ApplicationUpdateWithoutJobInput = {
   candidate?: Prisma.CandidateUpdateOneRequiredWithoutApplicationsNestedInput
   aiScore?: Prisma.AIScoreUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutJobInput = {
@@ -854,7 +854,7 @@ export type ApplicationUncheckedUpdateWithoutJobInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiScore?: Prisma.AIScoreUncheckedUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUncheckedUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUncheckedUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutJobInput = {
@@ -884,7 +884,7 @@ export type ApplicationUpdateWithoutCandidateInput = {
   job?: Prisma.JobUpdateOneRequiredWithoutApplicationsNestedInput
   aiScore?: Prisma.AIScoreUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutCandidateInput = {
@@ -896,7 +896,7 @@ export type ApplicationUncheckedUpdateWithoutCandidateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiScore?: Prisma.AIScoreUncheckedUpdateOneWithoutApplicationNestedInput
   interview?: Prisma.InterviewUncheckedUpdateOneWithoutApplicationNestedInput
-  aiinterview?: Prisma.AIInterviewUncheckedUpdateOneWithoutApplicationNestedInput
+  aiInterview?: Prisma.AIInterviewSessionUncheckedUpdateOneWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutCandidateInput = {
@@ -922,7 +922,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   job?: boolean | Prisma.JobDefaultArgs<ExtArgs>
   aiScore?: boolean | Prisma.Application$aiScoreArgs<ExtArgs>
   interview?: boolean | Prisma.Application$interviewArgs<ExtArgs>
-  aiinterview?: boolean | Prisma.Application$aiinterviewArgs<ExtArgs>
+  aiInterview?: boolean | Prisma.Application$aiInterviewArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -965,7 +965,7 @@ export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.Internal
   job?: boolean | Prisma.JobDefaultArgs<ExtArgs>
   aiScore?: boolean | Prisma.Application$aiScoreArgs<ExtArgs>
   interview?: boolean | Prisma.Application$interviewArgs<ExtArgs>
-  aiinterview?: boolean | Prisma.Application$aiinterviewArgs<ExtArgs>
+  aiInterview?: boolean | Prisma.Application$aiInterviewArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   candidate?: boolean | Prisma.CandidateDefaultArgs<ExtArgs>
@@ -983,7 +983,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     job: Prisma.$JobPayload<ExtArgs>
     aiScore: Prisma.$AIScorePayload<ExtArgs> | null
     interview: Prisma.$InterviewPayload<ExtArgs> | null
-    aiinterview: Prisma.$AIInterviewPayload<ExtArgs> | null
+    aiInterview: Prisma.$AIInterviewSessionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1391,7 +1391,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
   job<T extends Prisma.JobDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JobDefaultArgs<ExtArgs>>): Prisma.Prisma__JobClient<runtime.Types.Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   aiScore<T extends Prisma.Application$aiScoreArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$aiScoreArgs<ExtArgs>>): Prisma.Prisma__AIScoreClient<runtime.Types.Result.GetResult<Prisma.$AIScorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   interview<T extends Prisma.Application$interviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$interviewArgs<ExtArgs>>): Prisma.Prisma__InterviewClient<runtime.Types.Result.GetResult<Prisma.$InterviewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  aiinterview<T extends Prisma.Application$aiinterviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$aiinterviewArgs<ExtArgs>>): Prisma.Prisma__AIInterviewClient<runtime.Types.Result.GetResult<Prisma.$AIInterviewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  aiInterview<T extends Prisma.Application$aiInterviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$aiInterviewArgs<ExtArgs>>): Prisma.Prisma__AIInterviewSessionClient<runtime.Types.Result.GetResult<Prisma.$AIInterviewSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1867,22 +1867,22 @@ export type Application$interviewArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * Application.aiinterview
+ * Application.aiInterview
  */
-export type Application$aiinterviewArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Application$aiInterviewArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the AIInterview
+   * Select specific fields to fetch from the AIInterviewSession
    */
-  select?: Prisma.AIInterviewSelect<ExtArgs> | null
+  select?: Prisma.AIInterviewSessionSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the AIInterview
+   * Omit specific fields from the AIInterviewSession
    */
-  omit?: Prisma.AIInterviewOmit<ExtArgs> | null
+  omit?: Prisma.AIInterviewSessionOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.AIInterviewInclude<ExtArgs> | null
-  where?: Prisma.AIInterviewWhereInput
+  include?: Prisma.AIInterviewSessionInclude<ExtArgs> | null
+  where?: Prisma.AIInterviewSessionWhereInput
 }
 
 /**

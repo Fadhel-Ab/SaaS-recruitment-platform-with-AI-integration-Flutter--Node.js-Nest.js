@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AiInterviewController } from './ai-interview.controller';
+import { AiInterviewController } from './ai-interview.controller.js';
 
 describe('AiInterviewController', () => {
   let controller: AiInterviewController;

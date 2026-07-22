@@ -47,6 +47,7 @@ export type AIScoreMinAggregateOutputType = {
   summary: string | null
   recommendation: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AIScoreMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type AIScoreMaxAggregateOutputType = {
   summary: string | null
   recommendation: string | null
   createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type AIScoreCountAggregateOutputType = {
@@ -71,6 +73,7 @@ export type AIScoreCountAggregateOutputType = {
   summary: number
   recommendation: number
   createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -96,6 +99,7 @@ export type AIScoreMinAggregateInputType = {
   summary?: true
   recommendation?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type AIScoreMaxAggregateInputType = {
@@ -107,6 +111,7 @@ export type AIScoreMaxAggregateInputType = {
   summary?: true
   recommendation?: true
   createdAt?: true
+  updatedAt?: true
 }
 
 export type AIScoreCountAggregateInputType = {
@@ -120,6 +125,7 @@ export type AIScoreCountAggregateInputType = {
   summary?: true
   recommendation?: true
   createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -220,6 +226,7 @@ export type AIScoreGroupByOutputType = {
   summary: string
   recommendation: string
   createdAt: Date
+  updatedAt: Date
   _count: AIScoreCountAggregateOutputType | null
   _avg: AIScoreAvgAggregateOutputType | null
   _sum: AIScoreSumAggregateOutputType | null
@@ -256,6 +263,7 @@ export type AIScoreWhereInput = {
   summary?: Prisma.StringFilter<"AIScore"> | string
   recommendation?: Prisma.StringFilter<"AIScore"> | string
   createdAt?: Prisma.DateTimeFilter<"AIScore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"AIScore"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
 }
 
@@ -270,6 +278,7 @@ export type AIScoreOrderByWithRelationInput = {
   summary?: Prisma.SortOrder
   recommendation?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   application?: Prisma.ApplicationOrderByWithRelationInput
 }
 
@@ -287,6 +296,7 @@ export type AIScoreWhereUniqueInput = Prisma.AtLeast<{
   summary?: Prisma.StringFilter<"AIScore"> | string
   recommendation?: Prisma.StringFilter<"AIScore"> | string
   createdAt?: Prisma.DateTimeFilter<"AIScore"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"AIScore"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
 }, "id" | "applicationId">
 
@@ -301,6 +311,7 @@ export type AIScoreOrderByWithAggregationInput = {
   summary?: Prisma.SortOrder
   recommendation?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.AIScoreCountOrderByAggregateInput
   _avg?: Prisma.AIScoreAvgOrderByAggregateInput
   _max?: Prisma.AIScoreMaxOrderByAggregateInput
@@ -322,6 +333,7 @@ export type AIScoreScalarWhereWithAggregatesInput = {
   summary?: Prisma.StringWithAggregatesFilter<"AIScore"> | string
   recommendation?: Prisma.StringWithAggregatesFilter<"AIScore"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AIScore"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AIScore"> | Date | string
 }
 
 export type AIScoreCreateInput = {
@@ -334,6 +346,7 @@ export type AIScoreCreateInput = {
   summary: string
   recommendation: string
   createdAt?: Date | string
+  updatedAt?: Date | string
   application: Prisma.ApplicationCreateNestedOneWithoutAiScoreInput
 }
 
@@ -348,6 +361,7 @@ export type AIScoreUncheckedCreateInput = {
   summary: string
   recommendation: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AIScoreUpdateInput = {
@@ -360,6 +374,7 @@ export type AIScoreUpdateInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneRequiredWithoutAiScoreNestedInput
 }
 
@@ -374,6 +389,7 @@ export type AIScoreUncheckedUpdateInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AIScoreCreateManyInput = {
@@ -387,6 +403,7 @@ export type AIScoreCreateManyInput = {
   summary: string
   recommendation: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AIScoreUpdateManyMutationInput = {
@@ -399,6 +416,7 @@ export type AIScoreUpdateManyMutationInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AIScoreUncheckedUpdateManyInput = {
@@ -412,6 +430,7 @@ export type AIScoreUncheckedUpdateManyInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AIScoreNullableScalarRelationFilter = {
@@ -430,6 +449,7 @@ export type AIScoreCountOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   recommendation?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AIScoreAvgOrderByAggregateInput = {
@@ -447,6 +467,7 @@ export type AIScoreMaxOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   recommendation?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AIScoreMinOrderByAggregateInput = {
@@ -458,6 +479,7 @@ export type AIScoreMinOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   recommendation?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type AIScoreSumOrderByAggregateInput = {
@@ -524,6 +546,7 @@ export type AIScoreCreateWithoutApplicationInput = {
   summary: string
   recommendation: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AIScoreUncheckedCreateWithoutApplicationInput = {
@@ -536,6 +559,7 @@ export type AIScoreUncheckedCreateWithoutApplicationInput = {
   summary: string
   recommendation: string
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type AIScoreCreateOrConnectWithoutApplicationInput = {
@@ -564,6 +588,7 @@ export type AIScoreUpdateWithoutApplicationInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AIScoreUncheckedUpdateWithoutApplicationInput = {
@@ -576,6 +601,7 @@ export type AIScoreUncheckedUpdateWithoutApplicationInput = {
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   recommendation?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -591,6 +617,7 @@ export type AIScoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   summary?: boolean
   recommendation?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["aIScore"]>
 
@@ -605,6 +632,7 @@ export type AIScoreSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   summary?: boolean
   recommendation?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["aIScore"]>
 
@@ -619,6 +647,7 @@ export type AIScoreSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   summary?: boolean
   recommendation?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["aIScore"]>
 
@@ -633,9 +662,10 @@ export type AIScoreSelectScalar = {
   summary?: boolean
   recommendation?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type AIScoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "cvScore" | "interviewScore" | "overallScore" | "strengths" | "weaknesses" | "summary" | "recommendation" | "createdAt", ExtArgs["result"]["aIScore"]>
+export type AIScoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "cvScore" | "interviewScore" | "overallScore" | "strengths" | "weaknesses" | "summary" | "recommendation" | "createdAt" | "updatedAt", ExtArgs["result"]["aIScore"]>
 export type AIScoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
 }
@@ -662,6 +692,7 @@ export type $AIScorePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     summary: string
     recommendation: string
     createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["aIScore"]>
   composites: {}
 }
@@ -1096,6 +1127,7 @@ export interface AIScoreFieldRefs {
   readonly summary: Prisma.FieldRef<"AIScore", 'String'>
   readonly recommendation: Prisma.FieldRef<"AIScore", 'String'>
   readonly createdAt: Prisma.FieldRef<"AIScore", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"AIScore", 'DateTime'>
 }
     
 

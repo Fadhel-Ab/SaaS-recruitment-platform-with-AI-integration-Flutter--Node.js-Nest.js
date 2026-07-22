@@ -43,7 +43,7 @@ export type InterviewStatus = (typeof InterviewStatus)[keyof typeof InterviewSta
 
 
 export const AIInterviewStatus = {
-  NOT_STARTED: 'NOT_STARTED',
+  PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED'

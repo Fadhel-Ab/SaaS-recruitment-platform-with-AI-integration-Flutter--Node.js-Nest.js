@@ -53,7 +53,7 @@ export type Availability = Prisma.AvailabilityModel
  */
 export type Interview = Prisma.InterviewModel
 /**
- * Model AIInterview
+ * Model AIInterviewSession
  * 
  */
-export type AIInterview = Prisma.AIInterviewModel
+export type AIInterviewSession = Prisma.AIInterviewSessionModel

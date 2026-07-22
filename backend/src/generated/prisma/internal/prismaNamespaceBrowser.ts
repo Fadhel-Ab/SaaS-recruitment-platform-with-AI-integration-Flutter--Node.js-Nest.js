@@ -58,7 +58,7 @@ export const ModelName = {
   AIScore: 'AIScore',
   Availability: 'Availability',
   Interview: 'Interview',
-  AIInterview: 'AIInterview'
+  AIInterviewSession: 'AIInterviewSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -140,7 +140,8 @@ export const AIScoreScalarFieldEnum = {
   weaknesses: 'weaknesses',
   summary: 'summary',
   recommendation: 'recommendation',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AIScoreScalarFieldEnum = (typeof AIScoreScalarFieldEnum)[keyof typeof AIScoreScalarFieldEnum]
@@ -175,19 +176,20 @@ export const InterviewScalarFieldEnum = {
 export type InterviewScalarFieldEnum = (typeof InterviewScalarFieldEnum)[keyof typeof InterviewScalarFieldEnum]
 
 
-export const AIInterviewScalarFieldEnum = {
+export const AIInterviewSessionScalarFieldEnum = {
   id: 'id',
   applicationId: 'applicationId',
   status: 'status',
+  transcript: 'transcript',
+  summary: 'summary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
-  transcript: 'transcript',
-  score: 'score',
-  feedback: 'feedback',
-  createdAt: 'createdAt'
+  duration: 'duration',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type AIInterviewScalarFieldEnum = (typeof AIInterviewScalarFieldEnum)[keyof typeof AIInterviewScalarFieldEnum]
+export type AIInterviewSessionScalarFieldEnum = (typeof AIInterviewSessionScalarFieldEnum)[keyof typeof AIInterviewSessionScalarFieldEnum]
 
 
 export const SortOrder = {

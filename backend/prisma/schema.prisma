@@ -70,6 +70,7 @@ model AIScore {
   summary        String
   recommendation String
   createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
   application    Application @relation(fields: [applicationId], references: [id])
 }
 

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SchedulerService } from './scheduling.service.js'; 
+import { SchedulingService } from './scheduling.service.js'; 
 import { SchedulingController } from './scheduling.controller.js';
 
 @Module({

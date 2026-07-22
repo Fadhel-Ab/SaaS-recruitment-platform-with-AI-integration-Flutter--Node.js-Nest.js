@@ -391,7 +391,7 @@ export const ModelName = {
   AIScore: 'AIScore',
   Availability: 'Availability',
   Interview: 'Interview',
-  AIInterview: 'AIInterview'
+  AIInterviewSession: 'AIInterviewSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "job" | "candidate" | "application" | "aIScore" | "availability" | "interview" | "aIInterview"
+    modelProps: "user" | "job" | "candidate" | "application" | "aIScore" | "availability" | "interview" | "aIInterviewSession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -929,77 +929,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    AIInterview: {
-      payload: Prisma.$AIInterviewPayload<ExtArgs>
-      fields: Prisma.AIInterviewFieldRefs
+    AIInterviewSession: {
+      payload: Prisma.$AIInterviewSessionPayload<ExtArgs>
+      fields: Prisma.AIInterviewSessionFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.AIInterviewFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload> | null
+          args: Prisma.AIInterviewSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.AIInterviewFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         findFirst: {
-          args: Prisma.AIInterviewFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload> | null
+          args: Prisma.AIInterviewSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.AIInterviewFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         findMany: {
-          args: Prisma.AIInterviewFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>[]
+          args: Prisma.AIInterviewSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>[]
         }
         create: {
-          args: Prisma.AIInterviewCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         createMany: {
-          args: Prisma.AIInterviewCreateManyArgs<ExtArgs>
+          args: Prisma.AIInterviewSessionCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.AIInterviewCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>[]
+          args: Prisma.AIInterviewSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>[]
         }
         delete: {
-          args: Prisma.AIInterviewDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         update: {
-          args: Prisma.AIInterviewUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         deleteMany: {
-          args: Prisma.AIInterviewDeleteManyArgs<ExtArgs>
+          args: Prisma.AIInterviewSessionDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.AIInterviewUpdateManyArgs<ExtArgs>
+          args: Prisma.AIInterviewSessionUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.AIInterviewUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>[]
+          args: Prisma.AIInterviewSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>[]
         }
         upsert: {
-          args: Prisma.AIInterviewUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewPayload>
+          args: Prisma.AIInterviewSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInterviewSessionPayload>
         }
         aggregate: {
-          args: Prisma.AIInterviewAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAIInterview>
+          args: Prisma.AIInterviewSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAIInterviewSession>
         }
         groupBy: {
-          args: Prisma.AIInterviewGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AIInterviewGroupByOutputType>[]
+          args: Prisma.AIInterviewSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AIInterviewSessionGroupByOutputType>[]
         }
         count: {
-          args: Prisma.AIInterviewCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AIInterviewCountAggregateOutputType> | number
+          args: Prisma.AIInterviewSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AIInterviewSessionCountAggregateOutputType> | number
         }
       }
     }
@@ -1105,7 +1105,8 @@ export const AIScoreScalarFieldEnum = {
   weaknesses: 'weaknesses',
   summary: 'summary',
   recommendation: 'recommendation',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AIScoreScalarFieldEnum = (typeof AIScoreScalarFieldEnum)[keyof typeof AIScoreScalarFieldEnum]
@@ -1140,19 +1141,20 @@ export const InterviewScalarFieldEnum = {
 export type InterviewScalarFieldEnum = (typeof InterviewScalarFieldEnum)[keyof typeof InterviewScalarFieldEnum]
 
 
-export const AIInterviewScalarFieldEnum = {
+export const AIInterviewSessionScalarFieldEnum = {
   id: 'id',
   applicationId: 'applicationId',
   status: 'status',
+  transcript: 'transcript',
+  summary: 'summary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
-  transcript: 'transcript',
-  score: 'score',
-  feedback: 'feedback',
-  createdAt: 'createdAt'
+  duration: 'duration',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type AIInterviewScalarFieldEnum = (typeof AIInterviewScalarFieldEnum)[keyof typeof AIInterviewScalarFieldEnum]
+export type AIInterviewSessionScalarFieldEnum = (typeof AIInterviewSessionScalarFieldEnum)[keyof typeof AIInterviewSessionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1443,7 +1445,7 @@ export type GlobalOmitConfig = {
   aIScore?: Prisma.AIScoreOmit
   availability?: Prisma.AvailabilityOmit
   interview?: Prisma.InterviewOmit
-  aIInterview?: Prisma.AIInterviewOmit
+  aIInterviewSession?: Prisma.AIInterviewSessionOmit
 }
 
 /* Types for Logging */

@@ -11,7 +11,6 @@ import { ConfirmScheduleDto } from './dto/confirm-schedule.dto.js';
 @Controller('scheduler')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SchedulingController {
-  schedulerService: SchedulingService;
   constructor(private schedulingService: SchedulingService) {}
 
   @Post('jobs/:jobId/generate')
@@ -27,6 +26,6 @@ export class SchedulingController {
   @Post('jobs/:jobId/confirm')
   @Roles(UserRole.MANAGER)
   confirm(@CurrentUser() user, @Body() dto: ConfirmScheduleDto) {
-    return this.schedulerService.confirm(user.id, dto);
+    return this.schedulingService.confirm(user.id, dto);
   }
 }
