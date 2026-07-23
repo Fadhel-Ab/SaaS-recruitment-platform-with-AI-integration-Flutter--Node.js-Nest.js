@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -7,7 +8,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { AiService } from '../ai/ai.service.js';
-import { UpdateApplicationStatusDto } from '../jobs/dto/update-application-status.dto.js';
+import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
+import { allowedTransitions } from './utils/status-transition.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -76,10 +78,22 @@ export class ApplicationsService {
     return application;
   }
 
-  async updateStatus(id: string, dto: UpdateApplicationStatusDto) {
+  async updateStatus(applicationId: string, dto: UpdateApplicationStatusDto) {
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+    if (!allowedTransitions[application.status].includes(dto.status)) {
+      throw new BadRequestException('Invalid status transition');
+    }
     return this.prisma.application.update({
       where: {
-        id,
+        id: applicationId,
       },
       data: {
         status: dto.status,

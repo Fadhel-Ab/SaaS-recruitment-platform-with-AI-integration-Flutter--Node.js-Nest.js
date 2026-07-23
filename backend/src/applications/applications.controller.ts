@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { multerConfig } from '../common/multer.config.js';
-import { UpdateApplicationStatusDto } from '../jobs/dto/update-application-status.dto.js';
+import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
 import { UserRole } from '../generated/prisma/enums.js';
 
 @Controller('applications')
@@ -50,12 +50,14 @@ export class ApplicationsController {
     return this.applicationsService.apply(shareToken, dto);
   }
 
-  @Patch(':id/status')
-  @Roles(UserRole.MANAGER)
+  @Patch(':applicationId/status')
   updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateApplicationStatusDto,
+    @Param('applicationId')
+    applicationId: string,
+
+    @Body()
+    dto: UpdateApplicationStatusDto,
   ) {
-    return this.applicationsService.updateStatus(id, dto);
+    return this.applicationsService.updateStatus(applicationId, dto);
   }
 }
