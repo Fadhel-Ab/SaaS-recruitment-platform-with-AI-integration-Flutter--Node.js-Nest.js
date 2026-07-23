@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/app/app.dart';
+import 'package:frontend/features/auth/data/auth_test.dart';
 
 void main() {
-  runApp(const MainApp());
+  testLogin();
+  runApp(const RecruitmentApp());
 }
 
-class MainApp extends StatelessWidget {
+/* class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
@@ -18,3 +21,4 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+ */
