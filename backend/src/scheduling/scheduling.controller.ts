@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Param, Body } from '@nestjs/common';
+import { Controller, Post, Param, Body } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -9,7 +9,6 @@ import { SchedulingService } from './scheduling.service.js';
 import { ConfirmScheduleDto } from './dto/confirm-schedule.dto.js';
 
 @Controller('scheduler')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class SchedulingController {
   constructor(private schedulingService: SchedulingService) {}
 

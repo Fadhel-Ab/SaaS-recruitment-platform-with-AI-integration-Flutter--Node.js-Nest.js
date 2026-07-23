@@ -78,10 +78,17 @@ export class ApplicationsService {
     return application;
   }
 
-  async updateStatus(applicationId: string, dto: UpdateApplicationStatusDto) {
+  async updateStatus(
+    managerId: string,
+    applicationId: string,
+    dto: UpdateApplicationStatusDto,
+  ) {
     const application = await this.prisma.application.findUnique({
       where: {
         id: applicationId,
+        job: {
+          managerId,
+        },
       },
     });
 
@@ -100,10 +107,20 @@ export class ApplicationsService {
       },
     });
   }
-  async getJobApplications(jobId: string) {
+  async getJobApplications(managerId: string, jobId: string) {
+    const job = await this.prisma.job.findFirst({
+      where: {
+        id: jobId,
+        managerId,
+      },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
     return this.prisma.application.findMany({
       where: {
-        jobId,
+        id: jobId,
       },
 
       include: {
@@ -128,10 +145,13 @@ export class ApplicationsService {
       },
     });
   }
-  async getApplicationDetails(applicationId: string) {
+  async getApplicationDetails(managerId: string, applicationId: string) {
     const application = await this.prisma.application.findUnique({
       where: {
         id: applicationId,
+        job: {
+          managerId,
+        },
       },
 
       include: {

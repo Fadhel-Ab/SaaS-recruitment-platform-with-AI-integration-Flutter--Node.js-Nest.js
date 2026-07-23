@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
@@ -8,7 +8,6 @@ import { AvailabilityService } from './availability.service.js';
 import { CreateAvailabilityDto } from './dto/create-availability.dto.js';
 
 @Controller('availability')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class AvailabilityController {
   constructor(private service: AvailabilityService) {}
 
