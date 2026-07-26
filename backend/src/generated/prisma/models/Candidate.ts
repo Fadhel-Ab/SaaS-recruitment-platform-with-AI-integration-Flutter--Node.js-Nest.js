@@ -361,10 +361,6 @@ export type CandidateScalarRelationFilter = {
   isNot?: Prisma.CandidateWhereInput
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type CandidateCreateNestedOneWithoutApplicationsInput = {
   create?: Prisma.XOR<Prisma.CandidateCreateWithoutApplicationsInput, Prisma.CandidateUncheckedCreateWithoutApplicationsInput>
   connectOrCreate?: Prisma.CandidateCreateOrConnectWithoutApplicationsInput

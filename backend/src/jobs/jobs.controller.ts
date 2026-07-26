@@ -5,10 +5,18 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { JobsService } from './jobs.service.js';
 import { CreateJobDto } from './dto/create-job.dto.js';
+import { get } from 'node:http';
+import { Public } from '../auth/decorators/public.decorator.js';
 
 @Controller('jobs')
 export class JobsController {
   constructor(private jobsService: JobsService) {}
+
+  @Get()
+  @Public()
+  getAvailableJobs() {
+    return this.jobsService.getAvailableJobs();
+  }
 
   @Post()
   @Roles(UserRole.MANAGER)

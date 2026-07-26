@@ -21,16 +21,23 @@ model User {
 }
 
 model Job {
-  id           String        @id @default(uuid())
+  id           String @id @default(uuid())
   title        String
   description  String
   requirements String
-  shareToken   String        @unique
-  managerId    String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+
+  location       String?
+  employmentType EmploymentType 
+  isActive       Boolean        @default(true)
+
+  shareToken String @unique
+  managerId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   applications Application[]
-  manager      User          @relation(fields: [managerId], references: [id])
+  manager      User          @relation(fields: managerId, references: id)
 }
 
 model Candidate {
@@ -174,4 +181,12 @@ enum AIInterviewStatus {
   IN_PROGRESS
   COMPLETED
   FAILED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  REMOTE
 }

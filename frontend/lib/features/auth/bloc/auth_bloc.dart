@@ -10,6 +10,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final TokenStorage storage;
 
   AuthBloc(this.repository, this.storage) : super(const AuthState()) {
+    print('AuthBloc created');
     on<LoginRequested>(_login);
     on<AuthStarted>(_checkAuth);
   }

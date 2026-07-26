@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { EmploymentType } from '../../generated/prisma/enums.js';
 
 export class CreateJobDto {
   @IsNotEmpty()
@@ -9,4 +10,7 @@ export class CreateJobDto {
 
   @IsNotEmpty()
   requirements: string;
+
+  @IsNotEmpty()
+  employmentType: EmploymentType;
 }

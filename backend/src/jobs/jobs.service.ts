@@ -17,10 +17,30 @@ export class JobsService {
         title: dto.title,
         description: dto.description,
         requirements: dto.requirements,
-
+        employmentType: dto.employmentType,
         managerId: userId,
 
         shareToken: uuid(),
+      },
+    });
+  }
+
+  async getAvailableJobs() {
+    return this.prisma.job.findMany({
+      where: {
+        isActive: true,
+      },
+      select: {
+        id: true,
+        title: true,
+        location: true,
+        employmentType: true,
+        description: true,
+        shareToken: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

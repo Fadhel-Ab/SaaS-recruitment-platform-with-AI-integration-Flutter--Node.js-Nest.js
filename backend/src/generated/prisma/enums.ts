@@ -50,3 +50,14 @@ export const AIInterviewStatus = {
 } as const
 
 export type AIInterviewStatus = (typeof AIInterviewStatus)[keyof typeof AIInterviewStatus]
+
+
+export const EmploymentType = {
+  FULL_TIME: 'FULL_TIME',
+  PART_TIME: 'PART_TIME',
+  CONTRACT: 'CONTRACT',
+  INTERNSHIP: 'INTERNSHIP',
+  REMOTE: 'REMOTE'
+} as const
+
+export type EmploymentType = (typeof EmploymentType)[keyof typeof EmploymentType]
