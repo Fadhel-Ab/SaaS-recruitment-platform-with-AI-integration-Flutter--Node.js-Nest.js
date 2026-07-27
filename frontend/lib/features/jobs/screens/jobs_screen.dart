@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/jobs/screens/job_details_screen.dart';
+import 'package:frontend/features/jobs/screens/widgets/job_card.dart';
 
 import '../bloc/jobs_bloc.dart';
 import '../bloc/jobs_event.dart';
@@ -11,37 +13,45 @@ class JobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Jobs')),
+      appBar: AppBar(title: const Text('Available Jobs')),
 
       body: BlocBuilder<JobsBloc, JobsState>(
         builder: (context, state) {
-          if (state.status == JobsStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          switch (state.status) {
+            case JobsStatus.loading:
+              return const Center(child: CircularProgressIndicator());
 
-          if (state.status == JobsStatus.failure) {
-            return Center(child: Text(state.error ?? 'Something went wrong'));
-          }
+            case JobsStatus.failure:
+              return Center(child: Text(state.error ?? 'Error loading jobs'));
 
-          if (state.jobs.isEmpty) {
-            return const Center(child: Text('No jobs available'));
-          }
+            case JobsStatus.loaded:
+              if (state.jobs.isEmpty) {
+                return const Center(child: Text('No jobs available'));
+              }
 
-          return ListView.builder(
-            itemCount: state.jobs.length,
+              return ListView.builder(
+                itemCount: state.jobs.length,
 
-            itemBuilder: (context, index) {
-              final job = state.jobs[index];
+                itemBuilder: (context, index) {
+                  final job = state.jobs[index];
 
-              return Card(
-                child: ListTile(
-                  title: Text(job.title),
-
-                  subtitle: Text(job.location ?? 'Remote'),
-                ),
+                  return JobCard(
+                    job: job,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => JobDetailsScreen(job: job),
+                        ),
+                      );
+                    },
+                  );
+                },
               );
-            },
-          );
+
+            default:
+              return const SizedBox();
+          }
         },
       ),
     );

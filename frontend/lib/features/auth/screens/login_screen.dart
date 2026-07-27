@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state.user?.role == UserRole.manager) {
             context.go('/dashboard');
           } else {
-            context.go('/candidate');
+            context.go('/jobs');
           }
         }
 

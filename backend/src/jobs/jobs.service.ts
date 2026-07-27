@@ -36,6 +36,7 @@ export class JobsService {
         location: true,
         employmentType: true,
         description: true,
+        requirements: true,
         shareToken: true,
         createdAt: true,
       },

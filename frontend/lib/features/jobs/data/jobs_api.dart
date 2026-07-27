@@ -7,7 +7,7 @@ class JobsApi {
 
   Future<List<dynamic>> getJobs() async {
     final response = await dio.get('/jobs');
-
+    print(response.data);
     return response.data;
   }
 }
