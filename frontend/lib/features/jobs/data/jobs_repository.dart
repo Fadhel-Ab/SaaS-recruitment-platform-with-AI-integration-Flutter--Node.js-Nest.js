@@ -10,4 +10,8 @@ class JobsRepository {
     final response = await api.getJobs();
     return response.map<JobModel>((e) => JobModel.fromJson(e)).toList();
   }
+
+  Future<JobModel> getJob(String shareToken) {
+    return api.getJob(shareToken);
+  }
 }

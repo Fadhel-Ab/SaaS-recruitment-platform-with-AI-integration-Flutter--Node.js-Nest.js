@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/jobs/screens/job_details_screen.dart';
 import 'package:frontend/features/jobs/screens/widgets/job_card.dart';
+import 'package:go_router/go_router.dart';
 
 import '../bloc/jobs_bloc.dart';
-import '../bloc/jobs_event.dart';
 import '../bloc/jobs_state.dart';
 
 class JobsScreen extends StatelessWidget {
@@ -38,12 +38,7 @@ class JobsScreen extends StatelessWidget {
                   return JobCard(
                     job: job,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JobDetailsScreen(job: job),
-                        ),
-                      );
+                      context.push('/jobs/${job.shareToken}');
                     },
                   );
                 },

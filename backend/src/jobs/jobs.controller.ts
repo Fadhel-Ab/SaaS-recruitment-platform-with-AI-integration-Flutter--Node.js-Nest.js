@@ -31,6 +31,7 @@ export class JobsController {
   }
 
   @Get(':token')
+  @Public()
   findByToken(@Param('token') token: string) {
     return this.jobsService.findByToken(token);
   }

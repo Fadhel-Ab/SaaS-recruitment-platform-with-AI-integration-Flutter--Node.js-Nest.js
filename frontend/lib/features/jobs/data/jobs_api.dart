@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:frontend/features/jobs/models/job_model.dart';
 
 class JobsApi {
   final Dio dio;
@@ -9,5 +10,11 @@ class JobsApi {
     final response = await dio.get('/jobs');
     print(response.data);
     return response.data;
+  }
+
+  Future<JobModel> getJob(String shareToken) async {
+    final response = await dio.get('/jobs/$shareToken');
+
+    return JobModel.fromJson(response.data);
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/core/storage/secure_token_storage.dart';
 import 'package:frontend/core/storage/token_storage.dart';
 import 'package:frontend/core/storage/web_token_storage.dart';
+import 'package:frontend/features/applications/data/application_api.dart';
+import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
 import 'package:frontend/features/jobs/data/jobs_api.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
@@ -33,6 +35,10 @@ void main() {
 
   final jobsRepository = JobsRepository(jobsApi);
 
+  // Application
+  final applicationApi = ApplicationApi(dioClient.dio);
+
+  final applicationRepository = ApplicationRepository(applicationApi);
   runApp(
     RepositoryProvider(
       create: (_) => authRepository,
@@ -40,11 +46,15 @@ void main() {
       child: RepositoryProvider(
         create: (_) => jobsRepository,
 
-        child: BlocProvider(
-          create: (_) =>
-              AuthBloc(authRepository, tokenStorage)..add(const AuthStarted()),
+        child: RepositoryProvider(
+          create: (_) => applicationRepository,
+          child: BlocProvider(
+            create: (_) =>
+                AuthBloc(authRepository, tokenStorage)
+                  ..add(const AuthStarted()),
 
-          child: const RecruitmentApp(),
+            child: const RecruitmentApp(),
+          ),
         ),
       ),
     ),

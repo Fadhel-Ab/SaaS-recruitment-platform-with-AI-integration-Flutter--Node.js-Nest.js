@@ -18,10 +18,7 @@ async function bootstrap() {
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads',
   });
-
-  app.enableCors({
-    origin: '*',
-  });
+  app.enableCors();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

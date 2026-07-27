@@ -1,71 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/jobs/models/job_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
+import 'package:frontend/features/jobs/bloc/job_details_state.dart';
+import 'package:go_router/go_router.dart';
 
 class JobDetailsScreen extends StatelessWidget {
-  final JobModel job;
+  final String shareToken;
 
-  const JobDetailsScreen({super.key, required this.job});
+  const JobDetailsScreen({super.key, required this.shareToken});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(job.title)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(job.title, style: Theme.of(context).textTheme.headlineSmall),
+      appBar: AppBar(title: const Text('Job Details')),
 
-            const SizedBox(height: 12),
+      body: BlocBuilder<JobDetailsBloc, JobDetailsState>(
+        builder: (context, state) {
+          if (state.status == JobDetailsStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            Row(
+          if (state.status == JobDetailsStatus.failure) {
+            return Center(child: Text(state.error ?? 'Failed to load job'));
+          }
+
+          final job = state.job;
+
+          if (job == null) {
+            return const Center(child: Text('Job not found'));
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(16),
+
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
-                const Icon(Icons.location_on_outlined),
-                const SizedBox(width: 8),
-                Text(job.location),
+                Text(
+                  job.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(job.location ?? 'Not specified'),
+
+                const SizedBox(height: 20),
+
+                Text(job.description),
+
+                const SizedBox(height: 20),
+
+                Text(job.requirements),
+
+                const Spacer(),
+
+                SizedBox(
+                  width: double.infinity,
+
+                  child: FilledButton(
+                    onPressed: () {
+                      context.push('/apply/${job.shareToken}');
+                    },
+
+                    child: const Text('Apply Now'),
+                  ),
+                ),
               ],
             ),
-
-            const SizedBox(height: 8),
-
-            Row(
-              children: [
-                const Icon(Icons.work_outline),
-                const SizedBox(width: 8),
-                Text(job.employmentType),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            Text("Description", style: Theme.of(context).textTheme.titleLarge),
-
-            const SizedBox(height: 8),
-
-            Text(job.description),
-
-            const SizedBox(height: 24),
-
-            Text("Requirements", style: Theme.of(context).textTheme.titleLarge),
-
-            const SizedBox(height: 8),
-
-            Text(job.requirements),
-
-            const SizedBox(height: 32),
-
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  // later
-                },
-                child: const Text("Apply Now"),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

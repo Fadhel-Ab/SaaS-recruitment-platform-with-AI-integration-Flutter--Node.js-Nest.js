@@ -13,6 +13,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
+    // 1. Extract the underlying HTTP request object
+    const request = context.switchToHttp().getRequest();
+
+    // 2. 🟢 CRITICAL: Safely allow all browser CORS preflight requests
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
 
     const isPublic =
       this.reflector.getAllAndOverride<boolean>(
