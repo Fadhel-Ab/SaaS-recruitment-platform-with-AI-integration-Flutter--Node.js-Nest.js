@@ -7,11 +7,13 @@ import {
 } from '../generated/prisma/enums.js';
 import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
+import { TwilioService } from '../twilio/twilio.service.js';
 @Injectable()
 export class AiInterviewService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
+    private twilioService: TwilioService,
   ) {}
 
   async start(dto: StartInterviewDto) {
@@ -106,5 +108,29 @@ export class AiInterviewService {
 
       score: updatedScore,
     };
+  }
+
+  async startAiCall(interviewId: string) {
+    const interview = await this.prisma.interview.findUnique({
+      where: {
+        id: interviewId,
+      },
+      include: {
+        application: {
+          include: {
+            candidate: true,
+          },
+        },
+      },
+    });
+
+    if (!interview) {
+      throw new NotFoundException('Interview not found');
+    }
+
+    return this.twilioService.makeCall(
+      interview.application.candidate.phone,
+      interview.id,
+    );
   }
 }

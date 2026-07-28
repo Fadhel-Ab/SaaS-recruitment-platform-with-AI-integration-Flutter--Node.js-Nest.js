@@ -6,11 +6,12 @@ import type { Response as ExpressResponse } from 'express';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { InterviewsService } from '../interviews/interviews.service.js';
+import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 @Controller('twilio')
 export class TwilioController {
   constructor(
     private readonly twilio: TwilioService,
-    private readonly interviewsService: InterviewsService,
+    private readonly aiInterviewsService: AiInterviewService,
   ) {}
 
   @Post('test-call')
@@ -21,7 +22,7 @@ export class TwilioController {
   @Post(':id/start-call')
   @Roles(UserRole.MANAGER)
   startCall(@Param('id') applicationId: string) {
-    return this.interviewsService.startAiCall(applicationId);
+    return this.aiInterviewsService.startAiCall(applicationId);
   }
 
   @Post('voice')

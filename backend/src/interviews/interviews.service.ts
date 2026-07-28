@@ -43,27 +43,4 @@ export class InterviewsService {
 
     return interview;
   }
-  async startAiCall(interviewId: string) {
-    const interview = await this.prisma.interview.findUnique({
-      where: {
-        id: interviewId,
-      },
-      include: {
-        application: {
-          include: {
-            candidate: true,
-          },
-        },
-      },
-    });
-
-    if (!interview) {
-      throw new NotFoundException('Interview not found');
-    }
-
-    return this.twilioService.makeCall(
-      interview.application.candidate.phone,
-      interview.id,
-    );
-  }
 }
