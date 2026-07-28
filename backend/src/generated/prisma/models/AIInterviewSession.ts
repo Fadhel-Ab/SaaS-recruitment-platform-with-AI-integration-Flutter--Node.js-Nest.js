@@ -27,10 +27,12 @@ export type AggregateAIInterviewSession = {
 }
 
 export type AIInterviewSessionAvgAggregateOutputType = {
+  questionCount: number | null
   duration: number | null
 }
 
 export type AIInterviewSessionSumAggregateOutputType = {
+  questionCount: number | null
   duration: number | null
 }
 
@@ -39,6 +41,7 @@ export type AIInterviewSessionMinAggregateOutputType = {
   applicationId: string | null
   status: $Enums.AIInterviewStatus | null
   transcript: string | null
+  questionCount: number | null
   summary: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -52,6 +55,7 @@ export type AIInterviewSessionMaxAggregateOutputType = {
   applicationId: string | null
   status: $Enums.AIInterviewStatus | null
   transcript: string | null
+  questionCount: number | null
   summary: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -65,6 +69,7 @@ export type AIInterviewSessionCountAggregateOutputType = {
   applicationId: number
   status: number
   transcript: number
+  questionCount: number
   summary: number
   startedAt: number
   completedAt: number
@@ -76,10 +81,12 @@ export type AIInterviewSessionCountAggregateOutputType = {
 
 
 export type AIInterviewSessionAvgAggregateInputType = {
+  questionCount?: true
   duration?: true
 }
 
 export type AIInterviewSessionSumAggregateInputType = {
+  questionCount?: true
   duration?: true
 }
 
@@ -88,6 +95,7 @@ export type AIInterviewSessionMinAggregateInputType = {
   applicationId?: true
   status?: true
   transcript?: true
+  questionCount?: true
   summary?: true
   startedAt?: true
   completedAt?: true
@@ -101,6 +109,7 @@ export type AIInterviewSessionMaxAggregateInputType = {
   applicationId?: true
   status?: true
   transcript?: true
+  questionCount?: true
   summary?: true
   startedAt?: true
   completedAt?: true
@@ -114,6 +123,7 @@ export type AIInterviewSessionCountAggregateInputType = {
   applicationId?: true
   status?: true
   transcript?: true
+  questionCount?: true
   summary?: true
   startedAt?: true
   completedAt?: true
@@ -214,6 +224,7 @@ export type AIInterviewSessionGroupByOutputType = {
   applicationId: string
   status: $Enums.AIInterviewStatus
   transcript: string | null
+  questionCount: number
   summary: string | null
   startedAt: Date | null
   completedAt: Date | null
@@ -250,6 +261,7 @@ export type AIInterviewSessionWhereInput = {
   applicationId?: Prisma.StringFilter<"AIInterviewSession"> | string
   status?: Prisma.EnumAIInterviewStatusFilter<"AIInterviewSession"> | $Enums.AIInterviewStatus
   transcript?: Prisma.StringNullableFilter<"AIInterviewSession"> | string | null
+  questionCount?: Prisma.IntFilter<"AIInterviewSession"> | number
   summary?: Prisma.StringNullableFilter<"AIInterviewSession"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"AIInterviewSession"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"AIInterviewSession"> | Date | string | null
@@ -264,6 +276,7 @@ export type AIInterviewSessionOrderByWithRelationInput = {
   applicationId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   transcript?: Prisma.SortOrderInput | Prisma.SortOrder
+  questionCount?: Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -281,6 +294,7 @@ export type AIInterviewSessionWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AIInterviewSessionWhereInput | Prisma.AIInterviewSessionWhereInput[]
   status?: Prisma.EnumAIInterviewStatusFilter<"AIInterviewSession"> | $Enums.AIInterviewStatus
   transcript?: Prisma.StringNullableFilter<"AIInterviewSession"> | string | null
+  questionCount?: Prisma.IntFilter<"AIInterviewSession"> | number
   summary?: Prisma.StringNullableFilter<"AIInterviewSession"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"AIInterviewSession"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"AIInterviewSession"> | Date | string | null
@@ -295,6 +309,7 @@ export type AIInterviewSessionOrderByWithAggregationInput = {
   applicationId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   transcript?: Prisma.SortOrderInput | Prisma.SortOrder
+  questionCount?: Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -316,6 +331,7 @@ export type AIInterviewSessionScalarWhereWithAggregatesInput = {
   applicationId?: Prisma.StringWithAggregatesFilter<"AIInterviewSession"> | string
   status?: Prisma.EnumAIInterviewStatusWithAggregatesFilter<"AIInterviewSession"> | $Enums.AIInterviewStatus
   transcript?: Prisma.StringNullableWithAggregatesFilter<"AIInterviewSession"> | string | null
+  questionCount?: Prisma.IntWithAggregatesFilter<"AIInterviewSession"> | number
   summary?: Prisma.StringNullableWithAggregatesFilter<"AIInterviewSession"> | string | null
   startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AIInterviewSession"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"AIInterviewSession"> | Date | string | null
@@ -328,6 +344,7 @@ export type AIInterviewSessionCreateInput = {
   id?: string
   status?: $Enums.AIInterviewStatus
   transcript?: string | null
+  questionCount?: number
   summary?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -342,6 +359,7 @@ export type AIInterviewSessionUncheckedCreateInput = {
   applicationId: string
   status?: $Enums.AIInterviewStatus
   transcript?: string | null
+  questionCount?: number
   summary?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -354,6 +372,7 @@ export type AIInterviewSessionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -368,6 +387,7 @@ export type AIInterviewSessionUncheckedUpdateInput = {
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -381,6 +401,7 @@ export type AIInterviewSessionCreateManyInput = {
   applicationId: string
   status?: $Enums.AIInterviewStatus
   transcript?: string | null
+  questionCount?: number
   summary?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -393,6 +414,7 @@ export type AIInterviewSessionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -406,6 +428,7 @@ export type AIInterviewSessionUncheckedUpdateManyInput = {
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -424,6 +447,7 @@ export type AIInterviewSessionCountOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   transcript?: Prisma.SortOrder
+  questionCount?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -433,6 +457,7 @@ export type AIInterviewSessionCountOrderByAggregateInput = {
 }
 
 export type AIInterviewSessionAvgOrderByAggregateInput = {
+  questionCount?: Prisma.SortOrder
   duration?: Prisma.SortOrder
 }
 
@@ -441,6 +466,7 @@ export type AIInterviewSessionMaxOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   transcript?: Prisma.SortOrder
+  questionCount?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -454,6 +480,7 @@ export type AIInterviewSessionMinOrderByAggregateInput = {
   applicationId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   transcript?: Prisma.SortOrder
+  questionCount?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
@@ -463,6 +490,7 @@ export type AIInterviewSessionMinOrderByAggregateInput = {
 }
 
 export type AIInterviewSessionSumOrderByAggregateInput = {
+  questionCount?: Prisma.SortOrder
   duration?: Prisma.SortOrder
 }
 
@@ -514,6 +542,7 @@ export type AIInterviewSessionCreateWithoutApplicationInput = {
   id?: string
   status?: $Enums.AIInterviewStatus
   transcript?: string | null
+  questionCount?: number
   summary?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -526,6 +555,7 @@ export type AIInterviewSessionUncheckedCreateWithoutApplicationInput = {
   id?: string
   status?: $Enums.AIInterviewStatus
   transcript?: string | null
+  questionCount?: number
   summary?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
@@ -554,6 +584,7 @@ export type AIInterviewSessionUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -566,6 +597,7 @@ export type AIInterviewSessionUncheckedUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAIInterviewStatusFieldUpdateOperationsInput | $Enums.AIInterviewStatus
   transcript?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionCount?: Prisma.IntFieldUpdateOperationsInput | number
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -581,6 +613,7 @@ export type AIInterviewSessionSelect<ExtArgs extends runtime.Types.Extensions.In
   applicationId?: boolean
   status?: boolean
   transcript?: boolean
+  questionCount?: boolean
   summary?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -595,6 +628,7 @@ export type AIInterviewSessionSelectCreateManyAndReturn<ExtArgs extends runtime.
   applicationId?: boolean
   status?: boolean
   transcript?: boolean
+  questionCount?: boolean
   summary?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -609,6 +643,7 @@ export type AIInterviewSessionSelectUpdateManyAndReturn<ExtArgs extends runtime.
   applicationId?: boolean
   status?: boolean
   transcript?: boolean
+  questionCount?: boolean
   summary?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -623,6 +658,7 @@ export type AIInterviewSessionSelectScalar = {
   applicationId?: boolean
   status?: boolean
   transcript?: boolean
+  questionCount?: boolean
   summary?: boolean
   startedAt?: boolean
   completedAt?: boolean
@@ -631,7 +667,7 @@ export type AIInterviewSessionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AIInterviewSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "status" | "transcript" | "summary" | "startedAt" | "completedAt" | "duration" | "createdAt" | "updatedAt", ExtArgs["result"]["aIInterviewSession"]>
+export type AIInterviewSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "status" | "transcript" | "questionCount" | "summary" | "startedAt" | "completedAt" | "duration" | "createdAt" | "updatedAt", ExtArgs["result"]["aIInterviewSession"]>
 export type AIInterviewSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
 }
@@ -652,6 +688,7 @@ export type $AIInterviewSessionPayload<ExtArgs extends runtime.Types.Extensions.
     applicationId: string
     status: $Enums.AIInterviewStatus
     transcript: string | null
+    questionCount: number
     summary: string | null
     startedAt: Date | null
     completedAt: Date | null
@@ -1086,6 +1123,7 @@ export interface AIInterviewSessionFieldRefs {
   readonly applicationId: Prisma.FieldRef<"AIInterviewSession", 'String'>
   readonly status: Prisma.FieldRef<"AIInterviewSession", 'AIInterviewStatus'>
   readonly transcript: Prisma.FieldRef<"AIInterviewSession", 'String'>
+  readonly questionCount: Prisma.FieldRef<"AIInterviewSession", 'Int'>
   readonly summary: Prisma.FieldRef<"AIInterviewSession", 'String'>
   readonly startedAt: Prisma.FieldRef<"AIInterviewSession", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"AIInterviewSession", 'DateTime'>

@@ -184,6 +184,7 @@ export const AIInterviewSessionScalarFieldEnum = {
   applicationId: 'applicationId',
   status: 'status',
   transcript: 'transcript',
+  questionCount: 'questionCount',
   summary: 'summary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',

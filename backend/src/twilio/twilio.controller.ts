@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Param, Post, Query, Res } from '@nestjs/common';
 import { TwilioService } from './twilio.service.js';
 import { ConfigService } from '@nestjs/config';
 import { Public } from '../auth/decorators/public.decorator.js';
@@ -9,35 +9,7 @@ import { InterviewsService } from '../interviews/interviews.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 @Controller('twilio')
 export class TwilioController {
-  constructor(
-    private readonly twilio: TwilioService,
-    private readonly aiInterviewsService: AiInterviewService,
-  ) {}
+  constructor(private readonly twilio: TwilioService) {}
 
-  @Post('test-call')
-  @Public()
-  async testCall() {
-    return this.twilio.makeTestCall();
-  }
-  @Post(':id/start-call')
-  @Roles(UserRole.MANAGER)
-  startCall(@Param('id') applicationId: string) {
-    return this.aiInterviewsService.startAiCall(applicationId);
-  }
-
-  @Post('voice')
-  @Public()
-  voice(@Res() res: ExpressResponse) {
-    const twiml = `
-    <Response>
-      <Say voice="alice">
-        Hello, this is your AI interview assistant.
-        We will begin your interview shortly.
-      </Say>
-    </Response>
-  `;
-
-    res.type('text/xml');
-    res.send(twiml);
-  }
+  
 }

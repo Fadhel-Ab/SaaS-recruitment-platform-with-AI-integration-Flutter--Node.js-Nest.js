@@ -27,7 +27,7 @@ model Job {
   requirements String
 
   location       String?
-  employmentType EmploymentType 
+  employmentType EmploymentType
   isActive       Boolean        @default(true)
 
   shareToken String @unique
@@ -135,9 +135,9 @@ model AIInterviewSession {
 
   status AIInterviewStatus @default(PENDING)
 
-  transcript String?
-
-  summary String?
+  transcript    String?
+  questionCount Int     @default(0)
+  summary       String?
 
   startedAt DateTime?
 

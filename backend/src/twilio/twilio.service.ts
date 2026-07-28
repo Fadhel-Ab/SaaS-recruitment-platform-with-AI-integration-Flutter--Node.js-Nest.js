@@ -15,8 +15,8 @@ export class TwilioService {
 
   async makeCall(to: string, applicationId?: string) {
     const url = applicationId
-      ? `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/twilio/voice?applicationId=${applicationId}`
-      : `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/twilio/voice`;
+      ? `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice?applicationId=${applicationId}`
+      : `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice`;
 
     return this.client.calls.create({
       to,

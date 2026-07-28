@@ -82,7 +82,6 @@ export class ApplicationsService {
       },
     });
 
-    
     try {
       await this.aiService.processApplication(application.id);
 
@@ -99,7 +98,7 @@ export class ApplicationsService {
           applicationId: application.id,
         });
 
-        await this.twilio.makeCall(application.candidate.phone, application.id);
+        await this.aiInterviewService.startAiCall(application.id);
       }
     } catch (error) {
       console.error('AI processing failed:', error);

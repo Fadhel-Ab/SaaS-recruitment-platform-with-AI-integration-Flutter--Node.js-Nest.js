@@ -110,27 +110,47 @@ export class AiInterviewService {
     };
   }
 
-  async startAiCall(interviewId: string) {
-    const interview = await this.prisma.interview.findUnique({
+  async startAiCall(applicationId: string) {
+    console.log('call function accessed ?');
+    const application = await this.prisma.application.findUnique({
       where: {
-        id: interviewId,
+        id: applicationId,
       },
       include: {
-        application: {
-          include: {
-            candidate: true,
-          },
-        },
+        candidate: true,
       },
     });
 
-    if (!interview) {
-      throw new NotFoundException('Interview not found');
+    if (!application) {
+      throw new NotFoundException('Application not found');
     }
 
-    return this.twilioService.makeCall(
-      interview.application.candidate.phone,
-      interview.id,
-    );
+    return this.twilioService.makeCall('+97336317176', application.id);
+  }
+
+  async saveAnswer(applicationId: string, answer: string) {
+    const session = await this.prisma.aIInterviewSession.findUnique({
+      where: {
+        applicationId,
+      },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Interview session not found');
+    }
+
+    return this.prisma.aIInterviewSession.update({
+      where: {
+        applicationId,
+      },
+
+      data: {
+        transcript: `${session.transcript ?? ''}\nCandidate: ${answer}`,
+
+        questionCount: {
+          increment: 1,
+        },
+      },
+    });
   }
 }
