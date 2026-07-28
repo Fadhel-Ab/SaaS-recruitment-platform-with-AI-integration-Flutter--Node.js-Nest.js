@@ -8,12 +8,14 @@ import {
 import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { TwilioService } from '../twilio/twilio.service.js';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AiInterviewService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
     private twilioService: TwilioService,
+    private config: ConfigService,
   ) {}
 
   async start(dto: StartInterviewDto) {
@@ -125,7 +127,10 @@ export class AiInterviewService {
       throw new NotFoundException('Application not found');
     }
 
-    return this.twilioService.makeCall('+97336317176', application.id);
+    return this.twilioService.makeCall(
+      this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!,
+      application.id,
+    );
   }
 
   async saveAnswer(applicationId: string, answer: string) {
