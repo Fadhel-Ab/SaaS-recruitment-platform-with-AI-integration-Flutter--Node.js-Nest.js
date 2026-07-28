@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { StartInterviewDto } from './dto/start_interview.dto.js';
-import { AIInterviewStatus } from '../generated/prisma/enums.js';
+import {
+  AIInterviewStatus,
+  ApplicationStatus,
+} from '../generated/prisma/enums.js';
 import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
 @Injectable()
@@ -94,7 +97,7 @@ export class AiInterviewService {
       },
 
       data: {
-        status: 'INTERVIEW_COMPLETED',
+        status: ApplicationStatus.INTERVIEW_COMPLETED,
       },
     });
 

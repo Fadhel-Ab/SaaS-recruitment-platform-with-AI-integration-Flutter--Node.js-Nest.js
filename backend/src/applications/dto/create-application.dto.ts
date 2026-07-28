@@ -10,6 +10,6 @@ export class CreateApplicationDto {
   @IsNotEmpty()
   phone: string;
 
-  @IsUrl()
+  @IsNotEmpty()
   resumeFileName: string;
 }

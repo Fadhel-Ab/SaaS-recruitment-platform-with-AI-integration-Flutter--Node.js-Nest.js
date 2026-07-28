@@ -4,18 +4,23 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
 import { allowedTransitions } from './utils/status-transition.js';
+import { TwilioService } from '../twilio/twilio.service.js';
+import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 
 @Injectable()
 export class ApplicationsService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
+    private twilio: TwilioService,
+    private aiInterviewService: AiInterviewService,
+    private config: ConfigService,
   ) {}
 
   async apply(shareToken: string, dto: CreateApplicationDto) {
@@ -72,8 +77,33 @@ export class ApplicationsService {
         candidateId: candidate.id,
         jobId: job.id,
       },
+      include: {
+        candidate: true,
+      },
     });
-    await this.aiService.processApplication(application.id);
+
+    
+    try {
+      await this.aiService.processApplication(application.id);
+
+      const aiScore = await this.prisma.aIScore.findUnique({
+        where: {
+          applicationId: application.id,
+        },
+      });
+
+      const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+
+      if (aiScore && aiScore.cvScore >= threshold) {
+        await this.aiInterviewService.start({
+          applicationId: application.id,
+        });
+
+        await this.twilio.makeCall(application.candidate.phone, application.id);
+      }
+    } catch (error) {
+      console.error('AI processing failed:', error);
+    }
 
     return application;
   }

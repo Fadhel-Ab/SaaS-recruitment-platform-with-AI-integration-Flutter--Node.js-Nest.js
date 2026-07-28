@@ -19,6 +19,7 @@ import { StorageModule } from './common/storage/storage.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { AiInterviewModule } from './ai-interview/ai-interview.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
+import { TwilioModule } from './twilio/twilio.module.js';
 
 ConfigModule.forRoot({
   isGlobal: true,
@@ -42,6 +43,7 @@ ConfigModule.forRoot({
     CommonModule,
     AiInterviewModule,
     DashboardModule,
+    TwilioModule,
   ],
   controllers: [AppController],
   providers: [

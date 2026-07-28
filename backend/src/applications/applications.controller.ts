@@ -20,6 +20,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Public } from '../auth/decorators/public.decorator.js';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -47,6 +48,7 @@ export class ApplicationsController {
   }
 
   @Post('upload')
+  @Public()
   @UseInterceptors(FileInterceptor('cvs', multerConfig))
   uploadCv(@UploadedFile() file: Express.Multer.File) {
     return {
@@ -55,6 +57,7 @@ export class ApplicationsController {
   }
 
   @Post(':shareToken')
+  @Public()
   apply(
     @Param('shareToken') shareToken: string,
     @Body() dto: CreateApplicationDto,
@@ -70,6 +73,6 @@ export class ApplicationsController {
     @Body()
     dto: UpdateApplicationStatusDto,
   ) {
-    return this.applicationsService.updateStatus(user.id,applicationId, dto);
+    return this.applicationsService.updateStatus(user.id, applicationId, dto);
   }
 }

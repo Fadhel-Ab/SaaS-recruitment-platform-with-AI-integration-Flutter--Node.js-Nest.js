@@ -19,13 +19,16 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
   ) async {
     emit(state.copyWith(status: ApplicationStatus.uploading));
     try {
+      print('bloc working ?');
       final result = await repository.uploadCv(
         path: event.path,
         bytes: event.bytes,
         fileName: event.fileName,
       );
+      print('bloc finished');
       emit(state.copyWith(status: ApplicationStatus.success, fileName: result));
     } catch (e) {
+      print('failed ? ${e.toString()}');
       emit(
         state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
       );
