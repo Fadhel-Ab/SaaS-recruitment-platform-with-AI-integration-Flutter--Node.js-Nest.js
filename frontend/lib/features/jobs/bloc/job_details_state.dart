@@ -24,4 +24,5 @@ class JobDetailsState {
       error: error ?? this.error,
     );
   }
+
 }

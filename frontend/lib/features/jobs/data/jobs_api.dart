@@ -12,9 +12,12 @@ class JobsApi {
     return response.data;
   }
 
-  Future<JobModel> getJob(String shareToken) async {
-    final response = await dio.get('/jobs/$shareToken');
+  Future<dynamic> getJob(String shareToken) async {
+    final response = await dio.get('/$shareToken');
 
-    return JobModel.fromJson(response.data);
+    print(response.statusCode);
+    print(response.data);
+
+    return response.data;
   }
 }

@@ -21,20 +21,20 @@ model User {
 }
 
 model Job {
-  id           String @id @default(uuid())
-  title        String
-  description  String
-  requirements String
-
+  id             String         @id @default(uuid())
+  title          String
+  description    String
+  requirements   String
+  companyName    String         @default("anonymous")
   location       String?
   employmentType EmploymentType
   isActive       Boolean        @default(true)
-
-  shareToken String @unique
-  managerId  String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  skillLevel     SkillLevel     @default(ENTRY)
+  shareToken     String         @unique
+  managerId      String
+  status         JobStatus      @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   applications Application[]
   manager      User          @relation(fields: managerId, references: id)
@@ -157,6 +157,13 @@ enum UserRole {
   CANDIDATE
 }
 
+enum SkillLevel {
+  ENTRY
+  INTERMEDIATE
+  SENIOR
+  EXPERT
+}
+
 enum ApplicationStatus {
   PENDING
   SHORTLISTED
@@ -189,4 +196,10 @@ enum EmploymentType {
   CONTRACT
   INTERNSHIP
   REMOTE
+}
+
+enum JobStatus {
+  ACTIVE
+  EXPIRED
+  FULFILLED
 }

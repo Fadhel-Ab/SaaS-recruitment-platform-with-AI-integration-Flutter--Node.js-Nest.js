@@ -18,8 +18,9 @@ export class JobsService {
         description: dto.description,
         requirements: dto.requirements,
         employmentType: dto.employmentType,
+        companyName: dto.companyName,
+        skillLevel: dto.skillLevel,
         managerId: userId,
-
         shareToken: uuid(),
       },
     });
@@ -28,20 +29,27 @@ export class JobsService {
   async getAvailableJobs() {
     return this.prisma.job.findMany({
       where: {
-        isActive: true,
+        status: 'ACTIVE',
       },
       select: {
         id: true,
         title: true,
+        companyName: true,
+        skillLevel: true,
+        status: true,
+
+        _count: {
+          select: {
+            applications: true,
+          },
+        },
+
         location: true,
         employmentType: true,
         description: true,
         requirements: true,
         shareToken: true,
         createdAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
   }
@@ -55,13 +63,35 @@ export class JobsService {
       },
     });
   }
-
   async findByToken(token: string) {
-    return this.prisma.job.findUnique({
+    const job = await this.prisma.job.findUnique({
       where: {
         shareToken: token,
       },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        requirements: true,
+        location: true,
+        employmentType: true,
+        companyName: true,
+        skillLevel: true,
+        status: true,
+        shareToken: true,
+        createdAt: true,
+
+        _count: {
+          select: {
+            applications: true,
+          },
+        },
+      },
     });
+
+    console.log('JOB FOUND:', job);
+
+    return job;
   }
 
   async getApplications(jobId: string) {

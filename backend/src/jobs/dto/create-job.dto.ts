@@ -1,5 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
-import { EmploymentType } from '../../generated/prisma/enums.js';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { EmploymentType, SkillLevel } from '../../generated/prisma/enums.js';
 
 export class CreateJobDto {
   @IsNotEmpty()
@@ -13,4 +13,10 @@ export class CreateJobDto {
 
   @IsNotEmpty()
   employmentType: EmploymentType;
+
+  @IsNotEmpty()
+  companyName: string;
+
+  @IsEnum(SkillLevel)
+  skillLevel: SkillLevel;
 }

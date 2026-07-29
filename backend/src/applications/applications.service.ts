@@ -12,6 +12,7 @@ import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.
 import { allowedTransitions } from './utils/status-transition.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
+import type { AIScore } from '../generated/prisma/client.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -22,7 +23,6 @@ export class ApplicationsService {
     private aiInterviewService: AiInterviewService,
     private config: ConfigService,
   ) {}
-
   async apply(shareToken: string, dto: CreateApplicationDto) {
     const job = await this.prisma.job.findUnique({
       where: {
@@ -72,6 +72,7 @@ export class ApplicationsService {
     if (existing) {
       throw new ConflictException('Already applied to this job');
     }
+
     const application = await this.prisma.application.create({
       data: {
         candidateId: candidate.id,
@@ -82,16 +83,18 @@ export class ApplicationsService {
       },
     });
 
+    let aiScore: AIScore | null = null;
+
+    const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+
     try {
       await this.aiService.processApplication(application.id);
 
-      const aiScore = await this.prisma.aIScore.findUnique({
+      aiScore = await this.prisma.aIScore.findUnique({
         where: {
           applicationId: application.id,
         },
       });
-
-      const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
 
       if (aiScore && aiScore.cvScore >= threshold) {
         await this.aiInterviewService.start({
@@ -104,7 +107,20 @@ export class ApplicationsService {
       console.error('AI processing failed:', error);
     }
 
-    return application;
+    return {
+      applicationId: application.id,
+
+      status: application.status,
+
+      aiScore: aiScore
+        ? {
+            cvScore: aiScore.cvScore,
+            overallScore: aiScore.overallScore,
+          }
+        : null,
+
+      interviewStarted: aiScore !== null && aiScore.cvScore >= threshold,
+    };
   }
 
   async updateStatus(

@@ -17,6 +17,16 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const SkillLevel = {
+  ENTRY: 'ENTRY',
+  INTERMEDIATE: 'INTERMEDIATE',
+  SENIOR: 'SENIOR',
+  EXPERT: 'EXPERT'
+} as const
+
+export type SkillLevel = (typeof SkillLevel)[keyof typeof SkillLevel]
+
+
 export const ApplicationStatus = {
   PENDING: 'PENDING',
   SHORTLISTED: 'SHORTLISTED',
@@ -61,3 +71,12 @@ export const EmploymentType = {
 } as const
 
 export type EmploymentType = (typeof EmploymentType)[keyof typeof EmploymentType]
+
+
+export const JobStatus = {
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+  FULFILLED: 'FULFILLED'
+} as const
+
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]

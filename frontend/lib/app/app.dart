@@ -10,7 +10,7 @@ class RecruitmentApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Recruitment Platform',
 
-      theme: AppTheme.light,
+      theme: AppTheme.lightTheme,
 
       routerConfig: appRouter,
 

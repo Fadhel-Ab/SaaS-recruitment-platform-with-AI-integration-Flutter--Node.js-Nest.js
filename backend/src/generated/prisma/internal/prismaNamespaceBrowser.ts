@@ -95,11 +95,14 @@ export const JobScalarFieldEnum = {
   title: 'title',
   description: 'description',
   requirements: 'requirements',
+  companyName: 'companyName',
   location: 'location',
   employmentType: 'employmentType',
   isActive: 'isActive',
+  skillLevel: 'skillLevel',
   shareToken: 'shareToken',
   managerId: 'managerId',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
