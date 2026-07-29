@@ -77,7 +77,6 @@ export class AiInterviewController {
   // --------------------------
   // EVERY OTHER QUESTION
   // --------------------------
-
   @Post('answer')
   @Public()
   async answer(
@@ -85,6 +84,36 @@ export class AiInterviewController {
     @Body() body,
     @Res() res: ExpressResponse,
   ) {
+    // Handle no speech detected
+    if (!body.SpeechResult) {
+      const twiml = `
+<Response>
+
+  <Gather
+    input="speech"
+    action="/api/ai-interview/answer?applicationId=${applicationId}"
+    method="POST"
+    timeout="10"
+    speechTimeout="auto">
+
+    <Say voice="Polly.Joanna-Neural">
+      I did not hear your answer. Please try again.
+    </Say>
+
+  </Gather>
+
+  <Say voice="Polly.Joanna-Neural">
+    I did not receive an answer. Goodbye.
+  </Say>
+
+</Response>
+`;
+
+      res.type('text/xml');
+      return res.send(twiml);
+    }
+
+    // Save candidate answer
     const session = await this.aiInterviewService.saveAnswer(
       applicationId,
       body.SpeechResult,
@@ -118,8 +147,10 @@ export class AiInterviewController {
       return res.send(twiml);
     }
 
+    // Generate next AI question
     const nextQuestion =
       await this.aiService.generateInterviewQuestion(applicationId);
+
     await this.aiInterviewService.saveQuestion(applicationId, nextQuestion);
 
     const twiml = `
@@ -129,17 +160,16 @@ export class AiInterviewController {
     input="speech"
     action="/api/ai-interview/answer?applicationId=${applicationId}"
     method="POST"
+    timeout="10"
     speechTimeout="auto">
 
     <Say voice="Polly.Joanna-Neural">
-
       ${nextQuestion}
-
     </Say>
 
   </Gather>
 
-  <Say>
+  <Say voice="Polly.Joanna-Neural">
     I did not hear a response. Goodbye.
   </Say>
 
