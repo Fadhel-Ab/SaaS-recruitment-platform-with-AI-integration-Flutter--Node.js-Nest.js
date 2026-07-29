@@ -61,4 +61,24 @@ export class AiService {
   async evaluateInterview(transcript: string) {
     return this.aiProvider.analyzeInterview(transcript);
   }
+  async generateInterviewQuestion(applicationId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        job: true,
+        aiInterview: true,
+      },
+    });
+
+    if (!application) {
+      throw new Error('Application not found');
+    }
+
+    return this.aiProvider.generateInterviewQuestion(
+      application.job.description,
+      application.aiInterview?.transcript ?? '',
+    );
+  }
 }

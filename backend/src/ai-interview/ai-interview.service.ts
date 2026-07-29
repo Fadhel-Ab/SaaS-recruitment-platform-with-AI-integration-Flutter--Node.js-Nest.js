@@ -158,4 +158,25 @@ export class AiInterviewService {
       },
     });
   }
+  async saveQuestion(applicationId: string, question: string) {
+    const session = await this.prisma.aIInterviewSession.findUnique({
+      where: {
+        applicationId,
+      },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Interview session not found');
+    }
+
+    return this.prisma.aIInterviewSession.update({
+      where: {
+        applicationId,
+      },
+
+      data: {
+        transcript: `${session.transcript ?? ''}\nInterviewer: ${question}`,
+      },
+    });
+  }
 }

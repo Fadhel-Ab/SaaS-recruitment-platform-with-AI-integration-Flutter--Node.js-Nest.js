@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { GoogleGenAI } from '@google/genai';
 import { buildResumePrompt } from './prompts/resume-analysis.prompt.js';
 import { ResumeAnalysis } from './interfaces/resume-analysis.interface.js';
-import { buildInterviewPrompt } from './prompts/interview-analysis.prompt.js';
+import {
+  buildInterviewPrompt,
+  buildInterviewQuestionPrompt,
+} from './prompts/interview-analysis.prompt.js';
 import { InterviewAnalysis } from './interfaces/interview-analysis.interface.js';
 
 @Injectable()
@@ -59,5 +62,19 @@ export class AIProviderService {
     }
 
     return JSON.parse(content);
+  }
+
+  async generateInterviewQuestion(
+    jobDescription: string,
+    transcript: string,
+  ): Promise<string> {
+    const prompt = buildInterviewQuestionPrompt(jobDescription, transcript);
+
+    const response = await this.client.models.generateContent({
+      model: this.config.get<string>('GEMINI_MODEL', 'gemini-3.5-flash'),
+      contents: prompt,
+    });
+
+    return response.text?.trim() ?? '';
   }
 }
