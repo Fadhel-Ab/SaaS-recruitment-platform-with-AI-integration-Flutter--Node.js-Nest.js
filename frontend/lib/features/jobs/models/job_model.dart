@@ -7,8 +7,9 @@ class JobModel {
   final String employmentType;
   final String shareToken;
   final String? company;
-  final int? applications;
+  final int applications;
   final int? interviews;
+  final String? skillLevel;
   final String? status;
   final DateTime createdAt; // Added field
 
@@ -20,9 +21,10 @@ class JobModel {
     required this.location,
     required this.employmentType,
     required this.shareToken,
-    required this.createdAt, // Added to constructor
+    required this.createdAt,
+    required this.skillLevel, // Added to constructor
     this.company,
-    this.applications,
+    required this.applications,
     this.interviews,
     this.status,
   });
@@ -38,7 +40,7 @@ class JobModel {
       shareToken: json['shareToken'],
       company: json['company'],
       applications: json['_count']?['applications'] ?? 0,
-
+      skillLevel: json["skillLevel"],
       interviews: int.tryParse(json['interviews'] ?? ''),
       status: json['status'],
 

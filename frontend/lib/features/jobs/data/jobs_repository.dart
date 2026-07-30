@@ -1,4 +1,5 @@
 import 'package:frontend/features/jobs/data/jobs_api.dart';
+import 'package:frontend/features/jobs/models/create_job_request.dart';
 import 'package:frontend/features/jobs/models/job_model.dart';
 
 class JobsRepository {
@@ -18,7 +19,11 @@ class JobsRepository {
 
   Future<List<JobModel>> getMyJobs() async {
     final data = await api.getMyJobs();
-
+    print(data);
     return (data as List).map((json) => JobModel.fromJson(json)).toList();
+  }
+
+  Future<void> createJob(CreateJobRequest request) async {
+    await api.createJob(request.toJson());
   }
 }

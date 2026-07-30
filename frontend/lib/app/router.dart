@@ -12,9 +12,12 @@ import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_event.dart';
 import 'package:frontend/features/jobs/bloc/jobs_bloc.dart';
 import 'package:frontend/features/jobs/bloc/jobs_event.dart';
+import 'package:frontend/features/jobs/bloc/manager_jobs_bloc.dart';
+import 'package:frontend/features/jobs/bloc/manager_jobs_event.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
 import 'package:frontend/features/jobs/screens/job_details_screen.dart';
 import 'package:frontend/features/jobs/screens/jobs_screen.dart';
+import 'package:frontend/features/jobs/screens/manager_jobs_screen.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
@@ -87,6 +90,19 @@ final appRouter = GoRouter(
           },
 
           child: ApplicationScreen(shareToken: shareToken),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/manager/jobs',
+
+      builder: (context, state) {
+        return BlocProvider(
+          create: (_) =>
+              ManagerJobsBloc(context.read<JobsRepository>())
+                ..add(LoadManagerJobs()),
+
+          child: ManagerJobsScreen(),
         );
       },
     ),

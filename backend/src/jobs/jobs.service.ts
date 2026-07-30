@@ -53,11 +53,20 @@ export class JobsService {
       },
     });
   }
-  async findMine(userId: string) {
+  async findMine(managerId: string) {
     return this.prisma.job.findMany({
       where: {
-        managerId: userId,
+        managerId,
       },
+
+      include: {
+        _count: {
+          select: {
+            applications: true,
+          },
+        },
+      },
+
       orderBy: {
         createdAt: 'desc',
       },

@@ -23,5 +23,10 @@ class JobsApi {
 
     return response.data;
   }
-  
+
+  Future<dynamic> createJob(Map<String, dynamic> data) async {
+    final response = await dio.post('/jobs', data: data);
+
+    return response.data;
+  }
 }
