@@ -36,7 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _checkAuth(AuthStarted event, Emitter<AuthState> emit) async {
     print('AuthStarted received');
 
-    final token = await storage.getToken();
+    final token = await storage.readToken();
     print('Token: $token');
     if (token == null) {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
@@ -55,7 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     } catch (e) {
-      await storage.clear();
+      await storage.deleteToken();
 
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     } finally {

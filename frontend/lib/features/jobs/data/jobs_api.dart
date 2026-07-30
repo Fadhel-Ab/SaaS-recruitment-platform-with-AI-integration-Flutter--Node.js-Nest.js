@@ -17,4 +17,11 @@ class JobsApi {
 
     return response.data;
   }
+
+  Future<dynamic> getMyJobs() async {
+    final response = await dio.get('/jobs/my');
+
+    return response.data;
+  }
+  
 }

@@ -3,99 +3,144 @@ import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class DashboardService {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async getSummary(managerId: string) {
-  const jobs = await this.prisma.job.count({
-    where: {
-      managerId,
-    },
-  });
-
-  const applications = await this.prisma.application.findMany({
-    where: {
-      job: {
+  async getSummary(managerId: string) {
+    const jobs = await this.prisma.job.count({
+      where: {
         managerId,
       },
-    },
+    });
 
-    select: {
-      status: true,
-      aiScore: {
-        select: {
-          overallScore: true,
+    const applications = await this.prisma.application.findMany({
+      where: {
+        job: {
+          managerId,
         },
       },
-    },
-  });
 
-  const summary = {
-    activeJobs: jobs,
+      select: {
+        status: true,
 
-    totalApplications: applications.length,
+        aiScore: {
+          select: {
+            overallScore: true,
+          },
+        },
+      },
+    });
 
-    pendingApplications: 0,
+    // AI phone interviews
+    const aiInterviews = await this.prisma.aIInterviewSession.findMany({
+      where: {
+        application: {
+          job: {
+            managerId,
+          },
+        },
+      },
 
-    shortlisted: 0,
+      select: {
+        status: true,
+      },
+    });
 
-    interviewsScheduled: 0,
+    // Future manager interviews
+    const scheduledInterviews = await this.prisma.interview.count({
+      where: {
+        application: {
+          job: {
+            managerId,
+          },
+        },
+      },
+    });
 
-    interviewsCompleted: 0,
+    const completedInterviews = await this.prisma.interview.count({
+      where: {
+        status: 'COMPLETED',
 
-    offers: 0,
+        application: {
+          job: {
+            managerId,
+          },
+        },
+      },
+    });
 
-    hired: 0,
+    const summary = {
+      activeJobs: jobs,
 
-    rejected: 0,
+      totalApplications: applications.length,
 
-    averageAIScore: 0,
-  };
+      pendingApplications: 0,
 
-  let totalScore = 0;
-  let scoredCandidates = 0;
+      shortlisted: 0,
 
-  for (const application of applications) {
-    switch (application.status) {
-      case 'PENDING':
-        summary.pendingApplications++;
-        break;
+      // AI interviews
+      aiInterviews: aiInterviews.length,
 
-      case 'SHORTLISTED':
-        summary.shortlisted++;
-        break;
+      completedAIInterviews: 0,
 
-      case 'INTERVIEW_SCHEDULED':
-        summary.interviewsScheduled++;
-        break;
+      // Manager interviews
+      scheduledInterviews,
 
-      case 'INTERVIEW_COMPLETED':
-        summary.interviewsCompleted++;
-        break;
+      completedInterviews,
 
-      case 'OFFERED':
-        summary.offers++;
-        break;
+      offers: 0,
 
-      case 'HIRED':
-        summary.hired++;
-        break;
+      hired: 0,
 
-      case 'REJECTED':
-        summary.rejected++;
-        break;
+      rejected: 0,
+
+      averageAIScore: 0,
+    };
+
+    let totalScore = 0;
+    let scoredCandidates = 0;
+
+    // AI interview completion count
+    for (const interview of aiInterviews) {
+      if (interview.status === 'COMPLETED') {
+        summary.completedAIInterviews++;
+      }
     }
 
-    if (application.aiScore) {
-      totalScore += application.aiScore.overallScore;
-      scoredCandidates++;
+    // Application pipeline
+    for (const application of applications) {
+      switch (application.status) {
+        case 'PENDING':
+          summary.pendingApplications++;
+          break;
+
+        case 'SHORTLISTED':
+          summary.shortlisted++;
+          break;
+
+        case 'OFFERED':
+          summary.offers++;
+          break;
+
+        case 'HIRED':
+          summary.hired++;
+          break;
+
+        case 'REJECTED':
+          summary.rejected++;
+          break;
+      }
+
+      if (application.aiScore) {
+        totalScore += application.aiScore.overallScore;
+        scoredCandidates++;
+      }
     }
+
+    summary.averageAIScore =
+      scoredCandidates === 0
+        ? 0
+        : Number((totalScore / scoredCandidates).toFixed(2));
+
+    return summary;
   }
-
-  summary.averageAIScore =
-    scoredCandidates === 0
-      ? 0
-      : Number((totalScore / scoredCandidates).toFixed(2));
-
-  return summary;
-}
 }

@@ -3,8 +3,11 @@ import 'package:frontend/features/applications/bloc/application_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
-import 'package:frontend/features/auth/screens/dashboard_screen.dart';
 import 'package:frontend/features/auth/screens/login_screen.dart';
+import 'package:frontend/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:frontend/features/dashboard/bloc/dashboard_event.dart';
+import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
+import 'package:frontend/features/dashboard/screens/dashboard_screen.dart';
 import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_event.dart';
 import 'package:frontend/features/jobs/bloc/jobs_bloc.dart';
@@ -30,7 +33,13 @@ final appRouter = GoRouter(
       path: '/dashboard',
 
       builder: (context, state) {
-        return const DashboardScreen();
+        return BlocProvider(
+          create: (_) =>
+              DashboardBloc(context.read<DashboardRepository>())
+                ..add(LoadDashboard()),
+
+          child: const DashboardScreen(),
+        );
       },
     ),
     GoRoute(

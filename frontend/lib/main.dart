@@ -7,6 +7,8 @@ import 'package:frontend/core/storage/web_token_storage.dart';
 import 'package:frontend/features/applications/data/application_api.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
+import 'package:frontend/features/dashboard/data/dashboard_api.dart';
+import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
 import 'package:frontend/features/jobs/data/jobs_api.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
 
@@ -14,39 +16,36 @@ import 'app/app.dart';
 
 import 'core/api/dio_client.dart';
 
-import 'features/auth/data/auth_api.dart';
+import 'features/auth/data/api/auth_api.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/bloc/auth_bloc.dart';
-  
-void main() {
-  final dioClient = DioClient();
 
+void main() {
   final TokenStorage tokenStorage = kIsWeb
       ? WebTokenStorage()
       : SecureTokenStorage();
 
-  // Auth
+  final dioClient = DioClient(tokenStorage);
   final authApi = AuthApi(dioClient.dio);
-
-  final authRepository = AuthRepository(authApi, tokenStorage);
-
-  // Jobs
   final jobsApi = JobsApi(dioClient.dio);
-
-  final jobsRepository = JobsRepository(jobsApi);
-
-  // Application
+  final dashboardApi = DashboardApi(dioClient.dio);
   final applicationApi = ApplicationApi(dioClient.dio);
 
+  // Auth
+  final authRepository = AuthRepository(authApi, tokenStorage);
+  // Jobs
+  final jobsRepository = JobsRepository(jobsApi);
+  // dashboard
+  final dashboardRepository = DashboardRepository(dashboardApi);
+  // Application
   final applicationRepository = ApplicationRepository(applicationApi);
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepository),
-
         RepositoryProvider.value(value: jobsRepository),
-
         RepositoryProvider.value(value: applicationRepository),
+        RepositoryProvider.value(value: dashboardRepository),
       ],
 
       child: BlocProvider(

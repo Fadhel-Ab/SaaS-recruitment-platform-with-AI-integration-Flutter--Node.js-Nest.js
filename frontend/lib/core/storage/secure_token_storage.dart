@@ -10,12 +10,12 @@ class SecureTokenStorage implements TokenStorage {
   }
 
   @override
-  Future<String?> getToken() {
+  Future<String?> readToken() {
     return storage.read(key: 'access_token');
   }
 
   @override
-  Future<void> clear() {
+  Future<void> deleteToken() {
     return storage.delete(key: 'access_token');
   }
 }

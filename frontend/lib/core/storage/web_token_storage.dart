@@ -10,14 +10,14 @@ class WebTokenStorage implements TokenStorage {
   }
 
   @override
-  Future<String?> getToken() async {
+  Future<String?> readToken() async {
     final prefs = await SharedPreferences.getInstance();
 
     return prefs.getString('access_token');
   }
 
   @override
-  Future<void> clear() async {
+  Future<void> deleteToken() async {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.remove('access_token');

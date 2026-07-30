@@ -1,7 +1,7 @@
 import 'package:frontend/features/auth/data/models/user_model.dart';
 
 import '../../../core/storage/token_storage.dart';
-import 'auth_api.dart';
+import 'api/auth_api.dart';
 
 class AuthRepository {
   final AuthApi api;

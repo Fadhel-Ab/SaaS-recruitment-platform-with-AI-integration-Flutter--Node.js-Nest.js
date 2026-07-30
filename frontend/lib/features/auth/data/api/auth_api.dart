@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../../../core/api/api_constants.dart';
+import '../../../../core/api/api_constants.dart';
 
 class AuthApi {
   final Dio dio;
