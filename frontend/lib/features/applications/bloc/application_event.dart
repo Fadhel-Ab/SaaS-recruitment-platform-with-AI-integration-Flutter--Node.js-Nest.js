@@ -18,3 +18,9 @@ class SubmitApplicationRequested extends ApplicationEvent {
 
   SubmitApplicationRequested(this.shareToken, this.request);
 }
+
+class LoadApplicationJob extends ApplicationEvent {
+  final String shareToken;
+
+  LoadApplicationJob(this.shareToken);
+}

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
+import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
 import 'package:frontend/features/auth/screens/dashboard_screen.dart';
@@ -65,8 +66,17 @@ final appRouter = GoRouter(
         final shareToken = state.pathParameters['shareToken']!;
 
         return BlocProvider(
-          create: (context) =>
-              ApplicationBloc(context.read<ApplicationRepository>()),
+          create: (context) {
+            final bloc = ApplicationBloc(
+              context.read<ApplicationRepository>(),
+              context.read<JobsRepository>(),
+            );
+
+            bloc.add(LoadApplicationJob(shareToken));
+
+            return bloc;
+          },
+
           child: ApplicationScreen(shareToken: shareToken),
         );
       },

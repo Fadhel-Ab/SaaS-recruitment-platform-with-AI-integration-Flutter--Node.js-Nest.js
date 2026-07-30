@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_state.dart';
-import 'package:frontend/features/jobs/models/job_model.dart';
 import 'package:go_router/go_router.dart';
 
 class JobDetailsScreen extends StatelessWidget {
@@ -20,7 +19,6 @@ class JobDetailsScreen extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<JobDetailsBloc, JobDetailsState>(
           builder: (context, state) {
-            print("hello ${state.job}");
             if (state.status == JobDetailsStatus.loading) {
               return const Center(
                 child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
@@ -37,7 +35,6 @@ class JobDetailsScreen extends StatelessWidget {
             }
 
             final job = state.job;
-            print(job?.applications);
             if (job == null) {
               return const Center(
                 child: Text(
@@ -296,7 +293,7 @@ class JobDetailsScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => context.push('/apply/${job.shareToken}'),
+                onPressed: () => context.go('/apply/${job.shareToken}'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(
                     0xFF4F46E5,

@@ -113,6 +113,20 @@ export class AiInterviewService {
   }
 
   async startAiCall(applicationId: string) {
+    let session = await this.prisma.aIInterviewSession.findUnique({
+      where: {
+        applicationId,
+      },
+    });
+
+    if (!session) {
+      session = await this.prisma.aIInterviewSession.create({
+        data: {
+          applicationId,
+          status: 'IN_PROGRESS',
+        },
+      });
+    }
     console.log('call function accessed ?');
     const application = await this.prisma.application.findUnique({
       where: {

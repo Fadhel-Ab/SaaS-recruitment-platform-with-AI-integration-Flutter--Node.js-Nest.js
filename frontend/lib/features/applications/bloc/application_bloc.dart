@@ -4,13 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/bloc/application_state.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
+import 'package:frontend/features/jobs/data/jobs_repository.dart';
 
 class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
   final ApplicationRepository repository;
-  ApplicationBloc(this.repository) : super(const ApplicationState()) {
-    print('Application bloc works');
+  final JobsRepository jobsRepository;
+  ApplicationBloc(this.repository, this.jobsRepository)
+    : super(const ApplicationState()) {
     on<UploadCvRequested>(_upload);
     on<SubmitApplicationRequested>(_submit);
+    on<LoadApplicationJob>(_loadJob);
   }
 
   FutureOr<void> _upload(
@@ -19,16 +22,14 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
   ) async {
     emit(state.copyWith(status: ApplicationStatus.uploading));
     try {
-      print('bloc working ?');
       final result = await repository.uploadCv(
         path: event.path,
         bytes: event.bytes,
         fileName: event.fileName,
       );
-      print('bloc finished');
+
       emit(state.copyWith(status: ApplicationStatus.success, fileName: result));
     } catch (e) {
-      print('failed ? ${e.toString()}');
       emit(
         state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
       );
@@ -41,11 +42,25 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
   ) async {
     emit(state.copyWith(status: ApplicationStatus.submitting));
     try {
-      final result = await repository.submitApplication(
-        event.shareToken,
-        event.request,
-      );
+      await repository.submitApplication(event.shareToken, event.request);
       emit(state.copyWith(status: ApplicationStatus.success));
+    } catch (e) {
+      emit(
+        state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
+      );
+    }
+  }
+
+  Future<void> _loadJob(
+    LoadApplicationJob event,
+    Emitter<ApplicationState> emit,
+  ) async {
+    emit(state.copyWith(status: ApplicationStatus.loadingJob));
+
+    try {
+      final job = await jobsRepository.getJob(event.shareToken);
+
+      emit(state.copyWith(status: ApplicationStatus.initial, job: job));
     } catch (e) {
       emit(
         state.copyWith(status: ApplicationStatus.failure, error: e.toString()),

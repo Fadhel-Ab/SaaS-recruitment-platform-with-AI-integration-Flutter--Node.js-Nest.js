@@ -53,7 +53,11 @@ export class AiInterviewController {
     input="speech"
     action="/api/ai-interview/answer?applicationId=${applicationId}"
     method="POST"
-    speechTimeout="auto">
+    speechTimeout="5"
+    speechModel="phone_call"
+    enhanced="true"
+    language="en-US">
+    
 
     <Say voice="Polly.Joanna-Neural">
       Hello, this is your AI interview assistant.
@@ -93,8 +97,12 @@ export class AiInterviewController {
     input="speech"
     action="/api/ai-interview/answer?applicationId=${applicationId}"
     method="POST"
-    timeout="10"
-    speechTimeout="auto">
+    timeout="5"
+    speechTimeout="auto"
+    speechModel="phone_call"
+    enhanced="true"
+    language="en-US">
+    
 
     <Say voice="Polly.Joanna-Neural">
       I did not hear your answer. Please try again.
@@ -160,8 +168,12 @@ export class AiInterviewController {
     input="speech"
     action="/api/ai-interview/answer?applicationId=${applicationId}"
     method="POST"
-    timeout="10"
-    speechTimeout="auto">
+    timeout="5"
+    speechTimeout="auto"
+    speechModel="phone_call"
+    enhanced="true"
+    language="en-US">
+   
 
     <Say voice="Polly.Joanna-Neural">
       ${nextQuestion}

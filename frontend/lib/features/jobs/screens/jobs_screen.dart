@@ -46,7 +46,7 @@ class _JobsScreenState extends State<JobsScreen> {
                 buttonLabel: 'Post a New Job',
                 isDesktop: isDesktop,
                 onButtonPressed: () {
-                  context.push('/jobs/new');
+                  context.go('/jobs/new');
                 },
               ),
               const SizedBox(height: 20),
@@ -162,7 +162,7 @@ class _JobsScreenState extends State<JobsScreen> {
                   index: index,
                   isDesktop: isDesktop,
                   onTap: () {
-                    context.push('/jobs/${job.shareToken}');
+                    context.go('/jobs/${job.shareToken}');
                   },
                 );
               },

@@ -17,7 +17,7 @@ import 'core/api/dio_client.dart';
 import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/bloc/auth_bloc.dart';
-
+  
 void main() {
   final dioClient = DioClient();
 
@@ -40,22 +40,20 @@ void main() {
 
   final applicationRepository = ApplicationRepository(applicationApi);
   runApp(
-    RepositoryProvider(
-      create: (_) => authRepository,
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authRepository),
 
-      child: RepositoryProvider(
-        create: (_) => jobsRepository,
+        RepositoryProvider.value(value: jobsRepository),
 
-        child: RepositoryProvider(
-          create: (_) => applicationRepository,
-          child: BlocProvider(
-            create: (_) =>
-                AuthBloc(authRepository, tokenStorage)
-                  ..add(const AuthStarted()),
+        RepositoryProvider.value(value: applicationRepository),
+      ],
 
-            child: const RecruitmentApp(),
-          ),
-        ),
+      child: BlocProvider(
+        create: (_) =>
+            AuthBloc(authRepository, tokenStorage)..add(const AuthStarted()),
+
+        child: const RecruitmentApp(),
       ),
     ),
   );

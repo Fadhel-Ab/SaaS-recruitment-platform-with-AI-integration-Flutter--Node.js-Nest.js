@@ -9,6 +9,7 @@ import 'package:frontend/features/applications/model/create_application_request.
 import 'package:frontend/features/applications/widgets/ai_call_waiting_overlay.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
 import 'package:frontend/features/applications/widgets/resume_upload_zone.dart';
+import 'package:frontend/features/jobs/models/job_model.dart';
 import 'package:frontend/widgets/status_dialog.dart';
 
 class ApplicationScreen extends StatefulWidget {
@@ -25,7 +26,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
-
   String? filePath;
   String? fileName;
   Uint8List? fileBytes;
@@ -164,21 +164,39 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Apply for Position',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF111827),
-                                ),
+                              // 👇 REPLACE THE STATIC TEXT WIDGETS WITH THIS BLOCBUILDER
+                              BlocBuilder<ApplicationBloc, ApplicationState>(
+                                builder: (context, state) {
+                                  final jobTitle =
+                                      state.job?.title ?? 'this role';
+                                  final companyName = state.job?.company != null
+                                      ? ' at ${state.job!.company}'
+                                      : '';
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Apply for $jobTitle$companyName',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF111827),
+                                        ),
+                                      ),
+                                      const Text(
+                                        'Please complete all fields carefully.',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF6B7280),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
-                              const Text(
-                                'Please complete all fields carefully.',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF6B7280),
-                                ),
-                              ),
+
                               const SizedBox(height: 8),
 
                               const FormLabel(label: 'Full Name'),

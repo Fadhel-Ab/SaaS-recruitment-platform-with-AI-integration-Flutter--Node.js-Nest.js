@@ -17,12 +17,15 @@ export class TwilioService {
     const url = applicationId
       ? `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice?applicationId=${applicationId}`
       : `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice`;
-
-    return this.client.calls.create({
+    console.log('Creating call...');
+    const call = await this.client.calls.create({
       to,
       from: this.config.get<string>('TWILIO_PHONE_NUMBER')!,
       url,
     });
+    console.log('Twilio SID:', call.sid);
+    console.log('Twilio status:', call.status);
+    return call;
   }
   async makeTestCall() {
     return this.makeCall(this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!);

@@ -15,9 +15,6 @@ class JobsApi {
   Future<dynamic> getJob(String shareToken) async {
     final response = await dio.get('/$shareToken');
 
-    print(response.statusCode);
-    print(response.data);
-
     return response.data;
   }
 }
