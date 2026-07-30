@@ -8,6 +8,7 @@ import 'package:frontend/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:frontend/features/dashboard/bloc/dashboard_event.dart';
 import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
 import 'package:frontend/features/dashboard/screens/dashboard_screen.dart';
+import 'package:frontend/features/jobs/bloc/create_job_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_event.dart';
 import 'package:frontend/features/jobs/bloc/jobs_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:frontend/features/jobs/bloc/jobs_event.dart';
 import 'package:frontend/features/jobs/bloc/manager_jobs_bloc.dart';
 import 'package:frontend/features/jobs/bloc/manager_jobs_event.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
+import 'package:frontend/features/jobs/screens/create_job_screen.dart';
 import 'package:frontend/features/jobs/screens/job_details_screen.dart';
 import 'package:frontend/features/jobs/screens/jobs_screen.dart';
 import 'package:frontend/features/jobs/screens/manager_jobs_screen.dart';
@@ -103,6 +105,17 @@ final appRouter = GoRouter(
                 ..add(LoadManagerJobs()),
 
           child: ManagerJobsScreen(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/manager/create-job',
+
+      builder: (context, state) {
+        return BlocProvider(
+          create: (_) => CreateJobBloc(context.read<JobsRepository>()),
+
+          child: const CreateJobScreen(),
         );
       },
     ),

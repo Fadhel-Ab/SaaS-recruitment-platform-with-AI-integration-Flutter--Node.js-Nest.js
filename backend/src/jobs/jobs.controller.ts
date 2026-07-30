@@ -19,6 +19,7 @@ export class JobsController {
   @Post()
   @Roles(UserRole.MANAGER)
   create(@CurrentUser() user, @Body() dto: CreateJobDto) {
+    console.log('CURRENT USER:', user);
     return this.jobsService.create(user.id, dto);
   }
 

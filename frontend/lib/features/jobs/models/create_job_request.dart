@@ -5,6 +5,7 @@ class CreateJobRequest {
   final String employmentType;
   final String companyName;
   final String skillLevel;
+  final String location;
 
   CreateJobRequest({
     required this.title,
@@ -13,6 +14,7 @@ class CreateJobRequest {
     required this.employmentType,
     required this.companyName,
     required this.skillLevel,
+    required this.location,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class CreateJobRequest {
       'employmentType': employmentType,
       'companyName': companyName,
       'skillLevel': skillLevel,
+      'location': location,
     };
   }
 }

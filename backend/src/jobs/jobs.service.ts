@@ -10,22 +10,33 @@ export class JobsService {
     private prisma: PrismaService,
     private storageService: StorageService,
   ) {}
-
   async create(userId: string, dto: CreateJobDto) {
+    console.log('Creating job for user:', userId);
     return this.prisma.job.create({
       data: {
         title: dto.title,
+
         description: dto.description,
+
         requirements: dto.requirements,
+
         employmentType: dto.employmentType,
+
         companyName: dto.companyName,
+
         skillLevel: dto.skillLevel,
-        managerId: userId,
+        location: dto.location,
+
         shareToken: uuid(),
+
+        manager: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
   }
-
   async getAvailableJobs() {
     return this.prisma.job.findMany({
       where: {

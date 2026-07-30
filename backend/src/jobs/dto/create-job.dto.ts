@@ -17,6 +17,9 @@ export class CreateJobDto {
   @IsNotEmpty()
   companyName: string;
 
+  @IsNotEmpty()
+  location: string;
+
   @IsEnum(SkillLevel)
   skillLevel: SkillLevel;
 }
