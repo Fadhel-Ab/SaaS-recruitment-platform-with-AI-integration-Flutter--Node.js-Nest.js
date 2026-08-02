@@ -40,8 +40,6 @@ export type AvailabilityMinAggregateOutputType = {
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
-  createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type AvailabilityMaxAggregateOutputType = {
@@ -50,8 +48,6 @@ export type AvailabilityMaxAggregateOutputType = {
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
-  createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type AvailabilityCountAggregateOutputType = {
@@ -60,8 +56,6 @@ export type AvailabilityCountAggregateOutputType = {
   dayOfWeek: number
   startTime: number
   endTime: number
-  createdAt: number
-  updatedAt: number
   _all: number
 }
 
@@ -80,8 +74,6 @@ export type AvailabilityMinAggregateInputType = {
   dayOfWeek?: true
   startTime?: true
   endTime?: true
-  createdAt?: true
-  updatedAt?: true
 }
 
 export type AvailabilityMaxAggregateInputType = {
@@ -90,8 +82,6 @@ export type AvailabilityMaxAggregateInputType = {
   dayOfWeek?: true
   startTime?: true
   endTime?: true
-  createdAt?: true
-  updatedAt?: true
 }
 
 export type AvailabilityCountAggregateInputType = {
@@ -100,8 +90,6 @@ export type AvailabilityCountAggregateInputType = {
   dayOfWeek?: true
   startTime?: true
   endTime?: true
-  createdAt?: true
-  updatedAt?: true
   _all?: true
 }
 
@@ -197,8 +185,6 @@ export type AvailabilityGroupByOutputType = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt: Date
-  updatedAt: Date
   _count: AvailabilityCountAggregateOutputType | null
   _avg: AvailabilityAvgAggregateOutputType | null
   _sum: AvailabilitySumAggregateOutputType | null
@@ -230,8 +216,6 @@ export type AvailabilityWhereInput = {
   dayOfWeek?: Prisma.IntFilter<"Availability"> | number
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
-  createdAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
   manager?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -241,8 +225,6 @@ export type AvailabilityOrderByWithRelationInput = {
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   manager?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -255,8 +237,6 @@ export type AvailabilityWhereUniqueInput = Prisma.AtLeast<{
   dayOfWeek?: Prisma.IntFilter<"Availability"> | number
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
-  createdAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
   manager?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -266,8 +246,6 @@ export type AvailabilityOrderByWithAggregationInput = {
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   _count?: Prisma.AvailabilityCountOrderByAggregateInput
   _avg?: Prisma.AvailabilityAvgOrderByAggregateInput
   _max?: Prisma.AvailabilityMaxOrderByAggregateInput
@@ -284,8 +262,6 @@ export type AvailabilityScalarWhereWithAggregatesInput = {
   dayOfWeek?: Prisma.IntWithAggregatesFilter<"Availability"> | number
   startTime?: Prisma.StringWithAggregatesFilter<"Availability"> | string
   endTime?: Prisma.StringWithAggregatesFilter<"Availability"> | string
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Availability"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Availability"> | Date | string
 }
 
 export type AvailabilityCreateInput = {
@@ -293,8 +269,6 @@ export type AvailabilityCreateInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
   manager: Prisma.UserCreateNestedOneWithoutAvailabilityInput
 }
 
@@ -304,8 +278,6 @@ export type AvailabilityUncheckedCreateInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type AvailabilityUpdateInput = {
@@ -313,8 +285,6 @@ export type AvailabilityUpdateInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   manager?: Prisma.UserUpdateOneRequiredWithoutAvailabilityNestedInput
 }
 
@@ -324,8 +294,6 @@ export type AvailabilityUncheckedUpdateInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AvailabilityCreateManyInput = {
@@ -334,8 +302,6 @@ export type AvailabilityCreateManyInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type AvailabilityUpdateManyMutationInput = {
@@ -343,8 +309,6 @@ export type AvailabilityUpdateManyMutationInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AvailabilityUncheckedUpdateManyInput = {
@@ -353,8 +317,6 @@ export type AvailabilityUncheckedUpdateManyInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AvailabilityListRelationFilter = {
@@ -373,8 +335,6 @@ export type AvailabilityCountOrderByAggregateInput = {
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type AvailabilityAvgOrderByAggregateInput = {
@@ -387,8 +347,6 @@ export type AvailabilityMaxOrderByAggregateInput = {
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type AvailabilityMinOrderByAggregateInput = {
@@ -397,8 +355,6 @@ export type AvailabilityMinOrderByAggregateInput = {
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type AvailabilitySumOrderByAggregateInput = {
@@ -460,8 +416,6 @@ export type AvailabilityCreateWithoutManagerInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type AvailabilityUncheckedCreateWithoutManagerInput = {
@@ -469,8 +423,6 @@ export type AvailabilityUncheckedCreateWithoutManagerInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type AvailabilityCreateOrConnectWithoutManagerInput = {
@@ -508,8 +460,6 @@ export type AvailabilityScalarWhereInput = {
   dayOfWeek?: Prisma.IntFilter<"Availability"> | number
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
-  createdAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Availability"> | Date | string
 }
 
 export type AvailabilityCreateManyManagerInput = {
@@ -517,8 +467,6 @@ export type AvailabilityCreateManyManagerInput = {
   dayOfWeek: number
   startTime: string
   endTime: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type AvailabilityUpdateWithoutManagerInput = {
@@ -526,8 +474,6 @@ export type AvailabilityUpdateWithoutManagerInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AvailabilityUncheckedUpdateWithoutManagerInput = {
@@ -535,8 +481,6 @@ export type AvailabilityUncheckedUpdateWithoutManagerInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type AvailabilityUncheckedUpdateManyWithoutManagerInput = {
@@ -544,8 +488,6 @@ export type AvailabilityUncheckedUpdateManyWithoutManagerInput = {
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -556,8 +498,6 @@ export type AvailabilitySelect<ExtArgs extends runtime.Types.Extensions.Internal
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["availability"]>
 
@@ -567,8 +507,6 @@ export type AvailabilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["availability"]>
 
@@ -578,8 +516,6 @@ export type AvailabilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["availability"]>
 
@@ -589,11 +525,9 @@ export type AvailabilitySelectScalar = {
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
 }
 
-export type AvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "managerId" | "dayOfWeek" | "startTime" | "endTime" | "createdAt" | "updatedAt", ExtArgs["result"]["availability"]>
+export type AvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "managerId" | "dayOfWeek" | "startTime" | "endTime", ExtArgs["result"]["availability"]>
 export type AvailabilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -615,8 +549,6 @@ export type $AvailabilityPayload<ExtArgs extends runtime.Types.Extensions.Intern
     dayOfWeek: number
     startTime: string
     endTime: string
-    createdAt: Date
-    updatedAt: Date
   }, ExtArgs["result"]["availability"]>
   composites: {}
 }
@@ -1046,8 +978,6 @@ export interface AvailabilityFieldRefs {
   readonly dayOfWeek: Prisma.FieldRef<"Availability", 'Int'>
   readonly startTime: Prisma.FieldRef<"Availability", 'String'>
   readonly endTime: Prisma.FieldRef<"Availability", 'String'>
-  readonly createdAt: Prisma.FieldRef<"Availability", 'DateTime'>
-  readonly updatedAt: Prisma.FieldRef<"Availability", 'DateTime'>
 }
     
 

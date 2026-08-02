@@ -1136,9 +1136,7 @@ export const AvailabilityScalarFieldEnum = {
   managerId: 'managerId',
   dayOfWeek: 'dayOfWeek',
   startTime: 'startTime',
-  endTime: 'endTime',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  endTime: 'endTime'
 } as const
 
 export type AvailabilityScalarFieldEnum = (typeof AvailabilityScalarFieldEnum)[keyof typeof AvailabilityScalarFieldEnum]

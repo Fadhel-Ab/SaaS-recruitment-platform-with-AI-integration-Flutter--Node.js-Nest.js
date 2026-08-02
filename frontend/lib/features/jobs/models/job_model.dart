@@ -11,7 +11,7 @@ class JobModel {
   final int? interviews;
   final String? skillLevel;
   final String? status;
-  final DateTime createdAt; // Added field
+  final DateTime createdAt;
 
   JobModel({
     required this.id,
@@ -22,7 +22,7 @@ class JobModel {
     required this.employmentType,
     required this.shareToken,
     required this.createdAt,
-    required this.skillLevel, // Added to constructor
+    required this.skillLevel,
     this.company,
     required this.applications,
     this.interviews,
@@ -31,20 +31,27 @@ class JobModel {
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
     return JobModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      requirements: json['requirements'],
-      location: json['location'],
-      employmentType: json['employmentType'],
-      shareToken: json['shareToken'],
-      company: json['company'],
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      requirements: json['requirements'] ?? '',
+
+      location: json['location'] ?? '',
+
+      employmentType: json['employmentType'] ?? '',
+
+      shareToken: json['shareToken'] ?? '',
+
+      company: json['companyName'] ?? json['company'],
+
       applications: json['_count']?['applications'] ?? 0,
-      skillLevel: json["skillLevel"],
-      interviews: int.tryParse(json['interviews'] ?? ''),
+
+      skillLevel: json['skillLevel'],
+
+      interviews: json['interviews'] is int ? json['interviews'] : null,
+
       status: json['status'],
 
-      // Parses ISO 8601 string or falls back to current time if missing
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),

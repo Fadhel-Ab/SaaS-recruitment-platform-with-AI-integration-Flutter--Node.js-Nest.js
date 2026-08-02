@@ -26,10 +26,9 @@ export class AiInterviewController {
   startCall(@Param('id') applicationId: string) {
     return this.aiInterviewService.startAiCall(applicationId);
   }
-
   @Post('complete')
   complete(@Body() dto: CompleteInterviewDto) {
-    return this.aiInterviewService.complete(dto);
+    return this.aiInterviewService.complete(dto.sessionId, dto.transcript);
   }
 
   // --------------------------
@@ -134,10 +133,10 @@ export class AiInterviewController {
 
     // Finish interview after 5 answers
     if (session.questionCount >= 5) {
-      await this.aiInterviewService.complete({
-        sessionId: session.id,
-        transcript: session.transcript ?? '',
-      });
+     await this.aiInterviewService.complete(
+    session.id,
+    session.transcript ?? '',
+  );
 
       const twiml = `
 <Response>

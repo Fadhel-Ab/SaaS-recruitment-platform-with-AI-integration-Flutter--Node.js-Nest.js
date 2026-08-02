@@ -14,11 +14,9 @@ Give a score from 0-100 for:
 Return ONLY JSON.
 
 {
-  "communication":90,
-  "technical":82,
-  "confidence":88,
-  "problemSolving":84,
-  "summary":"..."
+  "score": number,
+  "summary": string,
+  "recommendation": string
 }
 
 Transcript:
@@ -52,4 +50,3 @@ Rules:
 - Return plain text only.
 `;
 }
-  

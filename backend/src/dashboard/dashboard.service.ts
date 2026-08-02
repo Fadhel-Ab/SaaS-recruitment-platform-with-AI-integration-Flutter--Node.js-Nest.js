@@ -140,7 +140,69 @@ export class DashboardService {
       scoredCandidates === 0
         ? 0
         : Number((totalScore / scoredCandidates).toFixed(2));
+    const topCandidatesRaw = await this.prisma.application.findMany({
+      where: {
+        job: { managerId },
+        aiScore: { isNot: null },
+      },
+      take: 5,
+      orderBy: {
+        aiScore: {
+          overallScore: 'desc',
+        },
+      },
+      select: {
+        id: true,
 
-    return summary;
+        candidate: {
+          select: {
+            fullName: true,
+          },
+        },
+
+        job: {
+          select: {
+            title: true,
+          },
+        },
+
+        aiScore: {
+          select: {
+            cvScore: true,
+            interviewScore: true,
+            overallScore: true,
+            summary: true,
+          },
+        },
+      },
+    });
+    // Format clean, frontend-ready models
+    const topCandidates = topCandidatesRaw.map((cand) => {
+      // Map decimals (e.g. 0.85) to percentages (85) safely
+      const cvPct = cand.aiScore ? Math.round(cand.aiScore.cvScore * 100) : 0;
+
+      const interviewScoreRaw = cand.aiScore?.interviewScore;
+      const interviewPct =
+        interviewScoreRaw != null ? Math.round(interviewScoreRaw * 100) : null;
+
+      return {
+        id: cand.id,
+        name: cand.candidate.fullName,
+        role: cand.job.title,
+        cvScore: cvPct,
+        interviewScore: interviewPct,
+        // Fall back to schema summary if available, otherwise apply a default string rule
+        summary:
+          cand.aiScore?.summary ||
+          (interviewPct
+            ? `Outstanding CV match (${cvPct}%) with strong verbal performance (${interviewPct}%).`
+            : `High potential profile match (${cvPct}%). Screening pending.`),
+      };
+    });
+
+    return {
+      ...summary,
+      topCandidates,
+    };
   }
 }

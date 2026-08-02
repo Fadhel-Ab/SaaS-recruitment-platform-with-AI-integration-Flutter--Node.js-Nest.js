@@ -14,6 +14,8 @@ export class AiService {
   ) {}
 
   async processApplication(applicationId: string) {
+    console.log('AI PROCESS START:', applicationId);
+
     const application = await this.prisma.application.findUnique({
       where: {
         id: applicationId,
@@ -34,18 +36,34 @@ export class AiService {
       application.candidate.resumeFileName,
     );
 
-    // 1. Convert resume file to plain text
     const resumeText = await this.parser.extractText(filePath);
 
-    // 2. Fetch the strict JSON response object from the API service
+    console.log('RESUME EXTRACTED LENGTH:', resumeText.length);
+
     const analysis = await this.aiProvider.analyzeResume(
       resumeText,
       application.job.description,
     );
 
-    // 3. Map values directly to your database fields
-    await this.prisma.aIScore.create({
-      data: {
+    console.log('AI ANALYSIS:', analysis);
+
+    console.log('CREATING AI SCORE:', analysis.score);
+
+    await this.prisma.aIScore.upsert({
+      where: {
+        applicationId: application.id,
+      },
+
+      update: {
+        cvScore: analysis.score,
+        overallScore: analysis.score,
+        strengths: analysis.strengths,
+        weaknesses: analysis.weaknesses,
+        summary: analysis.summary,
+        recommendation: analysis.recommendation,
+      },
+
+      create: {
         applicationId: application.id,
         cvScore: analysis.score,
         overallScore: analysis.score,
@@ -56,11 +74,15 @@ export class AiService {
       },
     });
 
+    console.log('AI SCORE SAVED SUCCESSFULLY');
+
     return analysis;
   }
+
   async evaluateInterview(transcript: string) {
     return this.aiProvider.analyzeInterview(transcript);
   }
+
   async generateInterviewQuestion(applicationId: string) {
     const application = await this.prisma.application.findUnique({
       where: {

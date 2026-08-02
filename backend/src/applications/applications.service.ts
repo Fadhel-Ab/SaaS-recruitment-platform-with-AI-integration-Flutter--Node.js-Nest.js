@@ -80,49 +80,56 @@ export class ApplicationsService {
       },
       include: {
         candidate: true,
+        job: true,
       },
     });
 
-    let aiScore: AIScore | null = null;
-
-    const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
-
-    try {
-      await this.aiService.processApplication(application.id);
-
-      aiScore = await this.prisma.aIScore.findUnique({
-        where: {
-          applicationId: application.id,
-        },
-      });
-
-      if (aiScore && aiScore.cvScore >= threshold) {
-        await this.aiInterviewService.start({
-          applicationId: application.id,
-        });
-
-        await this.aiInterviewService.startAiCall(application.id);
-      }
-    } catch (error) {
-      console.error('AI processing failed:', error);
-    }
+    // Run AI processing in background
+    void this.processApplicationAI(application.id);
 
     return {
       applicationId: application.id,
-
       status: application.status,
-
-      aiScore: aiScore
-        ? {
-            cvScore: aiScore.cvScore,
-            overallScore: aiScore.overallScore,
-          }
-        : null,
-
-      interviewStarted: aiScore !== null && aiScore.cvScore >= threshold,
+      message: 'Application submitted successfully. AI evaluation started.',
     };
   }
+  private async processApplicationAI(applicationId: string) {
+    try {
+      await this.aiService.processApplication(applicationId);
 
+      const aiScore = await this.prisma.aIScore.findUnique({
+        where: {
+          applicationId,
+        },
+      });
+
+      if (!aiScore) {
+        console.log('No AI score generated for:', applicationId);
+        return;
+      }
+
+      const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+
+      console.log(`AI score: ${aiScore.overallScore}, threshold: ${threshold}`);
+
+      if (aiScore.overallScore >= threshold) {
+        console.log(
+          'Candidate passed AI threshold, starting interview:',
+          applicationId,
+        );
+
+        await this.aiInterviewService.start({
+          applicationId,
+        });
+
+        await this.aiInterviewService.startAiCall(applicationId);
+      } else {
+        console.log('Candidate did not pass AI threshold:', applicationId);
+      }
+    } catch (error) {
+      console.error('AI application processing failed:', error);
+    }
+  }
   async updateStatus(
     managerId: string,
     applicationId: string,

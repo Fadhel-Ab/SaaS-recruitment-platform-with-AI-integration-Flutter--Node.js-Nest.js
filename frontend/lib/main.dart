@@ -7,6 +7,8 @@ import 'package:frontend/core/storage/web_token_storage.dart';
 import 'package:frontend/features/applications/data/application_api.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
+import 'package:frontend/features/availability/data/availability_api.dart';
+import 'package:frontend/features/availability/data/availability_repository.dart';
 import 'package:frontend/features/dashboard/data/dashboard_api.dart';
 import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
 import 'package:frontend/features/jobs/data/jobs_api.dart';
@@ -30,6 +32,9 @@ void main() {
   final jobsApi = JobsApi(dioClient.dio);
   final dashboardApi = DashboardApi(dioClient.dio);
   final applicationApi = ApplicationApi(dioClient.dio);
+  final availabilityApi = AvailabilityApi(dioClient.dio);
+
+  final availabilityRepository = AvailabilityRepository(availabilityApi);
 
   // Auth
   final authRepository = AuthRepository(authApi, tokenStorage);
@@ -46,6 +51,7 @@ void main() {
         RepositoryProvider.value(value: jobsRepository),
         RepositoryProvider.value(value: applicationRepository),
         RepositoryProvider.value(value: dashboardRepository),
+        RepositoryProvider.value(value: availabilityRepository),
       ],
 
       child: BlocProvider(

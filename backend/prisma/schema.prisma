@@ -82,24 +82,13 @@ model AIScore {
 }
 
 model Availability {
-  id String @id @default(uuid())
-
+  id        String @id @default(uuid())
   managerId String
-
   dayOfWeek Int
-  // 0 Sunday
-  // 1 Monday
-  // etc.
-
   startTime String
-
-  endTime String
+  endTime   String
 
   manager User @relation(fields: [managerId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
 }
 
 model Interview {

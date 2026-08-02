@@ -44,107 +44,145 @@ export class AiInterviewService {
       },
     });
   }
-
-  async complete(dto: CompleteInterviewDto) {
-    const session = await this.prisma.aIInterviewSession.update({
+  async complete(sessionId: string, transcript: string) {
+    const session = await this.prisma.aIInterviewSession.findUnique({
       where: {
-        id: dto.sessionId,
-      },
-      data: {
-        transcript: dto.transcript,
-        completedAt: new Date(),
-        status: AIInterviewStatus.COMPLETED,
-      },
-
-      include: {
-        application: {
-          include: {
-            aiScore: true,
-          },
-        },
+        id: sessionId,
       },
     });
 
-    const evaluation = await this.aiService.evaluateInterview(dto.transcript);
-
-    const interviewScore =
-      (evaluation.communication +
-        evaluation.technical +
-        evaluation.confidence +
-        evaluation.problemSolving) /
-      4;
-
-    const currentScore = session.application.aiScore;
-
-    if (!currentScore) {
-      throw new Error('AI score does not exist for this application');
+    if (!session) {
+      throw new Error('Interview session not found');
     }
 
-    const overallScore = (currentScore.cvScore + interviewScore) / 2;
+    await this.prisma.aIInterviewSession.update({
+      where: {
+        id: sessionId,
+      },
 
-    const updatedScore = await this.prisma.aIScore.update({
+      data: {
+        transcript,
+        status: AIInterviewStatus.COMPLETED,
+        completedAt: new Date(),
+      },
+    });
+
+    console.log('Evaluating AI interview transcript...');
+
+    const evaluation = await this.aiService.evaluateInterview(transcript);
+
+    console.log('Interview evaluation:', evaluation);
+
+    const aiScore = await this.prisma.aIScore.findUnique({
+      where: {
+        applicationId: session.applicationId,
+      },
+    });
+
+    if (!aiScore) {
+      throw new Error('CV AI score not found');
+    }
+
+    const overallScore = Math.round((aiScore.cvScore + evaluation.score) / 2);
+
+    console.log('FINAL SCORE:', overallScore);
+
+    await this.prisma.aIScore.update({
       where: {
         applicationId: session.applicationId,
       },
 
       data: {
-        interviewScore,
-
+        interviewScore: evaluation.score,
         overallScore,
-
         summary: evaluation.summary,
-      },
-    });
-    await this.prisma.application.update({
-      where: {
-        id: session.applicationId,
-      },
-
-      data: {
-        status: ApplicationStatus.INTERVIEW_COMPLETED,
+        recommendation: evaluation.recommendation,
       },
     });
 
-    return {
-      session,
+    const threshold = 70;
 
-      score: updatedScore,
-    };
-  }
+    if (overallScore >= threshold) {
+      const application = await this.prisma.application.findUnique({
+        where: {
+          id: session.applicationId,
+        },
 
-  async startAiCall(applicationId: string) {
-    let session = await this.prisma.aIInterviewSession.findUnique({
-      where: {
-        applicationId,
-      },
-    });
-
-    if (!session) {
-      session = await this.prisma.aIInterviewSession.create({
-        data: {
-          applicationId,
-          status: 'IN_PROGRESS',
+        include: {
+          candidate: true,
+          job: true,
         },
       });
-    }
-    console.log('call function accessed ?');
-    const application = await this.prisma.application.findUnique({
-      where: {
-        id: applicationId,
-      },
-      include: {
-        candidate: true,
-      },
-    });
 
-    if (!application) {
-      throw new NotFoundException('Application not found');
+      if (!application) {
+        throw new Error('Application not found');
+      }
+      const availability = await this.prisma.availability.findFirst({
+        where: {
+          managerId: application.job.managerId,
+        },
+      });
+
+      const scheduledAt = new Date();
+
+      if (availability) {
+        const today = scheduledAt.getDay(); // Sunday = 0
+
+        // Convert stored 1-7 (Mon-Sun) to JS 0-6 (Sun-Sat)
+        const targetDay = availability.dayOfWeek % 7;
+
+        let daysUntil = targetDay - today;
+
+        if (daysUntil <= 0) {
+          daysUntil += 7;
+        }
+
+        scheduledAt.setDate(scheduledAt.getDate() + daysUntil);
+
+        const parts = availability.startTime.split(':');
+
+        scheduledAt.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
+      } else {
+        scheduledAt.setDate(scheduledAt.getDate() + 1);
+      }
+      await this.prisma.interview.create({
+        data: {
+          applicationId: session.applicationId,
+
+          managerId: application.job.managerId,
+
+          status: 'SCHEDULED',
+
+          scheduledAt,
+
+          duration: 30,
+        },
+      });
+
+      if (application.candidate.phone) {
+        await this.twilioService.sendWhatsApp(
+          application.candidate.phone,
+
+          `Hello ${application.candidate.fullName}, congratulations!
+
+You have passed our AI interview.
+
+Your final score: ${overallScore}%.
+
+We will contact you regarding the next interview step.`,
+        );
+      }
     }
 
-    return this.twilioService.makeCall(
-      this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!,
-      application.id,
-    );
+    return {
+      interviewScore: evaluation.score,
+
+      overallScore,
+
+      summary: evaluation.summary,
+
+      recommendation: evaluation.recommendation,
+    };
   }
 
   async saveAnswer(applicationId: string, answer: string) {
@@ -190,6 +228,48 @@ export class AiInterviewService {
 
       data: {
         transcript: `${session.transcript ?? ''}\nInterviewer: ${question}`,
+      },
+    });
+  }
+  async startAiCall(applicationId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        candidate: true,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    return this.twilioService.makeCall(
+      this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!,
+      application.id,
+    );
+  }
+  async findLatestApplicationByPhone(phone: string) {
+    return this.prisma.application.findFirst({
+      where: {
+        candidate: {
+          phone,
+        },
+      },
+      orderBy: {
+        appliedAt: 'desc',
+      },
+    });
+  }
+  async getApplication(applicationId: string) {
+    return this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        candidate: true,
+        job: true,
       },
     });
   }

@@ -1,12 +1,13 @@
-import { IsInt, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class CreateAvailabilityDto {
+  @IsNotEmpty()
   @IsInt()
   dayOfWeek: number;
 
-  @IsString()
+  @IsNotEmpty()
   startTime: string;
 
-  @IsString()
+  @IsNotEmpty()
   endTime: string;
 }

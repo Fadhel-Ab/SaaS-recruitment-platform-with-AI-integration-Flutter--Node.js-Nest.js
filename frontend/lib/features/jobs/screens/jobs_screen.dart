@@ -46,7 +46,7 @@ class _JobsScreenState extends State<JobsScreen> {
                 buttonLabel: 'Post a New Job',
                 isDesktop: isDesktop,
                 onButtonPressed: () {
-                  context.go('/jobs/new');
+                  context.go('/manager/create-job');
                 },
               ),
               const SizedBox(height: 20),
