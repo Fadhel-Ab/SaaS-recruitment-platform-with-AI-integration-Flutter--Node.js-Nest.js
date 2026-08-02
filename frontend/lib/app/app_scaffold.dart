@@ -20,6 +20,8 @@ class AppScaffold extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final user = state.user;
+        final selectedIndex = _selectedIndex(context, user?.role);
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('Recruitment Platform'),
@@ -46,24 +48,91 @@ class AppScaffold extends StatelessWidget {
                   }
                 },
                 itemBuilder: (context) => [
-                  PopupMenuItem(enabled: false, child: Text(user?.email ?? 'User')),
+                  PopupMenuItem(
+                    enabled: false,
+                    child: Text(user?.email ?? 'User'),
+                  ),
                   const PopupMenuDivider(),
-                  const PopupMenuItem(value: 'logout', child: ListTile(leading: Icon(Icons.logout), title: Text('Logout'))),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(width: 8),
             ],
           ),
-          body: child,
-          bottomNavigationBar: isPhone ? NavigationBar(
-            selectedIndex: _selectedIndex(context, user?.role),
-            onDestinationSelected: (index) => _go(context, index, user?.role),
-            destinations: [
-              if (user?.role == UserRole.manager) const NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Dashboard'),
-              const NavigationDestination(icon: Icon(Icons.work_outline), label: 'Jobs'),
-              if (user?.role == UserRole.manager) const NavigationDestination(icon: Icon(Icons.add_circle_outline), label: 'Post'),
-            ],
-          ) : null,
+          body: isPhone
+              ? child
+              : Row(
+                  children: [
+                    // Desktop & Laptop Navigation Sidebar
+                    NavigationRail(
+                      selectedIndex: selectedIndex,
+                      onDestinationSelected: (index) =>
+                          _go(context, index, user?.role),
+                      labelType: NavigationRailLabelType.all,
+                      selectedIconTheme: const IconThemeData(
+                        color: Color(0xFF4F46E5),
+                      ),
+                      selectedLabelTextStyle: const TextStyle(
+                        color: Color(0xFF4F46E5),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      destinations: [
+                        if (user?.role == UserRole.manager)
+                          const NavigationRailDestination(
+                            icon: Icon(Icons.dashboard_outlined),
+                            selectedIcon: Icon(Icons.dashboard_rounded),
+                            label: Text('Dashboard'),
+                          ),
+                        const NavigationRailDestination(
+                          icon: Icon(Icons.work_outline),
+                          selectedIcon: Icon(Icons.work_rounded),
+                          label: Text('Jobs'),
+                        ),
+                        if (user?.role == UserRole.manager)
+                          const NavigationRailDestination(
+                            icon: Icon(Icons.add_circle_outline),
+                            selectedIcon: Icon(Icons.add_circle_rounded),
+                            label: Text('Post Job'),
+                          ),
+                      ],
+                    ),
+                    const VerticalDivider(
+                      thickness: 1,
+                      width: 1,
+                      color: Color(0xFFE5E7EB),
+                    ),
+                    Expanded(child: child),
+                  ],
+                ),
+          bottomNavigationBar: isPhone
+              ? NavigationBar(
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (index) =>
+                      _go(context, index, user?.role),
+                  destinations: [
+                    if (user?.role == UserRole.manager)
+                      const NavigationDestination(
+                        icon: Icon(Icons.dashboard_outlined),
+                        label: 'Dashboard',
+                      ),
+                    const NavigationDestination(
+                      icon: Icon(Icons.work_outline),
+                      label: 'Jobs',
+                    ),
+                    if (user?.role == UserRole.manager)
+                      const NavigationDestination(
+                        icon: Icon(Icons.add_circle_outline),
+                        label: 'Post',
+                      ),
+                  ],
+                )
+              : null,
         );
       },
     );
@@ -81,7 +150,13 @@ class AppScaffold extends StatelessWidget {
 
   void _go(BuildContext context, int index, UserRole? role) {
     if (role == UserRole.manager) {
-      context.go(index == 0 ? '/dashboard' : index == 1 ? '/jobs' : '/manager/create-job');
+      context.go(
+        index == 0
+            ? '/dashboard'
+            : index == 1
+            ? '/jobs'
+            : '/manager/create-job',
+      );
     } else {
       context.go('/jobs');
     }

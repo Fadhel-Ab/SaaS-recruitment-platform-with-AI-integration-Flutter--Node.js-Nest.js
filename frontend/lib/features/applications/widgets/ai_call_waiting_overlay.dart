@@ -53,7 +53,7 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
             child: Text(
               'AI Profile Matching Score: ${(widget.score * 100).toStringAsFixed(0)}%',
               style: const TextStyle(
-                color: const Color(0xFF137333),
+                color: Color(0xFF137333),
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
               ),
@@ -61,48 +61,54 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
           ),
           const SizedBox(height: 36),
 
-          // Pulsing Phone Animation Stack
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  ...List.generate(3, (index) {
-                    final double progress =
-                        (_animationController.value + (index / 3)) % 1.0;
-                    return Container(
-                      width: 80 + (progress * 100),
-                      height: 80 + (progress * 100),
-                      decoration: BoxDecoration(
+          // FIX: Added explicit constraints bounding box around the stack animation loops
+          SizedBox(
+            width: 200,
+            height: 200,
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip
+                      .none, // Allows circles to feather smoothly outwards without clipping layouts
+                  children: [
+                    ...List.generate(3, (index) {
+                      final double progress =
+                          (_animationController.value + (index / 3)) % 1.0;
+                      return Container(
+                        width: 80 + (progress * 100),
+                        height: 80 + (progress * 100),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(
+                            0xFF4F46E5,
+                          ).withOpacity((1.0 - progress) * 0.25),
+                        ),
+                      );
+                    }),
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: const Color(
-                          0xFF4F46E5,
-                        ).withOpacity((1.0 - progress) * 0.25),
+                        color: Color(0xFF4F46E5),
                       ),
-                    );
-                  }),
-                  Container(
-                    width: 90,
-                    height: 90,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF4F46E5),
-                    ),
-                    child: Transform.rotate(
-                      angle:
-                          math.sin(_animationController.value * math.pi * 2) *
-                          0.15,
-                      child: const Icon(
-                        Icons.phone_in_talk,
-                        size: 40,
-                        color: Colors.white,
+                      child: Transform.rotate(
+                        angle:
+                            math.sin(_animationController.value * math.pi * 2) *
+                            0.15,
+                        child: const Icon(
+                          Icons.phone_in_talk,
+                          size: 40,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
           const SizedBox(height: 40),
 

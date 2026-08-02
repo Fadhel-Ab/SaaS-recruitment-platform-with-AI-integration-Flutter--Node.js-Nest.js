@@ -11,7 +11,6 @@ import 'widgets/pipeline_chart_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +153,7 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 28),
 
-                    // Main Analytical Display Grid Blocks Split
+                    // Main Analytical Display Blocks
                     if (isDesktop)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,11 +169,17 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 24),
-                          // Placeholder container matching dashboard right-hand layout sub-sections
-                          Expanded(flex: 4, child: Container()),
+                          // Top Candidates Card sits next to Pipeline Chart on Desktop
+                          Expanded(
+                            flex: 4,
+                            child: TopCandidatesCard(
+                              candidates: summary.topCandidates ?? [],
+                            ),
+                          ),
                         ],
                       )
                     else ...[
+                      // Mobile / Tablet Vertical Layout Stack
                       PipelineChartCard(
                         pending: summary.pendingApplications,
                         shortlisted: summary.shortlisted,
@@ -182,13 +187,11 @@ class DashboardScreen extends StatelessWidget {
                         hired: summary.hired,
                         rejected: summary.rejected,
                       ),
+                      const SizedBox(height: 24),
+                      TopCandidatesCard(
+                        candidates: summary.topCandidates ?? [],
+                      ),
                     ],
-                    const SizedBox(height: 16),
-                    TopCandidatesCard(
-                      candidates:
-                          summary.topCandidates ??
-                          [], // Stacks vertically below on phones automatically
-                    ),
                   ],
                 ),
               ),
