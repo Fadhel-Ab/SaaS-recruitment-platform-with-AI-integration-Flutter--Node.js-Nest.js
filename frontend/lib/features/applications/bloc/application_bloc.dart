@@ -42,8 +42,11 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
   ) async {
     emit(state.copyWith(status: ApplicationStatus.submitting));
     try {
-      await repository.submitApplication(event.shareToken, event.request);
-      emit(state.copyWith(status: ApplicationStatus.success));
+      final result = await repository.submitApplication(
+        event.shareToken,
+        event.request,
+      );
+      emit(state.copyWith(status: ApplicationStatus.success, result: result));
     } catch (e) {
       emit(
         state.copyWith(status: ApplicationStatus.failure, error: e.toString()),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/bloc/auth_bloc.dart';
+import 'package:frontend/features/auth/bloc/auth_state.dart';
+import 'package:frontend/features/auth/data/models/user_role.dart';
 import 'package:frontend/features/jobs/bloc/job_details_bloc.dart';
 import 'package:frontend/features/jobs/bloc/job_details_state.dart';
 import 'package:go_router/go_router.dart';
@@ -293,7 +296,22 @@ class JobDetailsScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => context.go('/apply/${job.shareToken}'),
+                onPressed: () {
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState.status == AuthStatus.authenticated &&
+                      authState.user?.role == UserRole.manager) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Managers cannot apply to jobs. Please use a candidate account.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  context.go('/apply/${job.shareToken}');
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(
                     0xFF4F46E5,

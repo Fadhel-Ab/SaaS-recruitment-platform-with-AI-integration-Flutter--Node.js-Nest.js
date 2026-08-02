@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Headers,
   Param,
   Post,
   UploadedFile,
@@ -21,10 +22,14 @@ import type { CurrentUserData } from '../auth/interfaces/current-user.interface.
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Public } from '../auth/decorators/public.decorator.js';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('applications')
 export class ApplicationsController {
-  constructor(private readonly applicationsService: ApplicationsService) {}
+  constructor(
+    private readonly applicationsService: ApplicationsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Get('job/:jobId')
   @Roles(UserRole.MANAGER)
@@ -61,8 +66,33 @@ export class ApplicationsController {
   apply(
     @Param('shareToken') shareToken: string,
     @Body() dto: CreateApplicationDto,
+    @Headers('authorization') authorization?: string,
   ) {
-    return this.applicationsService.apply(shareToken, dto);
+    const currentUser = this.getOptionalCurrentUser(authorization);
+
+    return this.applicationsService.apply(shareToken, dto, currentUser);
+  }
+
+  private getOptionalCurrentUser(
+    authorization?: string,
+  ): CurrentUserData | undefined {
+    const [type, token] = authorization?.split(' ') ?? [];
+
+    if (type !== 'Bearer' || !token) {
+      return undefined;
+    }
+
+    try {
+      const payload = this.jwtService.verify(token);
+
+      return {
+        id: payload.sub,
+        email: payload.email,
+        role: payload.role,
+      };
+    } catch {
+      return undefined;
+    }
   }
 
   @Patch(':applicationId/status')

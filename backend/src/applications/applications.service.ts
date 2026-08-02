@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,7 +13,8 @@ import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.
 import { allowedTransitions } from './utils/status-transition.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
-import type { AIScore } from '../generated/prisma/client.js';
+import { UserRole } from '../generated/prisma/enums.js';
+import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -23,7 +25,16 @@ export class ApplicationsService {
     private aiInterviewService: AiInterviewService,
     private config: ConfigService,
   ) {}
-  async apply(shareToken: string, dto: CreateApplicationDto) {
+  async apply(
+    shareToken: string,
+    dto: CreateApplicationDto,
+    currentUser?: CurrentUserData,
+  ) {
+    if (currentUser?.role === UserRole.MANAGER) {
+      throw new ForbiddenException(
+        'Managers cannot apply to jobs. Please use a candidate account.',
+      );
+    }
     const job = await this.prisma.job.findUnique({
       where: {
         shareToken,
@@ -84,15 +95,24 @@ export class ApplicationsService {
       },
     });
 
-    // Run AI processing in background
-    void this.processApplicationAI(application.id);
+    const aiResult = await this.processApplicationAI(application.id);
+    const threshold = this.getAiInterviewThreshold();
 
     return {
       applicationId: application.id,
       status: application.status,
-      message: 'Application submitted successfully. AI evaluation started.',
+      message: aiResult?.shouldStartAiCall
+        ? 'Application submitted successfully. AI call is ready.'
+        : 'Application submitted successfully. AI evaluation completed.',
+      aiScore: aiResult?.aiScore ?? null,
+      threshold,
+      shouldStartAiCall: aiResult?.shouldStartAiCall ?? false,
     };
   }
+  private getAiInterviewThreshold() {
+    return this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+  }
+
   private async processApplicationAI(applicationId: string) {
     try {
       await this.aiService.processApplication(applicationId);
@@ -105,10 +125,10 @@ export class ApplicationsService {
 
       if (!aiScore) {
         console.log('No AI score generated for:', applicationId);
-        return;
+        return null;
       }
 
-      const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+      const threshold = this.getAiInterviewThreshold();
 
       console.log(`AI score: ${aiScore.overallScore}, threshold: ${threshold}`);
 
@@ -123,11 +143,15 @@ export class ApplicationsService {
         });
 
         await this.aiInterviewService.startAiCall(applicationId);
+
+        return { aiScore: aiScore.overallScore, shouldStartAiCall: true };
       } else {
         console.log('Candidate did not pass AI threshold:', applicationId);
+        return { aiScore: aiScore.overallScore, shouldStartAiCall: false };
       }
     } catch (error) {
       console.error('AI application processing failed:', error);
+      return null;
     }
   }
   async updateStatus(

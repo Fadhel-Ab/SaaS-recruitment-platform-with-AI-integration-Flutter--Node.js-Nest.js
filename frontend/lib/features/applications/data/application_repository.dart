@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:frontend/features/applications/data/application_api.dart';
+import 'package:frontend/features/applications/model/application_result.dart';
 import 'package:frontend/features/applications/model/create_application_request.dart';
 
 class ApplicationRepository {
@@ -15,10 +16,11 @@ class ApplicationRepository {
     return api.uploadCv(path: path, bytes: bytes, fileName: fileName);
   }
 
-  Future<void> submitApplication(
+  Future<ApplicationResult> submitApplication(
     String shareToken,
     CreateApplicationRequest request,
-  ) {
-    return api.apply(shareToken, request.toJson());
+  ) async {
+    final response = await api.apply(shareToken, request.toJson());
+    return ApplicationResult.fromJson(response);
   }
 }

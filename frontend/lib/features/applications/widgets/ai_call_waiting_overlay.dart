@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 
 class AiCallWaitingOverlay extends StatefulWidget {
   final double score;
+  final double threshold;
   final VoidCallback onStartCall;
 
   const AiCallWaitingOverlay({
     super.key,
     required this.score,
+    required this.threshold,
     required this.onStartCall,
   });
 
@@ -51,7 +53,7 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'AI Profile Matching Score: ${(widget.score * 100).toStringAsFixed(0)}%',
+              'AI Profile Matching Score: ${widget.score.toStringAsFixed(0)}% (threshold ${widget.threshold.toStringAsFixed(0)}%)',
               style: const TextStyle(
                 color: Color(0xFF137333),
                 fontWeight: FontWeight.w700,
@@ -83,7 +85,7 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
                           shape: BoxShape.circle,
                           color: const Color(
                             0xFF4F46E5,
-                          ).withOpacity((1.0 - progress) * 0.25),
+                          ).withValues(alpha: (1.0 - progress) * 0.25),
                         ),
                       );
                     }),

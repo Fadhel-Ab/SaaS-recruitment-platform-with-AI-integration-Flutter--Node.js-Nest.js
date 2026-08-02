@@ -2,6 +2,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/bloc/auth_bloc.dart';
+import 'package:frontend/features/auth/bloc/auth_state.dart';
+import 'package:frontend/features/auth/data/models/user_role.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/bloc/application_state.dart';
@@ -30,7 +33,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Uint8List? fileBytes;
 
   bool _showAiCallingInterface = false;
-  double _mockCvScore = 0.0;
+  double _aiScore = 0.0;
+  double _aiThreshold = 0.0;
 
   @override
   void dispose() {
@@ -66,6 +70,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   void _submitForm() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState.status == AuthStatus.authenticated &&
+        authState.user?.role == UserRole.manager) {
+      StatusDialog.show(
+        context: context,
+        isSuccess: false,
+        title: 'Managers Cannot Apply',
+        message: 'Please sign in with a candidate account before applying.',
+      );
+      return;
+    }
+
     // 1. Structural Form Validation
     if (!_formKey.currentState!.validate()) return;
 
@@ -91,7 +107,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     return BlocListener<ApplicationBloc, ApplicationState>(
       listener: (context, state) {
         if (state.status == ApplicationStatus.success &&
-            state.fileName != null) {
+            state.fileName != null &&
+            state.result == null) {
           final request = CreateApplicationRequest(
             fullName: fullNameController.text.trim(),
             email: emailController.text.trim(),
@@ -102,18 +119,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           context.read<ApplicationBloc>().add(
             SubmitApplicationRequested(widget.shareToken, request),
           );
+        }
 
-          // Simulated score interceptor checking your logic condition
-          // (Replace state.aiScore with your actual incoming BLoC field data parsing)
-          //final incomingScore = state.aiScore ?? 0.72;
-          final incomingScore = 0.72;
-
-          if (incomingScore >= 0.60) {
-            setState(() {
-              _mockCvScore = incomingScore;
-              _showAiCallingInterface = true;
-            });
-          }
+        final result = state.result;
+        if (state.status == ApplicationStatus.success &&
+            result != null &&
+            result.shouldStartAiCall &&
+            result.aiScore != null) {
+          setState(() {
+            _aiScore = result.aiScore!;
+            _aiThreshold = result.threshold;
+            _showAiCallingInterface = true;
+          });
         }
       },
       child: Scaffold(
@@ -136,7 +153,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: AiCallWaitingOverlay(
-                      score: _mockCvScore,
+                      score: _aiScore,
+                      threshold: _aiThreshold,
                       onStartCall: () {
                         // Fire your backend platform call channel initiation function here
                       },

@@ -106,7 +106,7 @@ export class AiInterviewService {
       },
     });
 
-    const threshold = 70;
+    const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
 
     if (overallScore >= threshold) {
       const application = await this.prisma.application.findUnique({

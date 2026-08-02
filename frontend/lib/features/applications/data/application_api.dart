@@ -26,7 +26,8 @@ class ApplicationApi {
     return response.data['fileName'];
   }
 
-  Future<void> apply(String shareToken, Map<String, dynamic> data) async {
-    await dio.post('/applications/$shareToken', data: data);
+  Future<Map<String, dynamic>> apply(String shareToken, Map<String, dynamic> data) async {
+    final response = await dio.post('/applications/$shareToken', data: data);
+    return Map<String, dynamic>.from(response.data as Map);
   }
 }
