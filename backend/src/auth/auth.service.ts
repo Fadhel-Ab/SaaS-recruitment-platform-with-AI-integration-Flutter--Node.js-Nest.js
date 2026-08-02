@@ -19,6 +19,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    console.log(dto);
     const existingUser = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -36,16 +37,24 @@ export class AuthService {
         fullName: dto.fullName,
         email: dto.email,
         password: hashedPassword,
+        role: dto.role,
       },
     });
 
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
     return {
-      message: 'User registered successfully',
+      accessToken,
       user: {
         id: user.id,
-        fullName: user.fullName,
         email: user.email,
-        role: dto.role,
+        role: user.role,
       },
     };
   }

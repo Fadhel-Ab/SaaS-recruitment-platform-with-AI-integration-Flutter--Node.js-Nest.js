@@ -1,9 +1,17 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/app/app_scaffold.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
+import 'package:frontend/features/auth/bloc/auth_bloc.dart';
+import 'package:frontend/features/auth/bloc/auth_state.dart';
+import 'package:frontend/features/auth/data/models/user_role.dart';
 import 'package:frontend/features/auth/screens/login_screen.dart';
+import 'package:frontend/features/auth/screens/register_screen.dart';
 import 'package:frontend/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:frontend/features/dashboard/bloc/dashboard_event.dart';
 import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
@@ -22,102 +30,49 @@ import 'package:frontend/features/jobs/screens/jobs_screen.dart';
 import 'package:frontend/features/jobs/screens/manager_jobs_screen.dart';
 import 'package:go_router/go_router.dart';
 
-final appRouter = GoRouter(
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+  late final StreamSubscription<dynamic> _subscription;
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
   initialLocation: '/login',
+  refreshListenable: GoRouterRefreshStream(authBloc.stream),
+  redirect: (context, state) {
+    final authState = authBloc.state;
+    final path = state.uri.path;
+    final isAuthPage = path == '/login' || path == '/register';
+    final isChecking = authState.status == AuthStatus.initial || authState.status == AuthStatus.loading;
 
+    if (isChecking) return null;
+    if (authState.status != AuthStatus.authenticated) return isAuthPage ? null : '/login';
+    if (isAuthPage) return authState.user?.role == UserRole.manager ? '/dashboard' : '/jobs';
+    if (path.startsWith('/manager') || path == '/dashboard') {
+      return authState.user?.role == UserRole.manager ? null : '/jobs';
+    }
+    return null;
+  },
   routes: [
-    GoRoute(
-      path: '/login',
-
-      builder: (context, state) {
-        return const LoginScreen();
-      },
-    ),
-
-    GoRoute(
-      path: '/dashboard',
-
-      builder: (context, state) {
-        return BlocProvider(
-          create: (_) =>
-              DashboardBloc(context.read<DashboardRepository>())
-                ..add(LoadDashboard()),
-
-          child: const DashboardScreen(),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/jobs',
-
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) =>
-              JobsBloc(context.read<JobsRepository>())..add(const LoadJobs()),
-          child: const JobsScreen(),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/jobs/:shareToken',
-
-      builder: (context, state) {
-        final token = state.pathParameters['shareToken']!;
-
-        return BlocProvider(
-          create: (context) =>
-              JobDetailsBloc(context.read<JobsRepository>())
-                ..add(LoadJobDetails(token)),
-
-          child: JobDetailsScreen(shareToken: token),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/apply/:shareToken',
-
-      builder: (context, state) {
-        final shareToken = state.pathParameters['shareToken']!;
-
-        return BlocProvider(
-          create: (context) {
-            final bloc = ApplicationBloc(
-              context.read<ApplicationRepository>(),
-              context.read<JobsRepository>(),
-            );
-
-            bloc.add(LoadApplicationJob(shareToken));
-
-            return bloc;
-          },
-
-          child: ApplicationScreen(shareToken: shareToken),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/manager/jobs',
-
-      builder: (context, state) {
-        return BlocProvider(
-          create: (_) =>
-              ManagerJobsBloc(context.read<JobsRepository>())
-                ..add(LoadManagerJobs()),
-
-          child: ManagerJobsScreen(),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/manager/create-job',
-
-      builder: (context, state) {
-        return BlocProvider(
-          create: (_) => CreateJobBloc(context.read<JobsRepository>()),
-
-          child: const CreateJobScreen(),
-        );
-      },
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+    ShellRoute(
+      builder: (context, state, child) => AppScaffold(child: child),
+      routes: [
+        GoRoute(path: '/dashboard', builder: (context, state) => BlocProvider(create: (_) => DashboardBloc(context.read<DashboardRepository>())..add(LoadDashboard()), child: const DashboardScreen())),
+        GoRoute(path: '/jobs', builder: (context, state) => BlocProvider(create: (context) => JobsBloc(context.read<JobsRepository>())..add(const LoadJobs()), child: const JobsScreen())),
+        GoRoute(path: '/jobs/:shareToken', builder: (context, state) { final token = state.pathParameters['shareToken']!; return BlocProvider(create: (context) => JobDetailsBloc(context.read<JobsRepository>())..add(LoadJobDetails(token)), child: JobDetailsScreen(shareToken: token)); }),
+        GoRoute(path: '/apply/:shareToken', builder: (context, state) { final shareToken = state.pathParameters['shareToken']!; return BlocProvider(create: (context) { final bloc = ApplicationBloc(context.read<ApplicationRepository>(), context.read<JobsRepository>()); bloc.add(LoadApplicationJob(shareToken)); return bloc; }, child: ApplicationScreen(shareToken: shareToken)); }),
+        GoRoute(path: '/manager/jobs', builder: (context, state) => BlocProvider(create: (_) => ManagerJobsBloc(context.read<JobsRepository>())..add(LoadManagerJobs()), child: ManagerJobsScreen())),
+        GoRoute(path: '/manager/create-job', builder: (context, state) => BlocProvider(create: (_) => CreateJobBloc(context.read<JobsRepository>()), child: const CreateJobScreen())),
+      ],
     ),
   ],
 );

@@ -12,6 +12,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(this.repository, this.storage) : super(const AuthState()) {
     on<LoginRequested>(_login);
     on<AuthStarted>(_checkAuth);
+    on<RegisterRequested>(_register);
+    on<LogoutRequested>(_logout);
   }
 
   Future<void> _login(LoginRequested event, Emitter<AuthState> emit) async {
@@ -32,8 +34,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _checkAuth(AuthStarted event, Emitter<AuthState> emit) async {
+  Future<void> _register(
+    RegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    try {
+      final result = await repository.register(
+        event.fullName,
+        event.email,
+        event.password,
+        event.role.name.toUpperCase(),
+      );
+      final user = UserModel.fromJson(result['user']);
+      emit(
+        AuthState(
+          status: AuthStatus.authenticated,
+          token: result['accessToken'],
+          user: user,
+        ),
+      );
+      print(user);
+    } catch (e) {
+      emit(state.copyWith(status: AuthStatus.failure, error: e.toString()));
+    }
+  }
 
+  Future<void> _logout(LogoutRequested event, Emitter<AuthState> emit) async {
+    await repository.logout();
+    emit(const AuthState(status: AuthStatus.unauthenticated));
+  }
+
+  Future<void> _checkAuth(AuthStarted event, Emitter<AuthState> emit) async {
     final token = await storage.readToken();
     if (token == null) {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
@@ -55,7 +87,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await storage.deleteToken();
 
       emit(state.copyWith(status: AuthStatus.unauthenticated));
-    } finally {
-    }
+    } finally {}
   }
 }

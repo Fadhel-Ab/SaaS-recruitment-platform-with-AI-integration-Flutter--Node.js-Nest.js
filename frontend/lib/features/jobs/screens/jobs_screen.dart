@@ -90,6 +90,66 @@ class _JobsScreenState extends State<JobsScreen> {
     );
   }
 
+  Widget _buildUrgentPinnedJobs(List jobs, {required bool isDesktop}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.push_pin_outlined, color: Color(0xFFF97316)),
+            SizedBox(width: 8),
+            Text('Urgent pinned jobs', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF9A3412))),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: isDesktop ? 180 : 170,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: jobs.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final job = jobs[index];
+              return SizedBox(
+                width: isDesktop ? 360 : 300,
+                child: Card(
+                  elevation: 0,
+                  color: const Color(0xFFFFF7ED),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFFFDBA74)),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => context.go('/jobs/${job.shareToken}'),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Chip(
+                            label: Text('URGENT'),
+                            avatar: Icon(Icons.local_fire_department, size: 16),
+                            backgroundColor: Color(0xFFFED7AA),
+                            labelStyle: TextStyle(color: Color(0xFF9A3412), fontWeight: FontWeight.w800),
+                          ),
+                          const Spacer(),
+                          Text(job.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF7C2D12))),
+                          const SizedBox(height: 8),
+                          Text('${job.company ?? 'TalentHQ'} • ${job.location}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFC2410C))),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSearchBar({required bool isDesktop}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -152,11 +212,17 @@ class _JobsScreenState extends State<JobsScreen> {
               return const Center(child: Text('No jobs found'));
             }
 
+            final urgentJobs = state.jobs.where((job) => job.isUrgent || job.isPinned).toList();
+            final regularJobs = state.jobs.where((job) => !urgentJobs.contains(job)).toList();
+
             return ListView.separated(
-              itemCount: state.jobs.length,
+              itemCount: regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final job = state.jobs[index];
+                if (urgentJobs.isNotEmpty && index == 0) {
+                  return _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop);
+                }
+                final job = regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
                 return JobCard(
                   job: job,
                   index: index,

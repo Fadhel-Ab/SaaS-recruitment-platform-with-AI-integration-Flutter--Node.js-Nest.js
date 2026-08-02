@@ -16,6 +16,14 @@ class AuthApi {
     return response.data;
   }
 
+  Future<Map<String, dynamic>> register(String fullName, String email, String password, String role) async {
+    final response = await dio.post(
+      ApiConstants.register,
+      data: {'fullName': fullName, 'email': email, 'password': password, 'role': role},
+    );
+    return response.data;
+  }
+
   Future<Map<String, dynamic>> getMe(String token) async {
     final response = await dio.get(
       '/auth/me',
