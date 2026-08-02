@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/jobs/models/job_model.dart';
 import 'package:frontend/features/jobs/screens/widgets/page_header.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,12 +17,58 @@ class JobsScreen extends StatefulWidget {
 }
 
 class _JobsScreenState extends State<JobsScreen> {
+  static const int _jobsPerPage = 6;
+
   final TextEditingController _searchController = TextEditingController();
+  final Set<String> _selectedTypes = {};
+  String _selectedLocation = 'All Locations';
+  int _currentPage = 1;
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _handleSearchChanged(String value) {
+    setState(() {
+      _currentPage = 1;
+    });
+  }
+
+  void _handleFiltersChanged(List<String> types, String? location) {
+    setState(() {
+      _selectedTypes
+        ..clear()
+        ..addAll(types);
+      _selectedLocation = location ?? 'All Locations';
+      _currentPage = 1;
+    });
+  }
+
+  List<JobModel> _filterJobs(List<JobModel> jobs) {
+    final query = _searchController.text.trim().toLowerCase();
+
+    return jobs.where((job) {
+      final matchesSearch = query.isEmpty ||
+          job.title.toString().toLowerCase().contains(query) ||
+          job.description.toString().toLowerCase().contains(query) ||
+          job.requirements.toString().toLowerCase().contains(query) ||
+          job.location.toString().toLowerCase().contains(query) ||
+          job.employmentType.toString().toLowerCase().contains(query) ||
+          (job.company?.toString().toLowerCase().contains(query) ?? false) ||
+          (job.skillLevel?.toString().toLowerCase().contains(query) ?? false);
+
+      final matchesType = _selectedTypes.isEmpty ||
+          _selectedTypes.any(
+            (type) => job.employmentType.toString().toLowerCase() == type.toLowerCase(),
+          );
+
+      final matchesLocation = _selectedLocation == 'All Locations' ||
+          job.location.toString().toLowerCase().contains(_selectedLocation.toLowerCase());
+
+      return matchesSearch && matchesType && matchesLocation;
+    }).toList();
   }
 
   @override
@@ -31,7 +78,15 @@ class _JobsScreenState extends State<JobsScreen> {
       backgroundColor: const Color(0xFFF8F9FE),
       // Drawer filter for mobile screens
       endDrawer: MediaQuery.of(context).size.width <= 900
-          ? const Drawer(child: SafeArea(child: JobsFilterPanel()))
+          ? Drawer(
+              child: SafeArea(
+                child: JobsFilterPanel(
+                  selectedTypes: _selectedTypes,
+                  selectedLocation: _selectedLocation,
+                  onFilterChanged: _handleFiltersChanged,
+                ),
+              ),
+            )
           : null,
       body: SafeArea(
         child: Padding(
@@ -62,7 +117,11 @@ class _JobsScreenState extends State<JobsScreen> {
                       children: [
                         // Web/Desktop Modern Faceted Filter Panel on the left
                         if (isDesktop) ...[
-                          const JobsFilterPanel(),
+                          JobsFilterPanel(
+                            selectedTypes: _selectedTypes,
+                            selectedLocation: _selectedLocation,
+                            onFilterChanged: _handleFiltersChanged,
+                          ),
                           const SizedBox(width: 24),
                         ],
 
@@ -165,6 +224,7 @@ class _JobsScreenState extends State<JobsScreen> {
           Expanded(
             child: TextField(
               controller: _searchController,
+              onChanged: _handleSearchChanged,
               decoration: const InputDecoration(
                 hintText: 'Search jobs by title, skills, or location...',
                 border: InputBorder.none,
@@ -185,6 +245,50 @@ class _JobsScreenState extends State<JobsScreen> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPagination({
+    required int currentPage,
+    required int totalPages,
+    required int totalJobs,
+    required int startIndex,
+    required int visibleCount,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Showing ${startIndex + 1}-${startIndex + visibleCount} of $totalJobs jobs',
+            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w500),
+          ),
+          Row(
+            children: [
+              IconButton(
+                tooltip: 'Previous page',
+                onPressed: currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                icon: const Icon(Icons.chevron_left),
+              ),
+              Text(
+                'Page $currentPage of $totalPages',
+                style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+              ),
+              IconButton(
+                tooltip: 'Next page',
+                onPressed: currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                icon: const Icon(Icons.chevron_right),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -212,26 +316,49 @@ class _JobsScreenState extends State<JobsScreen> {
               return const Center(child: Text('No jobs found'));
             }
 
-            final urgentJobs = state.jobs.where((job) => job.isUrgent || job.isPinned).toList();
-            final regularJobs = state.jobs.where((job) => !urgentJobs.contains(job)).toList();
+            final filteredJobs = _filterJobs(state.jobs);
+            if (filteredJobs.isEmpty) {
+              return const Center(child: Text('No jobs match your search or filters'));
+            }
 
-            return ListView.separated(
-              itemCount: regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                if (urgentJobs.isNotEmpty && index == 0) {
-                  return _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop);
-                }
-                final job = regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
-                return JobCard(
-                  job: job,
-                  index: index,
-                  isDesktop: isDesktop,
-                  onTap: () {
-                    context.go('/jobs/${job.shareToken}');
-                  },
-                );
-              },
+            final totalPages = (filteredJobs.length / _jobsPerPage).ceil();
+            final safePage = _currentPage.clamp(1, totalPages);
+            final startIndex = (safePage - 1) * _jobsPerPage;
+            final pagedJobs = filteredJobs.skip(startIndex).take(_jobsPerPage).toList();
+            final urgentJobs = pagedJobs.where((job) => job.isUrgent || job.isPinned).toList();
+            final regularJobs = pagedJobs.where((job) => !urgentJobs.contains(job)).toList();
+
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      if (urgentJobs.isNotEmpty && index == 0) {
+                        return _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop);
+                      }
+                      final job = regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
+                      return JobCard(
+                        job: job,
+                        index: startIndex + index,
+                        isDesktop: isDesktop,
+                        onTap: () {
+                          context.go('/jobs/${job.shareToken}');
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildPagination(
+                  currentPage: safePage,
+                  totalPages: totalPages,
+                  totalJobs: filteredJobs.length,
+                  startIndex: startIndex,
+                  visibleCount: pagedJobs.length,
+                ),
+              ],
             );
 
           default:

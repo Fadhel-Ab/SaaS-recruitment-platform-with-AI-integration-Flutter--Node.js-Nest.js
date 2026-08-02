@@ -252,7 +252,8 @@ We will contact you regarding the next interview step.`,
     }
 
     return this.twilioService.makeCall(
-      this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!,
+      this.config.get<string>('TWILIO_TEST_PHONE_NUMBER') ??
+        application.candidate.phone,
       application.id,
     );
   }

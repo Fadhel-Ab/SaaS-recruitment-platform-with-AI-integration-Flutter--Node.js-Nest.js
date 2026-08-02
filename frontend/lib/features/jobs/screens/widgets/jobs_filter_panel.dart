@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 
 class JobsFilterPanel extends StatefulWidget {
-  final Function(String search, List<String> types, String? location)? onFilterChanged;
+  final void Function(List<String> types, String? location)? onFilterChanged;
+  final Set<String> selectedTypes;
+  final String selectedLocation;
 
-  const JobsFilterPanel({super.key, this.onFilterChanged});
+  const JobsFilterPanel({
+    super.key,
+    this.onFilterChanged,
+    this.selectedTypes = const {},
+    this.selectedLocation = 'All Locations',
+  });
 
   @override
   State<JobsFilterPanel> createState() => _JobsFilterPanelState();
 }
 
 class _JobsFilterPanelState extends State<JobsFilterPanel> {
-  final Set<String> _selectedTypes = {'Full-time'};
-  String _selectedLocation = 'All Locations';
-  final double _maxSalary = 150;
+  late final Set<String> _selectedTypes;
+  late String _selectedLocation;
 
   final List<String> _employmentTypes = [
     'Full-time',
@@ -29,6 +35,29 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
     'Austin, TX',
     'Remote',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTypes = {...widget.selectedTypes};
+    _selectedLocation = widget.selectedLocation;
+  }
+
+  @override
+  void didUpdateWidget(covariant JobsFilterPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedTypes != widget.selectedTypes ||
+        oldWidget.selectedLocation != widget.selectedLocation) {
+      _selectedTypes
+        ..clear()
+        ..addAll(widget.selectedTypes);
+      _selectedLocation = widget.selectedLocation;
+    }
+  }
+
+  void _notifyFiltersChanged() {
+    widget.onFilterChanged?.call(_selectedTypes.toList(), _selectedLocation);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +97,7 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                       _selectedTypes.clear();
                       _selectedLocation = 'All Locations';
                     });
+                    _notifyFiltersChanged();
                   },
                   child: const Text(
                     'Reset',
@@ -96,6 +126,7 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                       _selectedTypes.add(type);
                     }
                   });
+                  _notifyFiltersChanged();
                 },
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
@@ -119,6 +150,7 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                                 _selectedTypes.remove(type);
                               }
                             });
+                            _notifyFiltersChanged();
                           },
                         ),
                       ),
@@ -162,6 +194,7 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                   onChanged: (val) {
                     if (val != null) {
                       setState(() => _selectedLocation = val);
+                      _notifyFiltersChanged();
                     }
                   },
                 ),
