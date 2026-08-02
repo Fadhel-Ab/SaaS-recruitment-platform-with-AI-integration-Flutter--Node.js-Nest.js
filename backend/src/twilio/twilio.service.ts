@@ -44,7 +44,7 @@ export class TwilioService {
     return call;
   }
 
-  async makeTestCall(applicationId: string) {
+  async makeTestCall(applicationId?: string) {
     return this.makeCall(
       this.config.get<string>('TWILIO_TEST_PHONE_NUMBER')!,
       applicationId,

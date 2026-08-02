@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { StartInterviewDto } from './dto/start_interview.dto.js';
 import {
@@ -14,6 +19,7 @@ export class AiInterviewService {
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
+    @Inject(forwardRef(() => TwilioService))
     private twilioService: TwilioService,
     private config: ConfigService,
   ) {}
