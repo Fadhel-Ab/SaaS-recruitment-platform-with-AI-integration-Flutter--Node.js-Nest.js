@@ -10,7 +10,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final TokenStorage storage;
 
   AuthBloc(this.repository, this.storage) : super(const AuthState()) {
-    print('AuthBloc created');
     on<LoginRequested>(_login);
     on<AuthStarted>(_checkAuth);
   }
@@ -34,10 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _checkAuth(AuthStarted event, Emitter<AuthState> emit) async {
-    print('AuthStarted received');
 
     final token = await storage.readToken();
-    print('Token: $token');
     if (token == null) {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
 
@@ -59,7 +56,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     } finally {
-      print('Check auth finished');
     }
   }
 }

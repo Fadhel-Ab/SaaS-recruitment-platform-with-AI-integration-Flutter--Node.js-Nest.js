@@ -9,7 +9,6 @@ import 'package:frontend/features/applications/model/create_application_request.
 import 'package:frontend/features/applications/widgets/ai_call_waiting_overlay.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
 import 'package:frontend/features/applications/widgets/resume_upload_zone.dart';
-import 'package:frontend/features/jobs/models/job_model.dart';
 import 'package:frontend/widgets/status_dialog.dart';
 
 class ApplicationScreen extends StatefulWidget {

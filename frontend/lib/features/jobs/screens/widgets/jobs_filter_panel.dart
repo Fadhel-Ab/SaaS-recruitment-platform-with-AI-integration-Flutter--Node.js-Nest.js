@@ -12,7 +12,7 @@ class JobsFilterPanel extends StatefulWidget {
 class _JobsFilterPanelState extends State<JobsFilterPanel> {
   final Set<String> _selectedTypes = {'Full-time'};
   String _selectedLocation = 'All Locations';
-  double _maxSalary = 150;
+  final double _maxSalary = 150;
 
   final List<String> _employmentTypes = [
     'Full-time',

@@ -19,7 +19,6 @@ class JobsRepository {
 
   Future<List<JobModel>> getMyJobs() async {
     final data = await api.getMyJobs();
-    print(data);
     return (data as List).map((json) => JobModel.fromJson(json)).toList();
   }
 

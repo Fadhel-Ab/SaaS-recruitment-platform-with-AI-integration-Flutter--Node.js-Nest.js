@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/dashboard/data/model/dashboard_summary.dart';
 import 'package:frontend/features/dashboard/data/model/top_candidate.dart';
 
 class TopCandidatesCard extends StatelessWidget {

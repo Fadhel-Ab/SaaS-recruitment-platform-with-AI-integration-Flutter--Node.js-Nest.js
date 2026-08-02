@@ -14,14 +14,11 @@ class JobDetailsBloc extends Bloc<JobDetailsEvent, JobDetailsState> {
     LoadJobDetails event,
     Emitter<JobDetailsState> emit,
   ) async {
-    print("bloc works ?");
     emit(state.copyWith(status: JobDetailsStatus.loading));
 
     try {
-      print("bloc inner works ?");
 
       final job = await repository.getJob(event.shareToken);
-      print("bloc outer works ?");
       emit(state.copyWith(status: JobDetailsStatus.loaded, job: job));
     } catch (e) {
       emit(

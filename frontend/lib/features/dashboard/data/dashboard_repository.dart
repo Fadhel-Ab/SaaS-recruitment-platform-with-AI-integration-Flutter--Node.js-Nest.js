@@ -8,7 +8,6 @@ class DashboardRepository {
 
   Future<DashboardSummary> getSummary() async {
     final json = await api.getSummary();
-    print(json);
     return DashboardSummary.fromJson(json);
   }
 }
