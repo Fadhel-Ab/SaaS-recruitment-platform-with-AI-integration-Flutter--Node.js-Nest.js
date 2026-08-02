@@ -31,8 +31,7 @@ export class TwilioService {
       from: this.config.get<string>('TWILIO_PHONE_NUMBER')!,
       url,
 
-      statusCallback: `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/twilio/call-status?applicationId=${applicationId}`,
-
+      statusCallback: `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/twilio/call-status?applicationId=${applicationId}`,
       statusCallbackEvent: ['completed', 'busy', 'no-answer', 'failed'],
 
       statusCallbackMethod: 'POST',
