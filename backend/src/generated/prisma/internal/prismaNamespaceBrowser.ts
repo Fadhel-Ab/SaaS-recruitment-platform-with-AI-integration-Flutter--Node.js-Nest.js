@@ -103,6 +103,7 @@ export const JobScalarFieldEnum = {
   shareToken: 'shareToken',
   managerId: 'managerId',
   status: 'status',
+  interviewQuestions: 'interviewQuestions',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

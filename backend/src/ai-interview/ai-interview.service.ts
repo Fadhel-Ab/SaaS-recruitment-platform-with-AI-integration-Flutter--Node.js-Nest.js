@@ -257,6 +257,18 @@ We will contact you regarding the next interview step.`,
       application.id,
     );
   }
+  async getInterviewPlan(applicationId: string): Promise<string[]> {
+    const application = await this.prisma.application.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        job: true,
+      },
+    });
+
+    return application?.job.interviewQuestions ?? [];
+  }
   async findLatestApplicationByPhone(phone: string) {
     return this.prisma.application.findFirst({
       where: {

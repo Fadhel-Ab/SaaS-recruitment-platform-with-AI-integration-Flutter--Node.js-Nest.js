@@ -71,6 +71,7 @@ export type JobCountAggregateOutputType = {
   shareToken: number
   managerId: number
   status: number
+  interviewQuestions: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -124,6 +125,7 @@ export type JobCountAggregateInputType = {
   shareToken?: true
   managerId?: true
   status?: true
+  interviewQuestions?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -214,6 +216,7 @@ export type JobGroupByOutputType = {
   shareToken: string
   managerId: string
   status: $Enums.JobStatus
+  interviewQuestions: string[]
   createdAt: Date
   updatedAt: Date
   _count: JobCountAggregateOutputType | null
@@ -252,6 +255,7 @@ export type JobWhereInput = {
   shareToken?: Prisma.StringFilter<"Job"> | string
   managerId?: Prisma.StringFilter<"Job"> | string
   status?: Prisma.EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+  interviewQuestions?: Prisma.StringNullableListFilter<"Job">
   createdAt?: Prisma.DateTimeFilter<"Job"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Job"> | Date | string
   applications?: Prisma.ApplicationListRelationFilter
@@ -271,6 +275,7 @@ export type JobOrderByWithRelationInput = {
   shareToken?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interviewQuestions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
@@ -293,6 +298,7 @@ export type JobWhereUniqueInput = Prisma.AtLeast<{
   skillLevel?: Prisma.EnumSkillLevelFilter<"Job"> | $Enums.SkillLevel
   managerId?: Prisma.StringFilter<"Job"> | string
   status?: Prisma.EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+  interviewQuestions?: Prisma.StringNullableListFilter<"Job">
   createdAt?: Prisma.DateTimeFilter<"Job"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Job"> | Date | string
   applications?: Prisma.ApplicationListRelationFilter
@@ -312,6 +318,7 @@ export type JobOrderByWithAggregationInput = {
   shareToken?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interviewQuestions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.JobCountOrderByAggregateInput
@@ -335,6 +342,7 @@ export type JobScalarWhereWithAggregatesInput = {
   shareToken?: Prisma.StringWithAggregatesFilter<"Job"> | string
   managerId?: Prisma.StringWithAggregatesFilter<"Job"> | string
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"Job"> | $Enums.JobStatus
+  interviewQuestions?: Prisma.StringNullableListFilter<"Job">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Job"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Job"> | Date | string
 }
@@ -351,6 +359,7 @@ export type JobCreateInput = {
   skillLevel?: $Enums.SkillLevel
   shareToken: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.ApplicationCreateNestedManyWithoutJobInput
@@ -370,6 +379,7 @@ export type JobUncheckedCreateInput = {
   shareToken: string
   managerId: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutJobInput
@@ -387,6 +397,7 @@ export type JobUpdateInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.ApplicationUpdateManyWithoutJobNestedInput
@@ -406,6 +417,7 @@ export type JobUncheckedUpdateInput = {
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutJobNestedInput
@@ -424,6 +436,7 @@ export type JobCreateManyInput = {
   shareToken: string
   managerId: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -440,6 +453,7 @@ export type JobUpdateManyMutationInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -457,6 +471,7 @@ export type JobUncheckedUpdateManyInput = {
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -469,6 +484,14 @@ export type JobListRelationFilter = {
 
 export type JobOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type JobCountOrderByAggregateInput = {
@@ -484,6 +507,7 @@ export type JobCountOrderByAggregateInput = {
   shareToken?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interviewQuestions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -569,6 +593,10 @@ export type JobUncheckedUpdateManyWithoutManagerNestedInput = {
   deleteMany?: Prisma.JobScalarWhereInput | Prisma.JobScalarWhereInput[]
 }
 
+export type JobCreateinterviewQuestionsInput = {
+  set: string[]
+}
+
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
@@ -587,6 +615,11 @@ export type EnumSkillLevelFieldUpdateOperationsInput = {
 
 export type EnumJobStatusFieldUpdateOperationsInput = {
   set?: $Enums.JobStatus
+}
+
+export type JobUpdateinterviewQuestionsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type JobCreateNestedOneWithoutApplicationsInput = {
@@ -615,6 +648,7 @@ export type JobCreateWithoutManagerInput = {
   skillLevel?: $Enums.SkillLevel
   shareToken: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.ApplicationCreateNestedManyWithoutJobInput
@@ -632,6 +666,7 @@ export type JobUncheckedCreateWithoutManagerInput = {
   skillLevel?: $Enums.SkillLevel
   shareToken: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutJobInput
@@ -679,6 +714,7 @@ export type JobScalarWhereInput = {
   shareToken?: Prisma.StringFilter<"Job"> | string
   managerId?: Prisma.StringFilter<"Job"> | string
   status?: Prisma.EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+  interviewQuestions?: Prisma.StringNullableListFilter<"Job">
   createdAt?: Prisma.DateTimeFilter<"Job"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Job"> | Date | string
 }
@@ -695,6 +731,7 @@ export type JobCreateWithoutApplicationsInput = {
   skillLevel?: $Enums.SkillLevel
   shareToken: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   manager: Prisma.UserCreateNestedOneWithoutJobsInput
@@ -713,6 +750,7 @@ export type JobUncheckedCreateWithoutApplicationsInput = {
   shareToken: string
   managerId: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -745,6 +783,7 @@ export type JobUpdateWithoutApplicationsInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   manager?: Prisma.UserUpdateOneRequiredWithoutJobsNestedInput
@@ -763,6 +802,7 @@ export type JobUncheckedUpdateWithoutApplicationsInput = {
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -779,6 +819,7 @@ export type JobCreateManyManagerInput = {
   skillLevel?: $Enums.SkillLevel
   shareToken: string
   status?: $Enums.JobStatus
+  interviewQuestions?: Prisma.JobCreateinterviewQuestionsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -795,6 +836,7 @@ export type JobUpdateWithoutManagerInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.ApplicationUpdateManyWithoutJobNestedInput
@@ -812,6 +854,7 @@ export type JobUncheckedUpdateWithoutManagerInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutJobNestedInput
@@ -829,6 +872,7 @@ export type JobUncheckedUpdateManyWithoutManagerInput = {
   skillLevel?: Prisma.EnumSkillLevelFieldUpdateOperationsInput | $Enums.SkillLevel
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+  interviewQuestions?: Prisma.JobUpdateinterviewQuestionsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -877,6 +921,7 @@ export type JobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   shareToken?: boolean
   managerId?: boolean
   status?: boolean
+  interviewQuestions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   applications?: boolean | Prisma.Job$applicationsArgs<ExtArgs>
@@ -897,6 +942,7 @@ export type JobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
   shareToken?: boolean
   managerId?: boolean
   status?: boolean
+  interviewQuestions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -915,6 +961,7 @@ export type JobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
   shareToken?: boolean
   managerId?: boolean
   status?: boolean
+  interviewQuestions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -933,11 +980,12 @@ export type JobSelectScalar = {
   shareToken?: boolean
   managerId?: boolean
   status?: boolean
+  interviewQuestions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type JobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "requirements" | "companyName" | "location" | "employmentType" | "isActive" | "skillLevel" | "shareToken" | "managerId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
+export type JobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "requirements" | "companyName" | "location" | "employmentType" | "isActive" | "skillLevel" | "shareToken" | "managerId" | "status" | "interviewQuestions" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
 export type JobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applications?: boolean | Prisma.Job$applicationsArgs<ExtArgs>
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -969,6 +1017,7 @@ export type $JobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     shareToken: string
     managerId: string
     status: $Enums.JobStatus
+    interviewQuestions: string[]
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["job"]>
@@ -1408,6 +1457,7 @@ export interface JobFieldRefs {
   readonly shareToken: Prisma.FieldRef<"Job", 'String'>
   readonly managerId: Prisma.FieldRef<"Job", 'String'>
   readonly status: Prisma.FieldRef<"Job", 'JobStatus'>
+  readonly interviewQuestions: Prisma.FieldRef<"Job", 'String[]'>
   readonly createdAt: Prisma.FieldRef<"Job", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Job", 'DateTime'>
 }

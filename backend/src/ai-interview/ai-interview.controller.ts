@@ -41,8 +41,11 @@ export class AiInterviewController {
     @Query('applicationId') applicationId: string,
     @Res() res: ExpressResponse,
   ) {
+    const plan = await this.aiInterviewService.getInterviewPlan(applicationId);
     const question =
-      await this.aiService.generateInterviewQuestion(applicationId);
+      plan.length > 0
+        ? plan[0]
+        : await this.aiService.generateInterviewQuestion(applicationId);
     await this.aiInterviewService.saveQuestion(applicationId, question);
 
     const twiml = `
@@ -131,8 +134,11 @@ export class AiInterviewController {
       answer: body.SpeechResult,
     });
 
-    // Finish interview after 5 answers
-    if (session.questionCount >= 5) {
+    const plan = await this.aiInterviewService.getInterviewPlan(applicationId);
+    const limit = plan.length > 0 ? plan.length : 5;
+
+    // Finish interview after the planned (or default 5) number of answers
+    if (session.questionCount >= limit) {
      await this.aiInterviewService.complete(
     session.id,
     session.transcript ?? '',
@@ -156,7 +162,9 @@ export class AiInterviewController {
 
     // Generate next AI question
     const nextQuestion =
-      await this.aiService.generateInterviewQuestion(applicationId);
+      plan.length > 0 && session.questionCount < plan.length
+        ? plan[session.questionCount]
+        : await this.aiService.generateInterviewQuestion(applicationId);
 
     await this.aiInterviewService.saveQuestion(applicationId, nextQuestion);
 

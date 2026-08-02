@@ -2,13 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { v4 as uuid } from 'uuid';
 import { CreateJobDto } from './dto/create-job.dto.js';
+import { GenerateInterviewQuestionsDto } from './dto/generate-interview-questions.dto.js';
 import { StorageService } from '../common/storage/storage.service.js';
+import { AiService } from '../ai/ai.service.js';
 
 @Injectable()
 export class JobsService {
   constructor(
     private prisma: PrismaService,
     private storageService: StorageService,
+    private aiService: AiService,
   ) {}
   async create(userId: string, dto: CreateJobDto) {
     console.log('Creating job for user:', userId);
@@ -29,6 +32,8 @@ export class JobsService {
 
         shareToken: uuid(),
 
+        interviewQuestions: dto.interviewQuestions ?? [],
+
         manager: {
           connect: {
             id: userId,
@@ -36,6 +41,16 @@ export class JobsService {
         },
       },
     });
+  }
+
+  async generateInterviewQuestions(dto: GenerateInterviewQuestionsDto) {
+    const questions = await this.aiService.generateInterviewQuestions(
+      dto.title,
+      dto.description,
+      dto.requirements,
+    );
+
+    return { questions };
   }
   async getAvailableJobs() {
     return this.prisma.job.findMany({

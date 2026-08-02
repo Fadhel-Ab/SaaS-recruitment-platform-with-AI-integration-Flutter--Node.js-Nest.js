@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/jobs/bloc/manager_jobs_event.dart';
+import 'package:go_router/go_router.dart';
 
 import '../bloc/manager_jobs_bloc.dart';
 import '../bloc/manager_jobs_state.dart';
@@ -127,7 +128,7 @@ class ManagerJobsScreen extends StatelessWidget {
 
                             ElevatedButton(
                               onPressed: () {
-                                // candidates page later
+                                context.push('/manager/jobs/${job.id}/applicants');
                               },
 
                               child: const Text('Candidates'),

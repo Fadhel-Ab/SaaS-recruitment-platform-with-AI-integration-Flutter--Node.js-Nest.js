@@ -33,6 +33,7 @@ model Job {
   shareToken     String         @unique
   managerId      String
   status         JobStatus      @default(ACTIVE)
+  interviewQuestions String[]   @default([])
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 

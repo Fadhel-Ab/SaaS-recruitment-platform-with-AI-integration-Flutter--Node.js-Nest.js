@@ -27,4 +27,15 @@ class JobsApi {
 
     return response.data;
   }
+
+  Future<List<dynamic>> generateInterviewQuestions(
+    Map<String, dynamic> data,
+  ) async {
+    final response = await dio.post(
+      '/jobs/generate-interview-questions',
+      data: data,
+    );
+
+    return response.data['questions'] as List<dynamic>;
+  }
 }

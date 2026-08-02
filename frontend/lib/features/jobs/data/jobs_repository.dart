@@ -25,4 +25,17 @@ class JobsRepository {
   Future<void> createJob(CreateJobRequest request) async {
     await api.createJob(request.toJson());
   }
+
+  Future<List<String>> generateInterviewQuestions(
+    CreateJobRequest request,
+  ) async {
+    // The backend DTO for this endpoint only accepts title/description/
+    // requirements (forbidNonWhitelisted is on) so we can't reuse toJson().
+    final data = await api.generateInterviewQuestions({
+      'title': request.title,
+      'description': request.description,
+      'requirements': request.requirements,
+    });
+    return data.map((e) => e.toString()).toList();
+  }
 }

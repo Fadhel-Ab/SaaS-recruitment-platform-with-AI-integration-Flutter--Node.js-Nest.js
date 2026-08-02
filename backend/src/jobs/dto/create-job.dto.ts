@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { EmploymentType, SkillLevel } from '../../generated/prisma/enums.js';
 
 export class CreateJobDto {
@@ -22,4 +28,9 @@ export class CreateJobDto {
 
   @IsEnum(SkillLevel)
   skillLevel: SkillLevel;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  interviewQuestions?: string[];
 }

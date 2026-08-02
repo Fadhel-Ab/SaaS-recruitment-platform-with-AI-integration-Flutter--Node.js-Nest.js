@@ -4,9 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/app/app_scaffold.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
+import 'package:frontend/features/applications/bloc/application_detail_bloc.dart';
+import 'package:frontend/features/applications/bloc/application_detail_event.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
+import 'package:frontend/features/applications/bloc/job_applicants_bloc.dart';
+import 'package:frontend/features/applications/bloc/job_applicants_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
+import 'package:frontend/features/applications/screens/application_detail_screen.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
+import 'package:frontend/features/applications/screens/job_applicants_screen.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
@@ -72,6 +78,8 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
         GoRoute(path: '/apply/:shareToken', builder: (context, state) { final shareToken = state.pathParameters['shareToken']!; return BlocProvider(create: (context) { final bloc = ApplicationBloc(context.read<ApplicationRepository>(), context.read<JobsRepository>()); bloc.add(LoadApplicationJob(shareToken)); return bloc; }, child: ApplicationScreen(shareToken: shareToken)); }),
         GoRoute(path: '/manager/jobs', builder: (context, state) => BlocProvider(create: (_) => ManagerJobsBloc(context.read<JobsRepository>())..add(LoadManagerJobs()), child: ManagerJobsScreen())),
         GoRoute(path: '/manager/create-job', builder: (context, state) => BlocProvider(create: (_) => CreateJobBloc(context.read<JobsRepository>()), child: const CreateJobScreen())),
+        GoRoute(path: '/manager/jobs/:jobId/applicants', builder: (context, state) { final jobId = state.pathParameters['jobId']!; return BlocProvider(create: (context) => JobApplicantsBloc(context.read<ApplicationRepository>())..add(LoadJobApplicants(jobId)), child: JobApplicantsScreen(jobId: jobId)); }),
+        GoRoute(path: '/manager/applications/:applicationId', builder: (context, state) { final applicationId = state.pathParameters['applicationId']!; return BlocProvider(create: (context) => ApplicationDetailBloc(context.read<ApplicationRepository>())..add(LoadApplicationDetail(applicationId)), child: ApplicationDetailScreen(applicationId: applicationId)); }),
       ],
     ),
   ],

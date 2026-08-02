@@ -103,4 +103,15 @@ export class AiService {
       application.aiInterview?.transcript ?? '',
     );
   }
+
+  async generateInterviewQuestions(
+    title: string,
+    description: string,
+    requirements: string,
+    count = 5,
+  ): Promise<string[]> {
+    const jobDescription = `${title}\n\n${description}\n\nRequirements:\n${requirements}`;
+
+    return this.aiProvider.generateInterviewQuestionSet(jobDescription, count);
+  }
 }

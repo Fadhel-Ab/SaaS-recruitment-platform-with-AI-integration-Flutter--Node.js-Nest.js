@@ -6,6 +6,7 @@ import { ResumeAnalysis } from './interfaces/resume-analysis.interface.js';
 import {
   buildInterviewPrompt,
   buildInterviewQuestionPrompt,
+  buildInterviewQuestionSetPrompt,
 } from './prompts/interview-analysis.prompt.js';
 import { InterviewAnalysis } from './interfaces/interview-analysis.interface.js';
 
@@ -115,5 +116,21 @@ export class AIProviderService implements OnModuleInit {
   ): Promise<string> {
     const prompt = buildInterviewQuestionPrompt(jobDescription, transcript);
     return await this.executePrompt(prompt);
+  }
+
+  async generateInterviewQuestionSet(
+    jobDescription: string,
+    count = 5,
+  ): Promise<string[]> {
+    const prompt = buildInterviewQuestionSetPrompt(jobDescription, count);
+    const content = await this.executePrompt(prompt, {
+      responseMimeType: 'application/json',
+    });
+
+    if (!content) {
+      throw new Error('AI returned empty response');
+    }
+
+    return JSON.parse(content);
   }
 }

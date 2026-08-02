@@ -143,6 +143,7 @@ class AppScaffold extends StatelessWidget {
     if (role == UserRole.manager) {
       if (location.startsWith('/dashboard')) return 0;
       if (location.startsWith('/manager/create-job')) return 2;
+      // /manager/jobs and its applicant/detail sub-routes fall through here.
       return 1;
     }
     return 0;
@@ -154,7 +155,7 @@ class AppScaffold extends StatelessWidget {
         index == 0
             ? '/dashboard'
             : index == 1
-            ? '/jobs'
+            ? '/manager/jobs'
             : '/manager/create-job',
       );
     } else {

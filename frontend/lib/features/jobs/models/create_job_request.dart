@@ -6,6 +6,7 @@ class CreateJobRequest {
   final String companyName;
   final String skillLevel;
   final String location;
+  final List<String>? interviewQuestions;
 
   CreateJobRequest({
     required this.title,
@@ -15,7 +16,21 @@ class CreateJobRequest {
     required this.companyName,
     required this.skillLevel,
     required this.location,
+    this.interviewQuestions,
   });
+
+  CreateJobRequest copyWith({List<String>? interviewQuestions}) {
+    return CreateJobRequest(
+      title: title,
+      description: description,
+      requirements: requirements,
+      employmentType: employmentType,
+      companyName: companyName,
+      skillLevel: skillLevel,
+      location: location,
+      interviewQuestions: interviewQuestions ?? this.interviewQuestions,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -26,6 +41,7 @@ class CreateJobRequest {
       'companyName': companyName,
       'skillLevel': skillLevel,
       'location': location,
+      if (interviewQuestions != null) 'interviewQuestions': interviewQuestions,
     };
   }
 }

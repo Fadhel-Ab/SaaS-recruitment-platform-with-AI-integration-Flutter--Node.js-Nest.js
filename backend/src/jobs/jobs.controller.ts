@@ -4,6 +4,7 @@ import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { JobsService } from './jobs.service.js';
 import { CreateJobDto } from './dto/create-job.dto.js';
+import { GenerateInterviewQuestionsDto } from './dto/generate-interview-questions.dto.js';
 import { Public } from '../auth/decorators/public.decorator.js';
 
 @Controller('jobs')
@@ -21,6 +22,12 @@ export class JobsController {
   create(@CurrentUser() user, @Body() dto: CreateJobDto) {
     console.log('CURRENT USER:', user);
     return this.jobsService.create(user.id, dto);
+  }
+
+  @Post('generate-interview-questions')
+  @Roles(UserRole.MANAGER)
+  generateInterviewQuestions(@Body() dto: GenerateInterviewQuestionsDto) {
+    return this.jobsService.generateInterviewQuestions(dto);
   }
 
   @Get('my')
