@@ -46,7 +46,8 @@ class JobCard extends StatelessWidget {
 
   // METHOD: Copies target token share routing link directly to user clipboard overlay
   void _copyShareLink(BuildContext context) {
-    final String shareUrl = '/jobs/${job.shareToken ?? ''}';
+    final String baseUrl = Uri.base.origin;
+    final String shareUrl = '$baseUrl/#/jobs/${job.shareToken ?? ''}';
 
     Clipboard.setData(ClipboardData(text: shareUrl)).then((_) {
       if (context.mounted) {

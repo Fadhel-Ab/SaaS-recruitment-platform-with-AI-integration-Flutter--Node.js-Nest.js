@@ -42,6 +42,12 @@ class AppScaffold extends StatelessWidget {
                     ),
                   ),
                 ),
+              if (user?.role == UserRole.manager && !isPhone)
+                IconButton(
+                  tooltip: 'View job listings',
+                  icon: const Icon(Icons.travel_explore_outlined),
+                  onPressed: () => context.push('/jobs'),
+                ),
               if (user?.role == UserRole.manager)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 1),
@@ -62,6 +68,8 @@ class AppScaffold extends StatelessWidget {
                 onSelected: (value) {
                   if (value == 'logout') {
                     context.read<AuthBloc>().add(const LogoutRequested());
+                  } else if (value == 'view-jobs') {
+                    context.push('/jobs');
                   }
                 },
                 itemBuilder: (context) => [
@@ -70,6 +78,14 @@ class AppScaffold extends StatelessWidget {
                     child: Text(user?.email ?? 'User'),
                   ),
                   const PopupMenuDivider(),
+                  if (user?.role == UserRole.manager)
+                    const PopupMenuItem(
+                      value: 'view-jobs',
+                      child: ListTile(
+                        leading: Icon(Icons.travel_explore_outlined),
+                        title: Text('View Job Listings'),
+                      ),
+                    ),
                   const PopupMenuItem(
                     value: 'logout',
                     child: ListTile(
