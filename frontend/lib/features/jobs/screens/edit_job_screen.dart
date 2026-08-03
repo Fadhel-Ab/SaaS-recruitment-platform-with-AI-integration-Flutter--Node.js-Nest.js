@@ -35,6 +35,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   late String employmentType = widget.job.employmentType;
   late String skillLevel = widget.job.skillLevel ?? 'ENTRY';
   late String status = widget.job.status ?? 'ACTIVE';
+  late bool isUrgent = widget.job.isUrgent;
   late final List<TextEditingController> _questionControllers =
       widget.job.interviewQuestions
           .map((q) => TextEditingController(text: q))
@@ -93,6 +94,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         'employmentType': employmentType,
         'skillLevel': skillLevel,
         'status': status,
+        'isUrgent': isUrgent,
         'interviewQuestions': questions,
       });
 
@@ -345,6 +347,41 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             onSelected: (_) => setState(() => status = s),
                           );
                         }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Urgent Hiring Toggle
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF7ED),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFFDBA74)),
+                        ),
+                        child: SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          value: isUrgent,
+                          onChanged: (v) => setState(() => isUrgent = v),
+                          activeThumbColor: const Color(0xFFF97316),
+                          title: const Text(
+                            'Mark as Urgent',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF9A3412),
+                            ),
+                          ),
+                          subtitle: const Text(
+                            'Pins this job to the top of the listings with an urgent flag.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFC2410C),
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       const FormLabel(

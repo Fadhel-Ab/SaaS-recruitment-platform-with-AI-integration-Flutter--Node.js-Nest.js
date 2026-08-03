@@ -30,6 +30,7 @@ model Job {
   location       String?
   employmentType EmploymentType
   isActive       Boolean        @default(true)
+  isUrgent       Boolean        @default(false)
   skillLevel     SkillLevel     @default(ENTRY)
   shareToken     String         @unique
   managerId      String

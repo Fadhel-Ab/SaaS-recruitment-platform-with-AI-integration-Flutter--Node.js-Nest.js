@@ -8,6 +8,7 @@ class CreateJobRequest {
   final String companyName;
   final String skillLevel;
   final String location;
+  final bool isUrgent;
   final List<String>? interviewQuestions;
   final List<AvailabilitySlot>? availability;
 
@@ -19,6 +20,7 @@ class CreateJobRequest {
     required this.companyName,
     required this.skillLevel,
     required this.location,
+    this.isUrgent = false,
     this.interviewQuestions,
     this.availability,
   });
@@ -35,6 +37,7 @@ class CreateJobRequest {
       companyName: companyName,
       skillLevel: skillLevel,
       location: location,
+      isUrgent: isUrgent,
       interviewQuestions: interviewQuestions ?? this.interviewQuestions,
       availability: availability ?? this.availability,
     );
@@ -49,6 +52,7 @@ class CreateJobRequest {
       'companyName': companyName,
       'skillLevel': skillLevel,
       'location': location,
+      'isUrgent': isUrgent,
       if (interviewQuestions != null) 'interviewQuestions': interviewQuestions,
       if (availability != null)
         'availability': availability!.map((a) => a.toJson()).toList(),

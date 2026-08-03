@@ -81,6 +81,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
 
   String employmentType = 'FULL_TIME';
   String skillLevel = 'ENTRY';
+  bool isUrgent = false;
 
   // 0 = details, 1 = interview questions, 2 = interview availability
   int _step = 0;
@@ -119,6 +120,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       requirements: requirementsController.text.trim(),
       employmentType: employmentType,
       skillLevel: skillLevel,
+      isUrgent: isUrgent,
     );
   }
 
@@ -514,6 +516,35 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 onSelected: (_) => setState(() => skillLevel = level),
               );
             }).toList(),
+          ),
+          const SizedBox(height: 20),
+
+          // Urgent Hiring Toggle
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF7ED),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFFDBA74)),
+            ),
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: isUrgent,
+              onChanged: (v) => setState(() => isUrgent = v),
+              activeThumbColor: const Color(0xFFF97316),
+              title: const Text(
+                'Mark as Urgent',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF9A3412),
+                ),
+              ),
+              subtitle: const Text(
+                'Pins this job to the top of the listings with an urgent flag.',
+                style: TextStyle(fontSize: 12, color: Color(0xFFC2410C)),
+              ),
+            ),
           ),
           const SizedBox(height: 36),
 

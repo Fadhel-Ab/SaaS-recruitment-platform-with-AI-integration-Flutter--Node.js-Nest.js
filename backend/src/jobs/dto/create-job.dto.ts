@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsIn,
@@ -61,6 +62,10 @@ export class CreateJobDto {
 
   @IsEnum(SkillLevel)
   skillLevel: SkillLevel;
+
+  @IsOptional()
+  @IsBoolean()
+  isUrgent?: boolean;
 
   @IsOptional()
   @IsArray()

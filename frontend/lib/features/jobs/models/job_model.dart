@@ -15,7 +15,6 @@ class JobModel {
   final String? status;
   final DateTime createdAt;
   final bool isUrgent;
-  final bool isPinned;
   final List<String> interviewQuestions;
   final List<AvailabilitySlot> jobAvailability;
 
@@ -34,7 +33,6 @@ class JobModel {
     this.interviews,
     this.status,
     this.isUrgent = false,
-    this.isPinned = false,
     this.interviewQuestions = const [],
     this.jobAvailability = const [],
   });
@@ -62,9 +60,7 @@ class JobModel {
 
       status: json['status'],
 
-      isUrgent: json['isUrgent'] == true || json['urgent'] == true || (json['priority']?.toString().toLowerCase() == 'urgent') || (json['status']?.toString().toLowerCase().contains('urgent') ?? false),
-
-      isPinned: json['isPinned'] == true || json['pinned'] == true,
+      isUrgent: json['isUrgent'] == true,
 
       interviewQuestions: json['interviewQuestions'] is List
           ? List<String>.from(json['interviewQuestions'])

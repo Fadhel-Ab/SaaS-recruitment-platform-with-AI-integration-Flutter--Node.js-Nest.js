@@ -31,6 +31,7 @@ export class JobsService {
 
         skillLevel: dto.skillLevel,
         location: dto.location,
+        isUrgent: dto.isUrgent ?? false,
 
         shareToken: uuid(),
 
@@ -141,6 +142,7 @@ export class JobsService {
         companyName: true,
         skillLevel: true,
         status: true,
+        isUrgent: true,
 
         _count: {
           select: {
@@ -193,6 +195,7 @@ export class JobsService {
         companyName: true,
         skillLevel: true,
         status: true,
+        isUrgent: true,
         shareToken: true,
         createdAt: true,
 

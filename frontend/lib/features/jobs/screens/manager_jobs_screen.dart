@@ -160,6 +160,10 @@ class _JobCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (job.isUrgent) ...[
+                  const _UrgentPill(),
+                  const SizedBox(width: 8),
+                ],
                 _StatusPill(status: job.status ?? 'ACTIVE'),
                 IconButton(
                   icon: const Icon(
@@ -250,6 +254,36 @@ class _InfoItem extends StatelessWidget {
           style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
         ),
       ],
+    );
+  }
+}
+
+class _UrgentPill extends StatelessWidget {
+  const _UrgentPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFED7AA),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.local_fire_department, size: 14, color: Color(0xFF9A3412)),
+          SizedBox(width: 4),
+          Text(
+            'URGENT',
+            style: TextStyle(
+              color: Color(0xFF9A3412),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

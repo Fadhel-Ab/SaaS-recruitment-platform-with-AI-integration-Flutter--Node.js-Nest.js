@@ -163,7 +163,10 @@ class _JobsScreenState extends State<JobsScreen> {
     );
   }
 
-  Widget _buildUrgentPinnedJobs(List jobs, {required bool isDesktop}) {
+  Widget _buildUrgentPinnedJobs(
+    List<JobModel> jobs, {
+    required bool isDesktop,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -184,61 +187,81 @@ class _JobsScreenState extends State<JobsScreen> {
         const SizedBox(height: 12),
         SizedBox(
           height: isDesktop ? 180 : 170,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: jobs.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final job = jobs[index];
-              return SizedBox(
-                width: isDesktop ? 360 : 300,
-                child: Card(
-                  elevation: 0,
-                  color: const Color(0xFFFFF7ED),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFFDBA74)),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => context.go('/jobs/${job.shareToken}'),
-                    child: Padding(
-                      padding: const EdgeInsets.all(18),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Chip(
-                            label: Text('URGENT'),
-                            avatar: Icon(Icons.local_fire_department, size: 16),
-                            backgroundColor: Color(0xFFFED7AA),
-                            labelStyle: TextStyle(
-                              color: Color(0xFF9A3412),
-                              fontWeight: FontWeight.w800,
-                            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Size cards so exactly 2 are visible at once; the rest are
+              // reachable by scrolling horizontally.
+              const spacing = 12.0;
+              const minCardWidth = 240.0;
+              double cardWidth = jobs.length == 1
+                  ? constraints.maxWidth.clamp(0, 420)
+                  : (constraints.maxWidth - spacing) / 2;
+              if (jobs.length > 1 && cardWidth < minCardWidth) {
+                cardWidth = minCardWidth;
+              }
+
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: jobs.length,
+                separatorBuilder: (_, __) => const SizedBox(width: spacing),
+                itemBuilder: (context, index) {
+                  final job = jobs[index];
+                  return SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      elevation: 0,
+                      color: const Color(0xFFFFF7ED),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Color(0xFFFDBA74)),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () => context.go('/jobs/${job.shareToken}'),
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Chip(
+                                label: Text('URGENT'),
+                                avatar: Icon(
+                                  Icons.local_fire_department,
+                                  size: 16,
+                                ),
+                                backgroundColor: Color(0xFFFED7AA),
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF9A3412),
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                job.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF7C2D12),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${job.company ?? 'TalentHQ'} • ${job.location}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFFC2410C),
+                                ),
+                              ),
+                            ],
                           ),
-                          const Spacer(),
-                          Text(
-                            job.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF7C2D12),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${job.company ?? 'TalentHQ'} • ${job.location}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Color(0xFFC2410C)),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
@@ -371,56 +394,60 @@ class _JobsScreenState extends State<JobsScreen> {
               );
             }
 
-            final totalPages = (filteredJobs.length / _jobsPerPage).ceil();
+            // Urgent jobs are pinned in their own strip above the paginated
+            // list (sourced from the full filtered set, not just the
+            // current page) and excluded from the regular list below.
+            final urgentJobs = filteredJobs
+                .where((job) => job.isUrgent)
+                .toList();
+            final regularJobs = filteredJobs
+                .where((job) => !job.isUrgent)
+                .toList();
+
+            final totalPages = regularJobs.isEmpty
+                ? 1
+                : (regularJobs.length / _jobsPerPage).ceil();
             final safePage = _currentPage.clamp(1, totalPages);
             final startIndex = (safePage - 1) * _jobsPerPage;
-            final pagedJobs = filteredJobs
+            final pagedJobs = regularJobs
                 .skip(startIndex)
                 .take(_jobsPerPage)
-                .toList();
-            final urgentJobs = pagedJobs
-                .where((job) => job.isUrgent || job.isPinned)
-                .toList();
-            final regularJobs = pagedJobs
-                .where((job) => !urgentJobs.contains(job))
                 .toList();
 
             return Column(
               children: [
-                Expanded(
-                  child: ListView.separated(
-                    itemCount:
-                        regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      if (urgentJobs.isNotEmpty && index == 0) {
-                        return _buildUrgentPinnedJobs(
-                          urgentJobs,
+                if (urgentJobs.isNotEmpty) ...[
+                  _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop),
+                  const SizedBox(height: 16),
+                ],
+                if (regularJobs.isNotEmpty) ...[
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: pagedJobs.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final job = pagedJobs[index];
+                        return JobCard(
+                          job: job,
+                          index: startIndex + index,
                           isDesktop: isDesktop,
+                          onTap: () {
+                            context.go('/jobs/${job.shareToken}');
+                          },
                         );
-                      }
-                      final job =
-                          regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
-                      return JobCard(
-                        job: job,
-                        index: startIndex + index,
-                        isDesktop: isDesktop,
-                        onTap: () {
-                          context.go('/jobs/${job.shareToken}');
-                        },
-                      );
-                    },
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                _buildPagination(
-                  currentPage: safePage,
-                  totalPages: totalPages,
-                  totalJobs: filteredJobs.length,
-                  startIndex: startIndex,
-                  visibleCount: pagedJobs.length,
-                ),
+                  const SizedBox(height: 16),
+                  _buildPagination(
+                    currentPage: safePage,
+                    totalPages: totalPages,
+                    totalJobs: regularJobs.length,
+                    startIndex: startIndex,
+                    visibleCount: pagedJobs.length,
+                  ),
+                ],
               ],
             );
 

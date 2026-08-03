@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -43,6 +44,10 @@ export class UpdateJobDto {
   @IsOptional()
   @IsEnum(JobStatus)
   status?: JobStatus;
+
+  @IsOptional()
+  @IsBoolean()
+  isUrgent?: boolean;
 
   @IsOptional()
   @IsArray()
