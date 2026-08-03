@@ -59,7 +59,7 @@ class ApplicationDetailScreen extends StatelessWidget {
           final application = state.application!;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Center(
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 800),

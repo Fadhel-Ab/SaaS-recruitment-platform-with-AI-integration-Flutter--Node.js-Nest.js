@@ -266,7 +266,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         },
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
             child: Container(
               constraints: const BoxConstraints(
                 maxWidth: 680,
@@ -275,7 +275,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 color: Colors.white,
                 elevation: 0,
                 child: Padding(
-                  padding: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.fromLTRB(32, 20, 32, 32),
                   child: switch (_step) {
                     0 => _buildDetailsStep(),
                     1 => _buildQuestionsStep(),

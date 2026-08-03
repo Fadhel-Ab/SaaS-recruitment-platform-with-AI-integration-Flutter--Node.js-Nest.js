@@ -132,7 +132,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 680),
             child: Card(
@@ -143,7 +143,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 side: const BorderSide(color: Color(0xFFE5E7EB)),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.fromLTRB(32, 20, 32, 32),
                 child: Form(
                   key: _formKey,
                   child: Column(

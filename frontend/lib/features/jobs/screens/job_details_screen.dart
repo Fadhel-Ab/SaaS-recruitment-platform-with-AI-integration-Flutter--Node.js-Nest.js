@@ -55,7 +55,12 @@ class JobDetailsScreen extends StatelessWidget {
                 // Main Content Viewport Area
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.all(isDesktop ? 32.0 : 16.0),
+                    padding: EdgeInsets.fromLTRB(
+                      isDesktop ? 32.0 : 16.0,
+                      16.0,
+                      isDesktop ? 32.0 : 16.0,
+                      isDesktop ? 32.0 : 16.0,
+                    ),
                     child: Center(
                       child: Container(
                         constraints: const BoxConstraints(maxWidth: 1200),

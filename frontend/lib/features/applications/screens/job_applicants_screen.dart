@@ -171,7 +171,7 @@ class _FilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -141,6 +141,8 @@ export class JobsService {
             applications: true,
           },
         },
+
+        jobAvailability: true,
       },
 
       orderBy: {

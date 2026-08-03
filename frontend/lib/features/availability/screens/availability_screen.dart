@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:frontend/features/availability/data/availability_repository.dart';
 import 'package:frontend/features/availability/model/availability_slot.dart';
+import 'package:frontend/features/jobs/data/jobs_repository.dart';
+import 'package:frontend/features/jobs/models/job_model.dart';
 
 const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -18,6 +20,7 @@ enum _LoadStatus { loading, success, failure }
 class _AvailabilityScreenState extends State<AvailabilityScreen> {
   _LoadStatus _status = _LoadStatus.loading;
   List<AvailabilitySlot> _slots = [];
+  List<JobModel> _jobsWithAvailability = [];
   String? _error;
   bool _isSaving = false;
 
@@ -30,9 +33,17 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   Future<void> _load() async {
     setState(() => _status = _LoadStatus.loading);
     try {
-      final slots = await context.read<AvailabilityRepository>().getMine();
+      final results = await Future.wait([
+        context.read<AvailabilityRepository>().getMine(),
+        context.read<JobsRepository>().getMyJobs(),
+      ]);
+      final slots = results[0] as List<AvailabilitySlot>;
+      final jobs = results[1] as List<JobModel>;
       setState(() {
         _slots = slots;
+        _jobsWithAvailability = jobs
+            .where((j) => j.jobAvailability.isNotEmpty)
+            .toList();
         _status = _LoadStatus.success;
       });
     } catch (e) {
@@ -118,6 +129,85 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     );
   }
 
+  Widget _buildSectionHeader(String title, {String? subtitle}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF111827),
+            ),
+          ),
+          if (subtitle != null)
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlotCard(
+    AvailabilitySlot slot, {
+    bool editable = true,
+  }) {
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
+      color: Colors.white,
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: const Color(0xFFEEF2FF),
+          child: Text(
+            _dayLabels[(slot.dayOfWeek - 1) % 7],
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF4F46E5),
+            ),
+          ),
+        ),
+        title: Text(
+          '${slot.startTime} - ${slot.endTime}',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        trailing: editable
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 20,
+                      color: Color(0xFF6B7280),
+                    ),
+                    onPressed: _isSaving ? null : () => _editSlot(slot),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 20,
+                      color: Color(0xFFC5221F),
+                    ),
+                    onPressed: _isSaving ? null : () => _deleteSlot(slot),
+                  ),
+                ],
+              )
+            : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,7 +241,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             );
           }
 
-          if (_slots.isEmpty) {
+          if (_slots.isEmpty && _jobsWithAvailability.isEmpty) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -176,59 +266,31 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: _slots.length,
-            itemBuilder: (context, index) {
-              final slot = _slots[index];
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFE5E7EB)),
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            children: [
+              _buildSectionHeader(
+                'General Availability',
+                subtitle:
+                    'Used as the default for new jobs when they don\'t have their own schedule.',
+              ),
+              if (_slots.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'No general slots set.',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
+                  ),
+                )
+              else
+                ..._slots.map((slot) => _buildSlotCard(slot)),
+              for (final job in _jobsWithAvailability) ...[
+                _buildSectionHeader('Job: ${job.title}'),
+                ...job.jobAvailability.map(
+                  (slot) => _buildSlotCard(slot, editable: false),
                 ),
-                color: Colors.white,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: const Color(0xFFEEF2FF),
-                    child: Text(
-                      _dayLabels[(slot.dayOfWeek - 1) % 7],
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF4F46E5),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    '${slot.startTime} - ${slot.endTime}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit_outlined,
-                          size: 20,
-                          color: Color(0xFF6B7280),
-                        ),
-                        onPressed: _isSaving ? null : () => _editSlot(slot),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 20,
-                          color: Color(0xFFC5221F),
-                        ),
-                        onPressed: _isSaving ? null : () => _deleteSlot(slot),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+              ],
+            ],
           );
         },
       ),

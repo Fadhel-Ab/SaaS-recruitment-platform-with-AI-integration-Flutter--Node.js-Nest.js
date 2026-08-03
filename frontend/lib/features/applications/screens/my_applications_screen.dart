@@ -75,7 +75,7 @@ class MyApplicationsScreen extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             itemCount: state.applications.length,
             itemBuilder: (context, index) {
               return _ApplicationCard(application: state.applications[index]);

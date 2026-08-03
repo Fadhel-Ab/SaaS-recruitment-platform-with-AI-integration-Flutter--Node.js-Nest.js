@@ -1,3 +1,5 @@
+import 'package:frontend/features/availability/model/availability_slot.dart';
+
 class JobModel {
   final String id;
   final String title;
@@ -15,6 +17,7 @@ class JobModel {
   final bool isUrgent;
   final bool isPinned;
   final List<String> interviewQuestions;
+  final List<AvailabilitySlot> jobAvailability;
 
   JobModel({
     required this.id,
@@ -33,6 +36,7 @@ class JobModel {
     this.isUrgent = false,
     this.isPinned = false,
     this.interviewQuestions = const [],
+    this.jobAvailability = const [],
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -64,6 +68,12 @@ class JobModel {
 
       interviewQuestions: json['interviewQuestions'] is List
           ? List<String>.from(json['interviewQuestions'])
+          : const [],
+
+      jobAvailability: json['jobAvailability'] is List
+          ? (json['jobAvailability'] as List)
+              .map((e) => AvailabilitySlot.fromJson(Map<String, dynamic>.from(e)))
+              .toList()
           : const [],
 
       createdAt: json['createdAt'] != null

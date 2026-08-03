@@ -188,7 +188,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               )
             : Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 600),
                     child: Card(
@@ -199,7 +199,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                         side: const BorderSide(color: Color(0xFFE5E7EB)),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(32.0),
+                        padding: const EdgeInsets.fromLTRB(32, 20, 32, 32),
                         child: Form(
                           key: _formKey,
                           child: Column(

@@ -105,7 +105,7 @@ class _JobsScreenState extends State<JobsScreen> {
           : null,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.fromLTRB(24.0, 10.0, 24.0, 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
