@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:frontend/core/api/api_constants.dart';
 import 'package:frontend/features/applications/bloc/application_detail_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_detail_event.dart';
 import 'package:frontend/features/applications/bloc/application_detail_state.dart';
 import 'package:frontend/features/applications/model/application_detail.dart';
 import 'package:frontend/features/applications/model/application_status.dart';
+
+Future<void> _openResume(String resumeUrl) async {
+  final uri = Uri.parse('${ApiConstants.serverOrigin}$resumeUrl');
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
 
 class ApplicationDetailScreen extends StatelessWidget {
   final String applicationId;
@@ -189,6 +196,26 @@ class _CandidateHeaderCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (application.resumeUrl != null) ...[
+                    const SizedBox(height: 10),
+                    OutlinedButton.icon(
+                      onPressed: () => _openResume(application.resumeUrl!),
+                      icon: const Icon(Icons.description_outlined, size: 16),
+                      label: const Text('View Resume'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF4F46E5),
+                        side: const BorderSide(color: Color(0xFF4F46E5)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

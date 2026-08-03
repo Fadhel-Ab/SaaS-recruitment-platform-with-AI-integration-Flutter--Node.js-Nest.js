@@ -14,6 +14,9 @@ import 'package:frontend/features/applications/bloc/my_applications_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/screens/application_detail_screen.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
+import 'package:frontend/features/applications/bloc/pipeline_bloc.dart';
+import 'package:frontend/features/applications/bloc/pipeline_event.dart';
+import 'package:frontend/features/applications/screens/candidate_pipeline_screen.dart';
 import 'package:frontend/features/applications/screens/job_applicants_screen.dart';
 import 'package:frontend/features/applications/screens/my_applications_screen.dart';
 import 'package:frontend/features/availability/screens/availability_screen.dart';
@@ -89,6 +92,7 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
         GoRoute(path: '/manager/applications/:applicationId', builder: (context, state) { final applicationId = state.pathParameters['applicationId']!; return BlocProvider(create: (context) => ApplicationDetailBloc(context.read<ApplicationRepository>())..add(LoadApplicationDetail(applicationId)), child: ApplicationDetailScreen(applicationId: applicationId)); }),
         GoRoute(path: '/my-applications', builder: (context, state) => BlocProvider(create: (_) => MyApplicationsBloc(context.read<ApplicationRepository>())..add(LoadMyApplications()), child: const MyApplicationsScreen())),
         GoRoute(path: '/manager/availability', builder: (context, state) => const AvailabilityScreen()),
+        GoRoute(path: '/manager/candidates', builder: (context, state) => BlocProvider(create: (_) => PipelineBloc(context.read<ApplicationRepository>())..add(LoadPipeline()), child: const CandidatePipelineScreen())),
       ],
     ),
   ],

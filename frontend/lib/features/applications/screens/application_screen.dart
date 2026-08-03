@@ -8,6 +8,7 @@ import 'package:frontend/features/auth/data/models/user_role.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/bloc/application_state.dart';
+import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/model/create_application_request.dart';
 import 'package:frontend/features/applications/widgets/ai_call_waiting_overlay.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
@@ -35,6 +36,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   bool _showAiCallingInterface = false;
   double _aiScore = 0.0;
   double _aiThreshold = 0.0;
+  String? _applicationId;
+  bool _isRequestingCall = false;
 
   @override
   void dispose() {
@@ -102,6 +105,27 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
+  Future<void> _requestCall() async {
+    final applicationId = _applicationId;
+    if (applicationId == null || _isRequestingCall) return;
+
+    setState(() => _isRequestingCall = true);
+    try {
+      await context.read<ApplicationRepository>().startAiCall(applicationId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Calling you now — please answer!")),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not start the call: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isRequestingCall = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<ApplicationBloc, ApplicationState>(
@@ -129,6 +153,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           setState(() {
             _aiScore = result.aiScore!;
             _aiThreshold = result.threshold;
+            _applicationId = result.applicationId;
             _showAiCallingInterface = true;
           });
         }
@@ -155,9 +180,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     child: AiCallWaitingOverlay(
                       score: _aiScore,
                       threshold: _aiThreshold,
-                      onStartCall: () {
-                        // Fire your backend platform call channel initiation function here
-                      },
+                      isRequestingCall: _isRequestingCall,
+                      onStartCall: _requestCall,
                     ),
                   ),
                 ),

@@ -15,6 +15,7 @@ import { TwilioService } from '../twilio/twilio.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
+import { StorageService } from '../common/storage/storage.service.js';
 
 @Injectable()
 export class ApplicationsService {
@@ -24,6 +25,7 @@ export class ApplicationsService {
     private twilio: TwilioService,
     private aiInterviewService: AiInterviewService,
     private config: ConfigService,
+    private storageService: StorageService,
   ) {}
   async apply(
     shareToken: string,
@@ -208,7 +210,7 @@ export class ApplicationsService {
     if (!job) {
       throw new NotFoundException('Job not found');
     }
-    return this.prisma.application.findMany({
+    const applications = await this.prisma.application.findMany({
       where: {
         jobId,
       },
@@ -220,6 +222,7 @@ export class ApplicationsService {
             fullName: true,
             email: true,
             phone: true,
+            resumeFileName: true,
           },
         },
 
@@ -232,6 +235,18 @@ export class ApplicationsService {
         appliedAt: 'desc',
       },
     });
+
+    return applications.map((application) => ({
+      ...application,
+      candidate: {
+        ...application.candidate,
+        resumeUrl: application.candidate.resumeFileName
+          ? this.storageService.getResumeUrl(
+              application.candidate.resumeFileName,
+            )
+          : null,
+      },
+    }));
   }
   async getApplicationDetails(managerId: string, applicationId: string) {
     const application = await this.prisma.application.findUnique({
@@ -272,7 +287,55 @@ export class ApplicationsService {
       throw new NotFoundException('Application not found');
     }
 
-    return application;
+    return {
+      ...application,
+      candidate: {
+        ...application.candidate,
+        resumeUrl: application.candidate.resumeFileName
+          ? this.storageService.getResumeUrl(
+              application.candidate.resumeFileName,
+            )
+          : null,
+      },
+    };
+  }
+
+  async getPipeline(managerId: string) {
+    const applications = await this.prisma.application.findMany({
+      where: {
+        job: {
+          managerId,
+        },
+      },
+
+      include: {
+        candidate: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+          },
+        },
+
+        job: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+
+        aiScore: true,
+
+        aiInterview: true,
+      },
+
+      orderBy: {
+        appliedAt: 'desc',
+      },
+    });
+
+    return applications;
   }
 
   async getMyApplications(userId: string, email: string) {

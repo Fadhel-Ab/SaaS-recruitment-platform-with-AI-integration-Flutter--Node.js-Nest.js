@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:frontend/features/applications/bloc/my_applications_bloc.dart';
 import 'package:frontend/features/applications/bloc/my_applications_state.dart';
@@ -205,11 +206,18 @@ class _ApplicationCard extends StatelessWidget {
                           ),
                           if (interview.meetingLink != null) ...[
                             const SizedBox(height: 4),
-                            Text(
-                              interview.meetingLink!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF4338CA),
+                            InkWell(
+                              onTap: () => launchUrl(
+                                Uri.parse(interview.meetingLink!),
+                                mode: LaunchMode.externalApplication,
+                              ),
+                              child: Text(
+                                interview.meetingLink!,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF4338CA),
+                                  decoration: TextDecoration.underline,
+                                ),
                               ),
                             ),
                           ],

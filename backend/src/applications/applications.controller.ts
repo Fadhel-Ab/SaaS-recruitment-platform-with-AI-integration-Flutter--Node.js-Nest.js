@@ -46,6 +46,12 @@ export class ApplicationsController {
     return this.applicationsService.getMyApplications(user.id, user.email);
   }
 
+  @Get('pipeline')
+  @Roles(UserRole.MANAGER)
+  getPipeline(@CurrentUser() user: CurrentUserData) {
+    return this.applicationsService.getPipeline(user.id);
+  }
+
   @Get(':applicationId')
   @Roles(UserRole.MANAGER)
   getApplicationDetails(

@@ -31,6 +31,10 @@ class ApplicationApi {
     return Map<String, dynamic>.from(response.data as Map);
   }
 
+  Future<void> startAiCall(String applicationId) async {
+    await dio.post('/ai-interview/$applicationId/start-call');
+  }
+
   Future<List<dynamic>> getJobApplications(String jobId) async {
     final response = await dio.get('/applications/job/$jobId');
     return response.data as List<dynamic>;
@@ -38,6 +42,11 @@ class ApplicationApi {
 
   Future<List<dynamic>> getMyApplications() async {
     final response = await dio.get('/applications/mine');
+    return response.data as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getPipeline() async {
+    final response = await dio.get('/applications/pipeline');
     return response.data as List<dynamic>;
   }
 

@@ -14,6 +14,7 @@ class JobModel {
   final DateTime createdAt;
   final bool isUrgent;
   final bool isPinned;
+  final List<String> interviewQuestions;
 
   JobModel({
     required this.id,
@@ -31,6 +32,7 @@ class JobModel {
     this.status,
     this.isUrgent = false,
     this.isPinned = false,
+    this.interviewQuestions = const [],
   });
 
   factory JobModel.fromJson(Map<String, dynamic> json) {
@@ -59,6 +61,10 @@ class JobModel {
       isUrgent: json['isUrgent'] == true || json['urgent'] == true || (json['priority']?.toString().toLowerCase() == 'urgent') || (json['status']?.toString().toLowerCase().contains('urgent') ?? false),
 
       isPinned: json['isPinned'] == true || json['pinned'] == true,
+
+      interviewQuestions: json['interviewQuestions'] is List
+          ? List<String>.from(json['interviewQuestions'])
+          : const [],
 
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()

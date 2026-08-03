@@ -6,6 +6,7 @@ import 'package:frontend/features/applications/model/application_detail.dart';
 import 'package:frontend/features/applications/model/application_result.dart';
 import 'package:frontend/features/applications/model/create_application_request.dart';
 import 'package:frontend/features/applications/model/my_application_summary.dart';
+import 'package:frontend/features/applications/model/pipeline_entry.dart';
 
 class ApplicationRepository {
   final ApplicationApi api;
@@ -55,6 +56,17 @@ class ApplicationRepository {
         .map(
           (e) => MyApplicationSummary.fromJson(Map<String, dynamic>.from(e)),
         )
+        .toList();
+  }
+
+  Future<void> startAiCall(String applicationId) {
+    return api.startAiCall(applicationId);
+  }
+
+  Future<List<PipelineEntry>> getPipeline() async {
+    final data = await api.getPipeline();
+    return data
+        .map((e) => PipelineEntry.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
 }

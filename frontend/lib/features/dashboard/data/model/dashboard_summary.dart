@@ -14,6 +14,13 @@ class DashboardSummary {
   final int hired;
   final int rejected;
 
+  final int jobsTrendPct;
+  final int applicationsTrendPct;
+  final int aiInterviewsYesterday;
+  final List<int> jobsSparkline;
+  final List<int> applicationsSparkline;
+  final List<int> aiInterviewsSparkline;
+
   final List<TopCandidate> topCandidates;
 
   DashboardSummary({
@@ -30,6 +37,12 @@ class DashboardSummary {
     required this.interviewsCompleted,
     required this.hired,
     required this.rejected,
+    this.jobsTrendPct = 0,
+    this.applicationsTrendPct = 0,
+    this.aiInterviewsYesterday = 0,
+    this.jobsSparkline = const [],
+    this.applicationsSparkline = const [],
+    this.aiInterviewsSparkline = const [],
   });
 
   factory DashboardSummary.fromJson(Map<String, dynamic> json) {
@@ -52,6 +65,18 @@ class DashboardSummary {
       interviewsCompleted: json['completedInterviews'] ?? 0,
       hired: json['hired'] ?? 0,
       rejected: json['rejected'] ?? 0,
+      jobsTrendPct: json['jobsTrendPct'] ?? 0,
+      applicationsTrendPct: json['applicationsTrendPct'] ?? 0,
+      aiInterviewsYesterday: json['aiInterviewsYesterday'] ?? 0,
+      jobsSparkline: (json['jobsSparkline'] as List? ?? [])
+          .map((e) => (e as num).toInt())
+          .toList(),
+      applicationsSparkline: (json['applicationsSparkline'] as List? ?? [])
+          .map((e) => (e as num).toInt())
+          .toList(),
+      aiInterviewsSparkline: (json['aiInterviewsSparkline'] as List? ?? [])
+          .map((e) => (e as num).toInt())
+          .toList(),
     );
   }
 }

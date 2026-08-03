@@ -4,10 +4,17 @@ import 'package:frontend/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:frontend/features/dashboard/bloc/dashboard_event.dart';
 import 'package:frontend/features/dashboard/bloc/dashboard_state.dart';
 import 'package:frontend/features/dashboard/screens/top_candidates_card.dart';
+import 'package:go_router/go_router.dart';
 
 // Import our decoupled sub-widgets
 import 'widgets/metric_card.dart';
 import 'widgets/pipeline_chart_card.dart';
+
+String _trendText(int pct, String period) {
+  if (pct > 0) return '↑ $pct% from $period';
+  if (pct < 0) return '↓ ${pct.abs()}% from $period';
+  return 'No change from $period';
+}
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -116,7 +123,11 @@ class DashboardScreen extends StatelessWidget {
                                   icon: Icons.work_outline,
                                   themeColor: const Color(0xFF4F46E5),
                                   backgroundColor: const Color(0xFFEEF2FF),
-                                  detailText: '↑ 12% from last week',
+                                  detailText: _trendText(
+                                    summary.jobsTrendPct,
+                                    'last week',
+                                  ),
+                                  sparklineData: summary.jobsSparkline,
                                 );
                               case 1:
                                 return MetricCard(
@@ -125,7 +136,11 @@ class DashboardScreen extends StatelessWidget {
                                   icon: Icons.people_outline,
                                   themeColor: Colors.blue,
                                   backgroundColor: const Color(0xFFE0F2FE),
-                                  detailText: '↑ 18% from last month',
+                                  detailText: _trendText(
+                                    summary.applicationsTrendPct,
+                                    'last week',
+                                  ),
+                                  sparklineData: summary.applicationsSparkline,
                                 );
                               case 2:
                                 return MetricCard(
@@ -134,7 +149,9 @@ class DashboardScreen extends StatelessWidget {
                                   icon: Icons.phone_in_talk_outlined,
                                   themeColor: Colors.orange,
                                   backgroundColor: const Color(0xFFFFF3E0),
-                                  detailText: '↑ 2 run yesterday',
+                                  detailText:
+                                      '${summary.aiInterviewsYesterday} run yesterday',
+                                  sparklineData: summary.aiInterviewsSparkline,
                                 );
                               case 3:
                               default:
@@ -167,6 +184,8 @@ class DashboardScreen extends StatelessWidget {
                               interviews: summary.interviewsCompleted,
                               hired: summary.hired,
                               rejected: summary.rejected,
+                              onViewAll: () =>
+                                  context.push('/manager/candidates'),
                             ),
                           ),
                           const SizedBox(width: 24),
@@ -175,6 +194,8 @@ class DashboardScreen extends StatelessWidget {
                             flex: 4,
                             child: TopCandidatesCard(
                               candidates: summary.topCandidates ?? [],
+                              onViewAll: () =>
+                                  context.push('/manager/candidates'),
                             ),
                           ),
                         ],
@@ -187,10 +208,12 @@ class DashboardScreen extends StatelessWidget {
                         interviews: summary.interviewsCompleted,
                         hired: summary.hired,
                         rejected: summary.rejected,
+                        onViewAll: () => context.push('/manager/candidates'),
                       ),
                       const SizedBox(height: 24),
                       TopCandidatesCard(
                         candidates: summary.topCandidates ?? [],
+                        onViewAll: () => context.push('/manager/candidates'),
                       ),
                     ],
                   ],

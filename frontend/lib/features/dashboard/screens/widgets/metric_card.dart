@@ -7,6 +7,7 @@ class MetricCard extends StatelessWidget {
   final Color themeColor;
   final Color backgroundColor;
   final String? detailText;
+  final List<int> sparklineData;
 
   const MetricCard({
     super.key,
@@ -16,6 +17,7 @@ class MetricCard extends StatelessWidget {
     required this.themeColor,
     required this.backgroundColor,
     this.detailText,
+    this.sparklineData = const [],
   });
 
   @override
@@ -74,12 +76,16 @@ class MetricCard extends StatelessWidget {
                 ),
               ),
             ],
-            // Simulated micro graphic spacing element
-            const SizedBox(height: 12),
-            CustomPaint(
-              size: const Size(double.infinity, 20),
-              painter: _SparklinePainter(color: themeColor),
-            ),
+            if (sparklineData.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              CustomPaint(
+                size: const Size(double.infinity, 20),
+                painter: _SparklinePainter(
+                  color: themeColor,
+                  data: sparklineData,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -89,27 +95,40 @@ class MetricCard extends StatelessWidget {
 
 class _SparklinePainter extends CustomPainter {
   final Color color;
-  _SparklinePainter({required this.color});
+  final List<int> data;
+
+  _SparklinePainter({required this.color, required this.data});
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (data.length < 2) return;
+
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
-    final path = Path()
-      ..moveTo(0, size.height * 0.7)
-      ..lineTo(size.width * 0.2, size.height * 0.8)
-      ..lineTo(size.width * 0.4, size.height * 0.3)
-      ..lineTo(size.width * 0.6, size.height * 0.6)
-      ..lineTo(size.width * 0.8, size.height * 0.2)
-      ..lineTo(size.width, size.height * 0.4);
+    final maxValue = data.reduce((a, b) => a > b ? a : b);
+    final safeMax = maxValue == 0 ? 1 : maxValue;
+    final stepX = size.width / (data.length - 1);
+
+    final path = Path();
+    for (var i = 0; i < data.length; i++) {
+      final x = stepX * i;
+      final normalized = data[i] / safeMax;
+      final y = size.height - (normalized * size.height);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
 
     canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _SparklinePainter oldDelegate) =>
+      oldDelegate.data != data || oldDelegate.color != color;
 }

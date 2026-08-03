@@ -95,6 +95,12 @@ class AppScaffold extends StatelessWidget {
                             selectedIcon: Icon(Icons.add_circle_rounded),
                             label: Text('Post Job'),
                           ),
+                        if (user?.role == UserRole.manager)
+                          const NavigationRailDestination(
+                            icon: Icon(Icons.groups_outlined),
+                            selectedIcon: Icon(Icons.groups_rounded),
+                            label: Text('Candidates'),
+                          ),
                         if (user != null && user.role != UserRole.manager)
                           const NavigationRailDestination(
                             icon: Icon(Icons.assignment_outlined),
@@ -131,6 +137,11 @@ class AppScaffold extends StatelessWidget {
                         icon: Icon(Icons.add_circle_outline),
                         label: 'Post',
                       ),
+                    if (user?.role == UserRole.manager)
+                      const NavigationDestination(
+                        icon: Icon(Icons.groups_outlined),
+                        label: 'Candidates',
+                      ),
                     if (user != null && user.role != UserRole.manager)
                       const NavigationDestination(
                         icon: Icon(Icons.assignment_outlined),
@@ -149,6 +160,7 @@ class AppScaffold extends StatelessWidget {
     if (role == UserRole.manager) {
       if (location.startsWith('/dashboard')) return 0;
       if (location.startsWith('/manager/create-job')) return 2;
+      if (location.startsWith('/manager/candidates')) return 3;
       // /manager/jobs and its applicant/detail sub-routes fall through here.
       return 1;
     }
@@ -158,13 +170,19 @@ class AppScaffold extends StatelessWidget {
 
   void _go(BuildContext context, int index, UserRole? role) {
     if (role == UserRole.manager) {
-      context.go(
-        index == 0
-            ? '/dashboard'
-            : index == 1
-            ? '/manager/jobs'
-            : '/manager/create-job',
-      );
+      switch (index) {
+        case 0:
+          context.go('/dashboard');
+          break;
+        case 1:
+          context.go('/manager/jobs');
+          break;
+        case 2:
+          context.go('/manager/create-job');
+          break;
+        default:
+          context.go('/manager/candidates');
+      }
     } else {
       context.go(index == 0 ? '/jobs' : '/my-applications');
     }

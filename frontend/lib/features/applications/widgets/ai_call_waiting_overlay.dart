@@ -5,12 +5,14 @@ class AiCallWaitingOverlay extends StatefulWidget {
   final double score;
   final double threshold;
   final VoidCallback onStartCall;
+  final bool isRequestingCall;
 
   const AiCallWaitingOverlay({
     super.key,
     required this.score,
     required this.threshold,
     required this.onStartCall,
+    this.isRequestingCall = false,
   });
 
   @override
@@ -126,7 +128,7 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
           ),
           const SizedBox(height: 8),
           const Text(
-            'Our recruitment AI module is online and ready to conduct your preliminary audio interview immediately.',
+            'Our recruitment AI is calling your phone now for a short screening interview. Didn\'t get the call?',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -136,15 +138,25 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
           ),
           const SizedBox(height: 40),
 
-          // Primary Call Trigger Button
+          // Manual retry — the call is already auto-dialed server-side;
+          // this re-requests one for candidates who missed it.
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: widget.onStartCall,
-              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
-              label: const Text(
-                'Start AI Screening Call Now',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              onPressed: widget.isRequestingCall ? null : widget.onStartCall,
+              icon: widget.isRequestingCall
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.phone_forwarded_rounded, color: Colors.white),
+              label: Text(
+                widget.isRequestingCall ? 'Calling...' : 'Call Me Now',
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF137333), // Success green

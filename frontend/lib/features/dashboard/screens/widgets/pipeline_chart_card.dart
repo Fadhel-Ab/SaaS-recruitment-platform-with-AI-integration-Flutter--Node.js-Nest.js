@@ -6,6 +6,7 @@ class PipelineChartCard extends StatelessWidget {
   final int interviews;
   final int hired;
   final int rejected;
+  final VoidCallback? onViewAll;
 
   const PipelineChartCard({
     super.key,
@@ -14,6 +15,7 @@ class PipelineChartCard extends StatelessWidget {
     required this.interviews,
     required this.hired,
     required this.rejected,
+    this.onViewAll,
   });
 
   @override
@@ -61,7 +63,7 @@ class PipelineChartCard extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onViewAll,
                   child: const Text(
                     'View full pipeline',
                     style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
@@ -78,6 +80,9 @@ class PipelineChartCard extends StatelessWidget {
   }
 
   Widget _buildCircularChart(int total) {
+    // How far the pipeline has moved past initial screening.
+    final double progress = total > 0 ? (total - pending) / total : 0.0;
+
     return Center(
       child: Stack(
         alignment: Alignment.center,
@@ -86,9 +91,7 @@ class PipelineChartCard extends StatelessWidget {
             width: 140,
             height: 140,
             child: CircularProgressIndicator(
-              value: total > 0
-                  ? 0.75
-                  : 0.0, // Base visual mock indicator mapping design chart
+              value: progress,
               strokeWidth: 16,
               color: const Color(0xFF4F46E5),
               backgroundColor: const Color(0xFFEEF2FF),

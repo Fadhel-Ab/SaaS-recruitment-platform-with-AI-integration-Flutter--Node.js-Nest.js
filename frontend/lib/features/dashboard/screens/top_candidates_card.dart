@@ -4,8 +4,9 @@ import 'package:frontend/features/dashboard/data/model/top_candidate.dart';
 class TopCandidatesCard extends StatelessWidget {
   final List<TopCandidate>
   candidates; // Map this to your updated data payload list array
+  final VoidCallback? onViewAll;
 
-  const TopCandidatesCard({super.key, required this.candidates});
+  const TopCandidatesCard({super.key, required this.candidates, this.onViewAll});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class TopCandidatesCard extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onViewAll,
                   child: const Text(
                     'View all',
                     style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),

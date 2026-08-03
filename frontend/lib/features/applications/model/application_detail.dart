@@ -133,6 +133,7 @@ class ApplicationDetail {
   final String candidateEmail;
   final String candidatePhone;
   final String? resumeFileName;
+  final String? resumeUrl;
   final String jobTitle;
   final AiScoreDetail? aiScore;
   final AiInterviewDetail? aiInterview;
@@ -147,6 +148,7 @@ class ApplicationDetail {
     required this.candidateEmail,
     required this.candidatePhone,
     this.resumeFileName,
+    this.resumeUrl,
     required this.jobTitle,
     this.aiScore,
     this.aiInterview,
@@ -171,6 +173,7 @@ class ApplicationDetail {
       candidateEmail: candidate['email'] ?? '',
       candidatePhone: candidate['phone'] ?? '',
       resumeFileName: candidate['resumeFileName'],
+      resumeUrl: candidate['resumeUrl'],
       jobTitle: job['title'] ?? '',
       aiScore: aiScoreJson != null ? AiScoreDetail.fromJson(aiScoreJson) : null,
       aiInterview: aiInterviewJson != null

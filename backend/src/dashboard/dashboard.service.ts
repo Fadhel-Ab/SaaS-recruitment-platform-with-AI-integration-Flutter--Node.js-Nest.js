@@ -1,14 +1,64 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
+const SPARKLINE_DAYS = 7;
+
+function bucketByDay(dates: Date[], days = SPARKLINE_DAYS): number[] {
+  const buckets = new Array(days).fill(0);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  for (const date of dates) {
+    const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayDiff = Math.round(
+      (startOfToday.getTime() - startOfDate.getTime()) / 86400000,
+    );
+    const bucketIndex = days - 1 - dayDiff;
+
+    if (bucketIndex >= 0 && bucketIndex < days) {
+      buckets[bucketIndex]++;
+    }
+  }
+
+  return buckets;
+}
+
+function trendPct(dates: Date[]): number {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 86400000);
+
+  const thisWeek = dates.filter((d) => d >= sevenDaysAgo && d <= now).length;
+  const lastWeek = dates.filter(
+    (d) => d >= fourteenDaysAgo && d < sevenDaysAgo,
+  ).length;
+
+  if (lastWeek === 0) {
+    return thisWeek > 0 ? 100 : 0;
+  }
+
+  return Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+}
+
+function countYesterday(dates: Date[]): number {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(startOfToday.getTime() - 86400000);
+
+  return dates.filter((d) => d >= startOfYesterday && d < startOfToday).length;
+}
+
 @Injectable()
 export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
   async getSummary(managerId: string) {
-    const jobs = await this.prisma.job.count({
+    const jobRows = await this.prisma.job.findMany({
       where: {
         managerId,
+      },
+      select: {
+        createdAt: true,
       },
     });
 
@@ -21,6 +71,7 @@ export class DashboardService {
 
       select: {
         status: true,
+        appliedAt: true,
 
         aiScore: {
           select: {
@@ -42,6 +93,7 @@ export class DashboardService {
 
       select: {
         status: true,
+        startedAt: true,
       },
     });
 
@@ -69,7 +121,7 @@ export class DashboardService {
     });
 
     const summary = {
-      activeJobs: jobs,
+      activeJobs: jobRows.length,
 
       totalApplications: applications.length,
 
@@ -94,6 +146,18 @@ export class DashboardService {
       rejected: 0,
 
       averageAIScore: 0,
+
+      jobsTrendPct: trendPct(jobRows.map((j) => j.createdAt)),
+      applicationsTrendPct: trendPct(applications.map((a) => a.appliedAt)),
+      aiInterviewsYesterday: countYesterday(
+        aiInterviews.filter((i) => i.startedAt).map((i) => i.startedAt!),
+      ),
+
+      jobsSparkline: bucketByDay(jobRows.map((j) => j.createdAt)),
+      applicationsSparkline: bucketByDay(applications.map((a) => a.appliedAt)),
+      aiInterviewsSparkline: bucketByDay(
+        aiInterviews.filter((i) => i.startedAt).map((i) => i.startedAt!),
+      ),
     };
 
     let totalScore = 0;
@@ -178,12 +242,12 @@ export class DashboardService {
     });
     // Format clean, frontend-ready models
     const topCandidates = topCandidatesRaw.map((cand) => {
-      // Map decimals (e.g. 0.85) to percentages (85) safely
-      const cvPct = cand.aiScore ? Math.round(cand.aiScore.cvScore * 100) : 0;
+      // cvScore/interviewScore are already stored on a 0-100 scale
+      const cvPct = cand.aiScore ? Math.round(cand.aiScore.cvScore) : 0;
 
       const interviewScoreRaw = cand.aiScore?.interviewScore;
       const interviewPct =
-        interviewScoreRaw != null ? Math.round(interviewScoreRaw * 100) : null;
+        interviewScoreRaw != null ? Math.round(interviewScoreRaw) : null;
 
       return {
         id: cand.id,

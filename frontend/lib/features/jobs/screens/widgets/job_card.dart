@@ -180,12 +180,6 @@ class JobCard extends StatelessWidget {
           ),
           onPressed: () => _copyShareLink(context),
         ),
-
-        IconButton(
-          icon: const Icon(Icons.more_vert, color: Color(0xFF9CA3AF), size: 22),
-          onPressed: () {},
-          splashRadius: 22,
-        ),
       ],
     );
   }

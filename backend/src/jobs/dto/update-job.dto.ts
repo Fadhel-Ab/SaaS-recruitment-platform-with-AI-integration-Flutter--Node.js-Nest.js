@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import {
   EmploymentType,
   JobStatus,
@@ -37,4 +43,9 @@ export class UpdateJobDto {
   @IsOptional()
   @IsEnum(JobStatus)
   status?: JobStatus;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  interviewQuestions?: string[];
 }

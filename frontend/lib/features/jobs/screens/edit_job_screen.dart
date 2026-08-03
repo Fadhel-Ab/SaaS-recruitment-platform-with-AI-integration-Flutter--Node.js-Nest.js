@@ -35,6 +35,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
   late String employmentType = widget.job.employmentType;
   late String skillLevel = widget.job.skillLevel ?? 'ENTRY';
   late String status = widget.job.status ?? 'ACTIVE';
+  late final List<TextEditingController> _questionControllers =
+      widget.job.interviewQuestions
+          .map((q) => TextEditingController(text: q))
+          .toList();
   bool _isSaving = false;
 
   final employmentTypes = const [
@@ -55,7 +59,18 @@ class _EditJobScreenState extends State<EditJobScreen> {
     descriptionController.dispose();
     requirementsController.dispose();
     locationController.dispose();
+    for (final controller in _questionControllers) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  void _addQuestion() {
+    setState(() => _questionControllers.add(TextEditingController()));
+  }
+
+  void _removeQuestion(int index) {
+    setState(() => _questionControllers.removeAt(index).dispose());
   }
 
   Future<void> _save() async {
@@ -64,6 +79,11 @@ class _EditJobScreenState extends State<EditJobScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final questions = _questionControllers
+          .map((c) => c.text.trim())
+          .where((text) => text.isNotEmpty)
+          .toList();
+
       await context.read<JobsRepository>().updateJob(widget.job.id, {
         'title': titleController.text.trim(),
         'companyName': companyController.text.trim(),
@@ -73,6 +93,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         'employmentType': employmentType,
         'skillLevel': skillLevel,
         'status': status,
+        'interviewQuestions': questions,
       });
 
       if (!mounted) return;
@@ -324,6 +345,60 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             onSelected: (_) => setState(() => status = s),
                           );
                         }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      const FormLabel(
+                        label: 'AI Interview Questions',
+                        isRequired: false,
+                      ),
+                      const SizedBox(height: 8),
+                      ...List.generate(_questionControllers.length, (index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 28,
+                                child: Text(
+                                  '${index + 1}.',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _questionControllers[index],
+                                  maxLines: 2,
+                                  minLines: 1,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Interview question',
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                                onPressed: () => _removeQuestion(index),
+                                tooltip: 'Remove question',
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      TextButton.icon(
+                        onPressed: _addQuestion,
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('Add Question'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF4F46E5),
+                        ),
                       ),
                       const SizedBox(height: 36),
                       SizedBox(
