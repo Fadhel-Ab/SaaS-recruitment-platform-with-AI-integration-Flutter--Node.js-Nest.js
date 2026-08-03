@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   ApplicationStatus,
   InterviewStatus,
@@ -31,11 +35,36 @@ export class SchedulingService {
       },
     });
 
-    const availability = await this.prisma.availability.findMany({
-      where: { managerId },
+    const job = await this.prisma.job.findFirst({
+      where: { id: jobId, managerId },
+      include: { jobAvailability: true },
     });
 
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+
+    const availability =
+      job.jobAvailability.length > 0
+        ? job.jobAvailability
+        : await this.prisma.availability.findMany({
+            where: { managerId, jobId: null },
+          });
+
     const windows = expandAvailabilityWindows(availability);
+
+    const existingInterviews = await this.prisma.interview.findMany({
+      where: {
+        managerId,
+        status: InterviewStatus.SCHEDULED,
+        scheduledAt: { not: null },
+      },
+    });
+
+    const busyRanges = existingInterviews.map((interview) => {
+      const start = interview.scheduledAt!.getTime();
+      return { start, end: start + interview.duration * 60000 };
+    });
 
     const slots: {
       date: Date;
@@ -49,12 +78,17 @@ export class SchedulingService {
         duration,
       );
 
-      slots.push(
-        ...generatedSlots.map((time) => ({
-          date: window.date,
-          time,
-        })),
-      );
+      for (const time of generatedSlots) {
+        const start = createDateFromSlot(window.date, time).getTime();
+        const end = start + duration * 60000;
+        const conflicts = busyRanges.some(
+          (range) => start < range.end && end > range.start,
+        );
+
+        if (!conflicts) {
+          slots.push({ date: window.date, time });
+        }
+      }
     }
 
     return applications.map((application, index) => ({

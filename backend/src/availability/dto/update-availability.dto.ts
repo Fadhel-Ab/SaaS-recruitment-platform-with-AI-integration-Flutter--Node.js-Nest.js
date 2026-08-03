@@ -3,6 +3,7 @@ import {
   IsIn,
   IsInt,
   IsOptional,
+  IsUUID,
   Max,
   Min,
   ValidateIf,
@@ -10,6 +11,11 @@ import {
 import { AvailabilityRecurrence } from '../../generated/prisma/enums.js';
 
 export class UpdateAvailabilityDto {
+  @IsOptional()
+  @ValidateIf((dto) => dto.jobId !== null)
+  @IsUUID()
+  jobId?: string | null;
+
   @IsOptional()
   @IsIn([AvailabilityRecurrence.RECURRING, AvailabilityRecurrence.SPECIFIC])
   recurrence?: AvailabilityRecurrence;

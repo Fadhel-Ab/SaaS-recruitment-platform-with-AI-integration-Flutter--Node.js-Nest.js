@@ -28,11 +28,6 @@ export type User = Prisma.UserModel
  */
 export type Job = Prisma.JobModel
 /**
- * Model JobAvailability
- * 
- */
-export type JobAvailability = Prisma.JobAvailabilityModel
-/**
  * Model Candidate
  * 
  */

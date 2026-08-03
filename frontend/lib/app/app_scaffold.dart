@@ -48,20 +48,6 @@ class AppScaffold extends StatelessWidget {
                   icon: const Icon(Icons.travel_explore_outlined),
                   onPressed: () => context.push('/jobs'),
                 ),
-              if (user?.role == UserRole.manager)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 1),
-                  child: FilledButton.icon(
-                    onPressed: () => context.push('/manager/availability'),
-                    style: isPhone
-                        ? FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                          )
-                        : null,
-                    icon: const Icon(Icons.schedule, size: 18),
-                    label: Text(isPhone ? 'Time' : 'Manager time'),
-                  ),
-                ),
               PopupMenuButton<String>(
                 tooltip: 'User menu',
                 icon: const Icon(Icons.account_circle_outlined),
@@ -141,6 +127,12 @@ class AppScaffold extends StatelessWidget {
                             selectedIcon: Icon(Icons.groups_rounded),
                             label: Text('Candidates'),
                           ),
+                        if (user?.role == UserRole.manager)
+                          const NavigationRailDestination(
+                            icon: Icon(Icons.schedule_outlined),
+                            selectedIcon: Icon(Icons.schedule_rounded),
+                            label: Text('Manager Time'),
+                          ),
                         if (user != null && user.role != UserRole.manager)
                           const NavigationRailDestination(
                             icon: Icon(Icons.assignment_outlined),
@@ -182,6 +174,11 @@ class AppScaffold extends StatelessWidget {
                         icon: Icon(Icons.groups_outlined),
                         label: 'Candidates',
                       ),
+                    if (user?.role == UserRole.manager)
+                      const NavigationDestination(
+                        icon: Icon(Icons.schedule_outlined),
+                        label: 'Time',
+                      ),
                     if (user != null && user.role != UserRole.manager)
                       const NavigationDestination(
                         icon: Icon(Icons.assignment_outlined),
@@ -201,6 +198,7 @@ class AppScaffold extends StatelessWidget {
       if (location.startsWith('/dashboard')) return 0;
       if (location.startsWith('/manager/create-job')) return 2;
       if (location.startsWith('/manager/candidates')) return 3;
+      if (location.startsWith('/manager/availability')) return 4;
       // /manager/jobs and its applicant/detail sub-routes fall through here.
       return 1;
     }
@@ -220,8 +218,11 @@ class AppScaffold extends StatelessWidget {
         case 2:
           context.go('/manager/create-job');
           break;
-        default:
+        case 3:
           context.go('/manager/candidates');
+          break;
+        default:
+          context.go('/manager/availability');
       }
     } else {
       context.go(index == 0 ? '/jobs' : '/my-applications');

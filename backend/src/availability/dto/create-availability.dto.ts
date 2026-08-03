@@ -3,6 +3,8 @@ import {
   IsIn,
   IsInt,
   IsNotEmpty,
+  IsOptional,
+  IsUUID,
   Max,
   Min,
   ValidateIf,
@@ -10,6 +12,10 @@ import {
 import { AvailabilityRecurrence } from '../../generated/prisma/enums.js';
 
 export class CreateAvailabilityDto {
+  @IsOptional()
+  @IsUUID()
+  jobId?: string;
+
   @IsIn([AvailabilityRecurrence.RECURRING, AvailabilityRecurrence.SPECIFIC])
   recurrence: AvailabilityRecurrence;
 

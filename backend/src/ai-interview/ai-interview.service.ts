@@ -43,7 +43,7 @@ export class AiInterviewService {
   ): Promise<Date> {
     const now = new Date();
 
-    const jobWindows = await this.prisma.jobAvailability.findMany({
+    const jobWindows = await this.prisma.availability.findMany({
       where: { jobId },
     });
 
@@ -51,7 +51,7 @@ export class AiInterviewService {
 
     if (windows.length === 0) {
       const managerWindows = await this.prisma.availability.findMany({
-        where: { managerId },
+        where: { managerId, jobId: null },
       });
 
       windows = expandAvailabilityWindows(managerWindows, { from: now });

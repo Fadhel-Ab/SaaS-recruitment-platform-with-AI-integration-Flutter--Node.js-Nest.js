@@ -53,7 +53,6 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Job: 'Job',
-  JobAvailability: 'JobAvailability',
   Candidate: 'Candidate',
   Application: 'Application',
   AIScore: 'AIScore',
@@ -113,20 +112,6 @@ export const JobScalarFieldEnum = {
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
 
 
-export const JobAvailabilityScalarFieldEnum = {
-  id: 'id',
-  jobId: 'jobId',
-  recurrence: 'recurrence',
-  date: 'date',
-  dayOfWeek: 'dayOfWeek',
-  startTime: 'startTime',
-  endTime: 'endTime',
-  createdAt: 'createdAt'
-} as const
-
-export type JobAvailabilityScalarFieldEnum = (typeof JobAvailabilityScalarFieldEnum)[keyof typeof JobAvailabilityScalarFieldEnum]
-
-
 export const CandidateScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
@@ -174,6 +159,7 @@ export type AIScoreScalarFieldEnum = (typeof AIScoreScalarFieldEnum)[keyof typeo
 export const AvailabilityScalarFieldEnum = {
   id: 'id',
   managerId: 'managerId',
+  jobId: 'jobId',
   recurrence: 'recurrence',
   date: 'date',
   dayOfWeek: 'dayOfWeek',

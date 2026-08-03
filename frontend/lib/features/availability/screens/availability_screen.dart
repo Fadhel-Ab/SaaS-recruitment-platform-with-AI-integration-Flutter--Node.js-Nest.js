@@ -37,6 +37,7 @@ enum _LoadStatus { loading, success, failure }
 class _AvailabilityScreenState extends State<AvailabilityScreen> {
   _LoadStatus _status = _LoadStatus.loading;
   List<AvailabilitySlot> _slots = [];
+  List<JobModel> _allJobs = [];
   List<JobModel> _jobsWithAvailability = [];
   String? _error;
   bool _isSaving = false;
@@ -58,6 +59,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       final jobs = results[1] as List<JobModel>;
       setState(() {
         _slots = slots;
+        _allJobs = jobs;
         _jobsWithAvailability = jobs
             .where((j) => j.jobAvailability.isNotEmpty)
             .toList();
@@ -133,7 +135,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   }) {
     return showDialog<AvailabilitySlot>(
       context: context,
-      builder: (_) => _SlotFormDialog(initial: initial),
+      builder: (_) => _SlotFormDialog(initial: initial, jobs: _allJobs),
     );
   }
 
@@ -294,7 +296,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               for (final job in _jobsWithAvailability) ...[
                 _buildSectionHeader('Job: ${job.title}'),
                 ...job.jobAvailability.map(
-                  (slot) => _buildSlotCard(slot, editable: false),
+                  (slot) => _buildSlotCard(slot),
                 ),
               ],
             ],
@@ -307,8 +309,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
 
 class _SlotFormDialog extends StatefulWidget {
   final AvailabilitySlot? initial;
+  final List<JobModel> jobs;
 
-  const _SlotFormDialog({this.initial});
+  const _SlotFormDialog({this.initial, this.jobs = const []});
 
   @override
   State<_SlotFormDialog> createState() => _SlotFormDialogState();
@@ -320,6 +323,7 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
   late int _dayOfWeek;
   late TimeOfDay _start;
   late TimeOfDay _end;
+  String? _jobId;
 
   @override
   void initState() {
@@ -335,6 +339,7 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
     _end = initial != null
         ? _parseTime(initial.endTime)
         : const TimeOfDay(hour: 17, minute: 0);
+    _jobId = initial?.jobId;
   }
 
   TimeOfDay _parseTime(String value) {
@@ -396,6 +401,24 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
                 setState(() => _recurrence = selection.first),
           ),
           const SizedBox(height: 8),
+          DropdownButtonFormField<String?>(
+            initialValue: _jobId,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Applies to'),
+            items: [
+              const DropdownMenuItem<String?>(
+                value: null,
+                child: Text('General (all jobs)'),
+              ),
+              for (final job in widget.jobs)
+                DropdownMenuItem<String?>(
+                  value: job.id,
+                  child: Text(job.title, overflow: TextOverflow.ellipsis),
+                ),
+            ],
+            onChanged: (v) => setState(() => _jobId = v),
+          ),
+          const SizedBox(height: 8),
           if (_recurrence == AvailabilityRecurrence.recurring)
             DropdownButtonFormField<int>(
               initialValue: _dayOfWeek,
@@ -437,12 +460,14 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
             final slot = _recurrence == AvailabilityRecurrence.recurring
                 ? AvailabilitySlot.recurring(
                     id: widget.initial?.id,
+                    jobId: _jobId,
                     dayOfWeek: _dayOfWeek,
                     startTime: _formatTime(_start),
                     endTime: _formatTime(_end),
                   )
                 : AvailabilitySlot.specific(
                     id: widget.initial?.id,
+                    jobId: _jobId,
                     date: _date,
                     startTime: _formatTime(_start),
                     endTime: _formatTime(_end),

@@ -45,6 +45,7 @@ export class JobsService {
 
         jobAvailability: {
           create: (dto.availability ?? []).map((slot) => ({
+            managerId: userId,
             recurrence: slot.recurrence,
             date:
               slot.recurrence === AvailabilityRecurrence.SPECIFIC && slot.date
@@ -110,7 +111,7 @@ export class JobsService {
     }
 
     const generalAvailability = await this.prisma.availability.findMany({
-      where: { managerId, ...upcomingOrRecurring },
+      where: { managerId, jobId: null, ...upcomingOrRecurring },
     });
 
     return generalAvailability.map((a) => ({
