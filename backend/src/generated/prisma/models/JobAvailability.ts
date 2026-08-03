@@ -37,6 +37,8 @@ export type JobAvailabilitySumAggregateOutputType = {
 export type JobAvailabilityMinAggregateOutputType = {
   id: string | null
   jobId: string | null
+  recurrence: $Enums.AvailabilityRecurrence | null
+  date: Date | null
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
@@ -46,6 +48,8 @@ export type JobAvailabilityMinAggregateOutputType = {
 export type JobAvailabilityMaxAggregateOutputType = {
   id: string | null
   jobId: string | null
+  recurrence: $Enums.AvailabilityRecurrence | null
+  date: Date | null
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
@@ -55,6 +59,8 @@ export type JobAvailabilityMaxAggregateOutputType = {
 export type JobAvailabilityCountAggregateOutputType = {
   id: number
   jobId: number
+  recurrence: number
+  date: number
   dayOfWeek: number
   startTime: number
   endTime: number
@@ -74,6 +80,8 @@ export type JobAvailabilitySumAggregateInputType = {
 export type JobAvailabilityMinAggregateInputType = {
   id?: true
   jobId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -83,6 +91,8 @@ export type JobAvailabilityMinAggregateInputType = {
 export type JobAvailabilityMaxAggregateInputType = {
   id?: true
   jobId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -92,6 +102,8 @@ export type JobAvailabilityMaxAggregateInputType = {
 export type JobAvailabilityCountAggregateInputType = {
   id?: true
   jobId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -188,7 +200,9 @@ export type JobAvailabilityGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type JobAvailabilityGroupByOutputType = {
   id: string
   jobId: string
-  dayOfWeek: number
+  recurrence: $Enums.AvailabilityRecurrence
+  date: Date | null
+  dayOfWeek: number | null
   startTime: string
   endTime: string
   createdAt: Date
@@ -220,7 +234,9 @@ export type JobAvailabilityWhereInput = {
   NOT?: Prisma.JobAvailabilityWhereInput | Prisma.JobAvailabilityWhereInput[]
   id?: Prisma.StringFilter<"JobAvailability"> | string
   jobId?: Prisma.StringFilter<"JobAvailability"> | string
-  dayOfWeek?: Prisma.IntFilter<"JobAvailability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"JobAvailability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"JobAvailability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"JobAvailability"> | number | null
   startTime?: Prisma.StringFilter<"JobAvailability"> | string
   endTime?: Prisma.StringFilter<"JobAvailability"> | string
   createdAt?: Prisma.DateTimeFilter<"JobAvailability"> | Date | string
@@ -230,7 +246,9 @@ export type JobAvailabilityWhereInput = {
 export type JobAvailabilityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
-  dayOfWeek?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrderInput | Prisma.SortOrder
+  dayOfWeek?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -243,7 +261,9 @@ export type JobAvailabilityWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.JobAvailabilityWhereInput[]
   NOT?: Prisma.JobAvailabilityWhereInput | Prisma.JobAvailabilityWhereInput[]
   jobId?: Prisma.StringFilter<"JobAvailability"> | string
-  dayOfWeek?: Prisma.IntFilter<"JobAvailability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"JobAvailability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"JobAvailability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"JobAvailability"> | number | null
   startTime?: Prisma.StringFilter<"JobAvailability"> | string
   endTime?: Prisma.StringFilter<"JobAvailability"> | string
   createdAt?: Prisma.DateTimeFilter<"JobAvailability"> | Date | string
@@ -253,7 +273,9 @@ export type JobAvailabilityWhereUniqueInput = Prisma.AtLeast<{
 export type JobAvailabilityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
-  dayOfWeek?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrderInput | Prisma.SortOrder
+  dayOfWeek?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -270,7 +292,9 @@ export type JobAvailabilityScalarWhereWithAggregatesInput = {
   NOT?: Prisma.JobAvailabilityScalarWhereWithAggregatesInput | Prisma.JobAvailabilityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"JobAvailability"> | string
   jobId?: Prisma.StringWithAggregatesFilter<"JobAvailability"> | string
-  dayOfWeek?: Prisma.IntWithAggregatesFilter<"JobAvailability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceWithAggregatesFilter<"JobAvailability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableWithAggregatesFilter<"JobAvailability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableWithAggregatesFilter<"JobAvailability"> | number | null
   startTime?: Prisma.StringWithAggregatesFilter<"JobAvailability"> | string
   endTime?: Prisma.StringWithAggregatesFilter<"JobAvailability"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"JobAvailability"> | Date | string
@@ -278,7 +302,9 @@ export type JobAvailabilityScalarWhereWithAggregatesInput = {
 
 export type JobAvailabilityCreateInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -288,7 +314,9 @@ export type JobAvailabilityCreateInput = {
 export type JobAvailabilityUncheckedCreateInput = {
   id?: string
   jobId: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -296,7 +324,9 @@ export type JobAvailabilityUncheckedCreateInput = {
 
 export type JobAvailabilityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -306,7 +336,9 @@ export type JobAvailabilityUpdateInput = {
 export type JobAvailabilityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -315,7 +347,9 @@ export type JobAvailabilityUncheckedUpdateInput = {
 export type JobAvailabilityCreateManyInput = {
   id?: string
   jobId: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -323,7 +357,9 @@ export type JobAvailabilityCreateManyInput = {
 
 export type JobAvailabilityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -332,7 +368,9 @@ export type JobAvailabilityUpdateManyMutationInput = {
 export type JobAvailabilityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jobId?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,6 +389,8 @@ export type JobAvailabilityOrderByRelationAggregateInput = {
 export type JobAvailabilityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -364,6 +404,8 @@ export type JobAvailabilityAvgOrderByAggregateInput = {
 export type JobAvailabilityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -373,6 +415,8 @@ export type JobAvailabilityMaxOrderByAggregateInput = {
 export type JobAvailabilityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   jobId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -425,8 +469,16 @@ export type JobAvailabilityUncheckedUpdateManyWithoutJobNestedInput = {
   deleteMany?: Prisma.JobAvailabilityScalarWhereInput | Prisma.JobAvailabilityScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
+export type EnumAvailabilityRecurrenceFieldUpdateOperationsInput = {
+  set?: $Enums.AvailabilityRecurrence
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
@@ -435,7 +487,9 @@ export type IntFieldUpdateOperationsInput = {
 
 export type JobAvailabilityCreateWithoutJobInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -443,7 +497,9 @@ export type JobAvailabilityCreateWithoutJobInput = {
 
 export type JobAvailabilityUncheckedCreateWithoutJobInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -481,7 +537,9 @@ export type JobAvailabilityScalarWhereInput = {
   NOT?: Prisma.JobAvailabilityScalarWhereInput | Prisma.JobAvailabilityScalarWhereInput[]
   id?: Prisma.StringFilter<"JobAvailability"> | string
   jobId?: Prisma.StringFilter<"JobAvailability"> | string
-  dayOfWeek?: Prisma.IntFilter<"JobAvailability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"JobAvailability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"JobAvailability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"JobAvailability"> | number | null
   startTime?: Prisma.StringFilter<"JobAvailability"> | string
   endTime?: Prisma.StringFilter<"JobAvailability"> | string
   createdAt?: Prisma.DateTimeFilter<"JobAvailability"> | Date | string
@@ -489,7 +547,9 @@ export type JobAvailabilityScalarWhereInput = {
 
 export type JobAvailabilityCreateManyJobInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   createdAt?: Date | string
@@ -497,7 +557,9 @@ export type JobAvailabilityCreateManyJobInput = {
 
 export type JobAvailabilityUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -505,7 +567,9 @@ export type JobAvailabilityUpdateWithoutJobInput = {
 
 export type JobAvailabilityUncheckedUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -513,7 +577,9 @@ export type JobAvailabilityUncheckedUpdateWithoutJobInput = {
 
 export type JobAvailabilityUncheckedUpdateManyWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -524,6 +590,8 @@ export type JobAvailabilityUncheckedUpdateManyWithoutJobInput = {
 export type JobAvailabilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   jobId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -534,6 +602,8 @@ export type JobAvailabilitySelect<ExtArgs extends runtime.Types.Extensions.Inter
 export type JobAvailabilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   jobId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -544,6 +614,8 @@ export type JobAvailabilitySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
 export type JobAvailabilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   jobId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -554,13 +626,15 @@ export type JobAvailabilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
 export type JobAvailabilitySelectScalar = {
   id?: boolean
   jobId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
   createdAt?: boolean
 }
 
-export type JobAvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "dayOfWeek" | "startTime" | "endTime" | "createdAt", ExtArgs["result"]["jobAvailability"]>
+export type JobAvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jobId" | "recurrence" | "date" | "dayOfWeek" | "startTime" | "endTime" | "createdAt", ExtArgs["result"]["jobAvailability"]>
 export type JobAvailabilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   job?: boolean | Prisma.JobDefaultArgs<ExtArgs>
 }
@@ -579,7 +653,9 @@ export type $JobAvailabilityPayload<ExtArgs extends runtime.Types.Extensions.Int
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     jobId: string
-    dayOfWeek: number
+    recurrence: $Enums.AvailabilityRecurrence
+    date: Date | null
+    dayOfWeek: number | null
     startTime: string
     endTime: string
     createdAt: Date
@@ -1009,6 +1085,8 @@ export interface Prisma__JobAvailabilityClient<T, Null = never, ExtArgs extends 
 export interface JobAvailabilityFieldRefs {
   readonly id: Prisma.FieldRef<"JobAvailability", 'String'>
   readonly jobId: Prisma.FieldRef<"JobAvailability", 'String'>
+  readonly recurrence: Prisma.FieldRef<"JobAvailability", 'AvailabilityRecurrence'>
+  readonly date: Prisma.FieldRef<"JobAvailability", 'DateTime'>
   readonly dayOfWeek: Prisma.FieldRef<"JobAvailability", 'Int'>
   readonly startTime: Prisma.FieldRef<"JobAvailability", 'String'>
   readonly endTime: Prisma.FieldRef<"JobAvailability", 'String'>

@@ -1,4 +1,10 @@
-import { IsArray, ValidateNested, IsString, IsInt } from 'class-validator';
+import {
+  IsArray,
+  ValidateNested,
+  IsString,
+  IsInt,
+  IsDateString,
+} from 'class-validator';
 
 import { Type } from 'class-transformer';
 
@@ -6,8 +12,8 @@ class ScheduledInterviewDto {
   @IsString()
   applicationId: string;
 
-  @IsInt()
-  dayOfWeek: number;
+  @IsDateString()
+  date: string;
 
   @IsString()
   time: string;

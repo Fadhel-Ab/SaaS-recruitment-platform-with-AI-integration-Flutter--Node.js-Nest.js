@@ -44,13 +44,15 @@ model Job {
 }
 
 model JobAvailability {
-  id        String   @id @default(uuid())
-  jobId     String
-  dayOfWeek Int
-  startTime String
-  endTime   String
-  job       Job      @relation(fields: [jobId], references: [id])
-  createdAt DateTime @default(now())
+  id         String           @id @default(uuid())
+  jobId      String
+  recurrence AvailabilityRecurrence @default(SPECIFIC)
+  date       DateTime?        @db.Date
+  dayOfWeek  Int?
+  startTime  String
+  endTime    String
+  job        Job              @relation(fields: [jobId], references: [id])
+  createdAt  DateTime         @default(now())
 }
 
 model Candidate {
@@ -97,11 +99,13 @@ model AIScore {
 }
 
 model Availability {
-  id        String @id @default(uuid())
-  managerId String
-  dayOfWeek Int
-  startTime String
-  endTime   String
+  id         String                 @id @default(uuid())
+  managerId  String
+  recurrence AvailabilityRecurrence @default(SPECIFIC)
+  date       DateTime?              @db.Date
+  dayOfWeek  Int?
+  startTime  String
+  endTime    String
 
   manager User @relation(fields: [managerId], references: [id])
 }
@@ -206,4 +210,9 @@ enum JobStatus {
   ACTIVE
   EXPIRED
   FULFILLED
+}
+
+enum AvailabilityRecurrence {
+  RECURRING
+  SPECIFIC
 }

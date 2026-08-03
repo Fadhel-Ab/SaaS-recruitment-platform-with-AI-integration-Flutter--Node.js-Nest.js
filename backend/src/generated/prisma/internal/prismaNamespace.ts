@@ -1167,6 +1167,8 @@ export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobSca
 export const JobAvailabilityScalarFieldEnum = {
   id: 'id',
   jobId: 'jobId',
+  recurrence: 'recurrence',
+  date: 'date',
   dayOfWeek: 'dayOfWeek',
   startTime: 'startTime',
   endTime: 'endTime',
@@ -1223,6 +1225,8 @@ export type AIScoreScalarFieldEnum = (typeof AIScoreScalarFieldEnum)[keyof typeo
 export const AvailabilityScalarFieldEnum = {
   id: 'id',
   managerId: 'managerId',
+  recurrence: 'recurrence',
+  date: 'date',
   dayOfWeek: 'dayOfWeek',
   startTime: 'startTime',
   endTime: 'endTime'
@@ -1398,6 +1402,20 @@ export type EnumJobStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'JobStatus[]'
  */
 export type ListEnumJobStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AvailabilityRecurrence'
+ */
+export type EnumAvailabilityRecurrenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AvailabilityRecurrence'>
+    
+
+
+/**
+ * Reference to a field of type 'AvailabilityRecurrence[]'
+ */
+export type ListEnumAvailabilityRecurrenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AvailabilityRecurrence[]'>
     
 
 

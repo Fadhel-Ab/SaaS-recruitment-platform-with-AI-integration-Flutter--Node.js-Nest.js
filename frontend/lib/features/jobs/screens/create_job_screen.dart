@@ -12,11 +12,15 @@ import '../models/create_job_request.dart';
 const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 class _EditableSlot {
+  AvailabilityRecurrence recurrence;
+  DateTime date;
   int dayOfWeek;
   TimeOfDay start;
   TimeOfDay end;
 
   _EditableSlot({
+    required this.recurrence,
+    required this.date,
     required this.dayOfWeek,
     required this.start,
     required this.end,
@@ -24,7 +28,9 @@ class _EditableSlot {
 
   factory _EditableSlot.fromAvailabilitySlot(AvailabilitySlot slot) {
     return _EditableSlot(
-      dayOfWeek: slot.dayOfWeek,
+      recurrence: slot.recurrence,
+      date: slot.date ?? DateTime.now(),
+      dayOfWeek: slot.dayOfWeek ?? 1,
       start: _parseTime(slot.startTime),
       end: _parseTime(slot.endTime),
     );
@@ -43,11 +49,17 @@ class _EditableSlot {
   }
 
   AvailabilitySlot toAvailabilitySlot() {
-    return AvailabilitySlot(
-      dayOfWeek: dayOfWeek,
-      startTime: _formatTime(start),
-      endTime: _formatTime(end),
-    );
+    return recurrence == AvailabilityRecurrence.recurring
+        ? AvailabilitySlot.recurring(
+            dayOfWeek: dayOfWeek,
+            startTime: _formatTime(start),
+            endTime: _formatTime(end),
+          )
+        : AvailabilitySlot.specific(
+            date: date,
+            startTime: _formatTime(start),
+            endTime: _formatTime(end),
+          );
   }
 }
 
@@ -158,10 +170,17 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
     setState(() => _step = 1);
   }
 
+  static DateTime _defaultSlotDate() {
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    return DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+  }
+
   void _addAvailabilitySlot() {
     setState(
       () => _availabilitySlots.add(
         _EditableSlot(
+          recurrence: AvailabilityRecurrence.specific,
+          date: _defaultSlotDate(),
           dayOfWeek: 1,
           start: const TimeOfDay(hour: 9, minute: 0),
           end: const TimeOfDay(hour: 17, minute: 0),
@@ -172,6 +191,17 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
 
   void _removeAvailabilitySlot(int index) {
     setState(() => _availabilitySlots.removeAt(index));
+  }
+
+  Future<void> _pickSlotDate(_EditableSlot slot) async {
+    final today = DateTime.now();
+    final result = await showDatePicker(
+      context: context,
+      initialDate: slot.date,
+      firstDate: DateTime(today.year, today.month, today.day),
+      lastDate: DateTime(today.year + 2),
+    );
+    if (result != null) setState(() => slot.date = result);
   }
 
   Future<void> _pickSlotStart(_EditableSlot slot) async {
@@ -228,6 +258,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
               if (state.defaultAvailability.isEmpty) {
                 _availabilitySlots.add(
                   _EditableSlot(
+                    recurrence: AvailabilityRecurrence.specific,
+                    date: _defaultSlotDate(),
                     dayOfWeek: 1,
                     start: const TimeOfDay(hour: 9, minute: 0),
                     end: const TimeOfDay(hour: 17, minute: 0),
@@ -656,67 +688,118 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         ),
         ...List.generate(_availabilitySlots.length, (index) {
           final slot = _availabilitySlots[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
+          final isRecurring = slot.recurrence == AvailabilityRecurrence.recurring;
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<int>(
-                        value: slot.dayOfWeek,
-                        isExpanded: true,
-                        items: [
-                          for (int i = 1; i <= 7; i++)
-                            DropdownMenuItem(
-                              value: i,
-                              child: Text(_dayLabels[i - 1]),
-                            ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SegmentedButton<AvailabilityRecurrence>(
+                        segments: const [
+                          ButtonSegment(
+                            value: AvailabilityRecurrence.recurring,
+                            label: Text('Repeats weekly'),
+                            icon: Icon(Icons.repeat, size: 14),
+                          ),
+                          ButtonSegment(
+                            value: AvailabilityRecurrence.specific,
+                            label: Text('Specific date'),
+                            icon: Icon(Icons.event_outlined, size: 14),
+                          ),
                         ],
-                        onChanged: (v) =>
-                            setState(() => slot.dayOfWeek = v ?? slot.dayOfWeek),
+                        selected: {slot.recurrence},
+                        onSelectionChanged: (selection) => setState(
+                          () => slot.recurrence = selection.first,
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 3,
-                  child: OutlinedButton(
-                    onPressed: () => _pickSlotStart(slot),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF0F172A),
-                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Color(0xFF94A3B8),
+                      ),
+                      onPressed: () => _removeAvailabilitySlot(index),
+                      tooltip: 'Remove slot',
                     ),
-                    child: Text(slot.start.format(context)),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 3,
-                  child: OutlinedButton(
-                    onPressed: () => _pickSlotEnd(slot),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF0F172A),
-                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: isRecurring
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  value: slot.dayOfWeek,
+                                  isExpanded: true,
+                                  items: [
+                                    for (int i = 1; i <= 7; i++)
+                                      DropdownMenuItem(
+                                        value: i,
+                                        child: Text(_dayLabels[i - 1]),
+                                      ),
+                                  ],
+                                  onChanged: (v) => setState(
+                                    () => slot.dayOfWeek = v ?? slot.dayOfWeek,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : OutlinedButton.icon(
+                              onPressed: () => _pickSlotDate(slot),
+                              icon: const Icon(Icons.calendar_today_outlined, size: 16),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF0F172A),
+                                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                              ),
+                              label: Text(
+                                '${slot.date.year}-${slot.date.month.toString().padLeft(2, '0')}-${slot.date.day.toString().padLeft(2, '0')}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                     ),
-                    child: Text(slot.end.format(context)),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    size: 18,
-                    color: Color(0xFF94A3B8),
-                  ),
-                  onPressed: () => _removeAvailabilitySlot(index),
-                  tooltip: 'Remove slot',
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 3,
+                      child: OutlinedButton(
+                        onPressed: () => _pickSlotStart(slot),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF0F172A),
+                          side: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        child: Text(slot.start.format(context)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 3,
+                      child: OutlinedButton(
+                        onPressed: () => _pickSlotEnd(slot),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF0F172A),
+                          side: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        child: Text(slot.end.format(context)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

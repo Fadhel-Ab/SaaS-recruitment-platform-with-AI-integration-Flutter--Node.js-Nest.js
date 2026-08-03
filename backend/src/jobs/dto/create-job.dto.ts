@@ -1,18 +1,37 @@
 import {
   IsArray,
+  IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
+  Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EmploymentType, SkillLevel } from '../../generated/prisma/enums.js';
+import {
+  AvailabilityRecurrence,
+  EmploymentType,
+  SkillLevel,
+} from '../../generated/prisma/enums.js';
 
 export class JobAvailabilitySlotDto {
+  @IsIn([AvailabilityRecurrence.RECURRING, AvailabilityRecurrence.SPECIFIC])
+  recurrence: AvailabilityRecurrence;
+
+  @ValidateIf((dto) => dto.recurrence === AvailabilityRecurrence.SPECIFIC)
+  @IsDateString()
+  date?: string;
+
+  @ValidateIf((dto) => dto.recurrence === AvailabilityRecurrence.RECURRING)
   @IsInt()
-  dayOfWeek: number;
+  @Min(1)
+  @Max(7)
+  dayOfWeek?: number;
 
   @IsNotEmpty()
   startTime: string;

@@ -14,17 +14,11 @@ import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { ConfigService } from '@nestjs/config';
-
-type AvailabilityWindow = {
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string;
-};
+import { expandAvailabilityWindows } from '../scheduling/util/expand-availability-windows.js';
 
 @Injectable()
 export class AiInterviewService {
   private readonly SLOT_DURATION_MINUTES = 30;
-  private readonly SCHEDULING_HORIZON_WEEKS = 8;
 
   constructor(
     private prisma: PrismaService,
@@ -37,34 +31,30 @@ export class AiInterviewService {
   /**
    * Finds the next free interview slot for a manager, preferring the job's
    * own availability windows and falling back to the manager's general
-   * availability, then to "tomorrow" if neither is configured. Walks
-   * forward through weeks/slots checking against already-booked interviews
-   * for that manager so two candidates never land on the same time.
+   * availability, then to "tomorrow" if neither is configured. Availability
+   * windows can be recurring weekdays or one-off calendar dates; both are
+   * expanded into concrete dated occurrences and walked in order, checking
+   * against already-booked interviews for that manager so two candidates
+   * never land on the same time.
    */
   private async findNextAvailableSlot(
     jobId: string,
     managerId: string,
   ): Promise<Date> {
+    const now = new Date();
+
     const jobWindows = await this.prisma.jobAvailability.findMany({
       where: { jobId },
     });
 
-    let windows: AvailabilityWindow[] = jobWindows.map((w) => ({
-      dayOfWeek: w.dayOfWeek,
-      startTime: w.startTime,
-      endTime: w.endTime,
-    }));
+    let windows = expandAvailabilityWindows(jobWindows, { from: now });
 
     if (windows.length === 0) {
       const managerWindows = await this.prisma.availability.findMany({
         where: { managerId },
       });
 
-      windows = managerWindows.map((w) => ({
-        dayOfWeek: w.dayOfWeek,
-        startTime: w.startTime,
-        endTime: w.endTime,
-      }));
+      windows = expandAvailabilityWindows(managerWindows, { from: now });
     }
 
     const fallbackTomorrow = () => {
@@ -77,9 +67,10 @@ export class AiInterviewService {
       return fallbackTomorrow();
     }
 
-    const now = new Date();
-    const horizon = new Date(now);
-    horizon.setDate(horizon.getDate() + (this.SCHEDULING_HORIZON_WEEKS + 1) * 7);
+    const horizon = windows.reduce(
+      (latest, w) => (w.date > latest ? w.date : latest),
+      windows[0].date,
+    );
 
     const existingInterviews = await this.prisma.interview.findMany({
       where: {
@@ -96,55 +87,27 @@ export class AiInterviewService {
         .map((i) => i.scheduledAt!.getTime()),
     );
 
-    const sortedWindows = [...windows].sort((a, b) => {
-      if (a.dayOfWeek !== b.dayOfWeek) return a.dayOfWeek - b.dayOfWeek;
-      return a.startTime.localeCompare(b.startTime);
-    });
+    for (const window of windows) {
+      const [startHour, startMinute] = window.startTime.split(':').map(Number);
+      const [endHour, endMinute] = window.endTime.split(':').map(Number);
 
-    for (
-      let weekOffset = 0;
-      weekOffset <= this.SCHEDULING_HORIZON_WEEKS;
-      weekOffset++
-    ) {
-      for (const window of sortedWindows) {
-        const today = now.getDay(); // Sunday = 0
+      const windowStart = new Date(window.date);
+      windowStart.setHours(startHour, startMinute, 0, 0);
 
-        // Convert stored 1-7 (Mon-Sun) to JS 0-6 (Sun-Sat)
-        const targetDay = window.dayOfWeek % 7;
+      const windowEnd = new Date(window.date);
+      windowEnd.setHours(endHour, endMinute, 0, 0);
 
-        let daysUntil = targetDay - today;
+      const slot = new Date(windowStart);
 
-        if (daysUntil <= 0) {
-          daysUntil += 7;
+      while (
+        slot.getTime() + this.SLOT_DURATION_MINUTES * 60000 <=
+        windowEnd.getTime()
+      ) {
+        if (slot.getTime() > now.getTime() && !taken.has(slot.getTime())) {
+          return new Date(slot);
         }
 
-        daysUntil += weekOffset * 7;
-
-        const [startHour, startMinute] = window.startTime
-          .split(':')
-          .map(Number);
-        const [endHour, endMinute] = window.endTime.split(':').map(Number);
-
-        const windowStart = new Date(now);
-        windowStart.setDate(windowStart.getDate() + daysUntil);
-        windowStart.setHours(startHour, startMinute, 0, 0);
-
-        const windowEnd = new Date(now);
-        windowEnd.setDate(windowEnd.getDate() + daysUntil);
-        windowEnd.setHours(endHour, endMinute, 0, 0);
-
-        const slot = new Date(windowStart);
-
-        while (
-          slot.getTime() + this.SLOT_DURATION_MINUTES * 60000 <=
-          windowEnd.getTime()
-        ) {
-          if (slot.getTime() > now.getTime() && !taken.has(slot.getTime())) {
-            return new Date(slot);
-          }
-
-          slot.setMinutes(slot.getMinutes() + this.SLOT_DURATION_MINUTES);
-        }
+        slot.setMinutes(slot.getMinutes() + this.SLOT_DURATION_MINUTES);
       }
     }
 

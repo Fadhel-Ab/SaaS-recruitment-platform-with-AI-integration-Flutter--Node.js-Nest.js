@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AvailabilityRecurrence } from '../generated/prisma/enums.js';
 import { CreateAvailabilityDto } from './dto/create-availability.dto.js';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto.js';
 
@@ -11,7 +12,14 @@ export class AvailabilityService {
     return this.prisma.availability.create({
       data: {
         managerId,
-        ...dto,
+        recurrence: dto.recurrence,
+        date: dto.recurrence === AvailabilityRecurrence.SPECIFIC ? dto.date : null,
+        dayOfWeek:
+          dto.recurrence === AvailabilityRecurrence.RECURRING
+            ? dto.dayOfWeek
+            : null,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
       },
     });
   }
@@ -25,9 +33,23 @@ export class AvailabilityService {
       throw new NotFoundException('Availability slot not found');
     }
 
+    const recurrence = dto.recurrence ?? existing.recurrence;
+
     return this.prisma.availability.update({
       where: { id },
-      data: dto,
+      data: {
+        recurrence,
+        date:
+          recurrence === AvailabilityRecurrence.SPECIFIC
+            ? (dto.date ?? existing.date)
+            : null,
+        dayOfWeek:
+          recurrence === AvailabilityRecurrence.RECURRING
+            ? (dto.dayOfWeek ?? existing.dayOfWeek)
+            : null,
+        startTime: dto.startTime ?? existing.startTime,
+        endTime: dto.endTime ?? existing.endTime,
+      },
     });
   }
 
@@ -50,9 +72,7 @@ export class AvailabilityService {
       where: {
         managerId,
       },
-      orderBy: {
-        dayOfWeek: 'asc',
-      },
+      orderBy: [{ date: 'asc' }, { dayOfWeek: 'asc' }],
     });
   }
 }

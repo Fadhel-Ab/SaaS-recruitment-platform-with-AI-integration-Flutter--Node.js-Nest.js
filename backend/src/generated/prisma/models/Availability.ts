@@ -37,6 +37,8 @@ export type AvailabilitySumAggregateOutputType = {
 export type AvailabilityMinAggregateOutputType = {
   id: string | null
   managerId: string | null
+  recurrence: $Enums.AvailabilityRecurrence | null
+  date: Date | null
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
@@ -45,6 +47,8 @@ export type AvailabilityMinAggregateOutputType = {
 export type AvailabilityMaxAggregateOutputType = {
   id: string | null
   managerId: string | null
+  recurrence: $Enums.AvailabilityRecurrence | null
+  date: Date | null
   dayOfWeek: number | null
   startTime: string | null
   endTime: string | null
@@ -53,6 +57,8 @@ export type AvailabilityMaxAggregateOutputType = {
 export type AvailabilityCountAggregateOutputType = {
   id: number
   managerId: number
+  recurrence: number
+  date: number
   dayOfWeek: number
   startTime: number
   endTime: number
@@ -71,6 +77,8 @@ export type AvailabilitySumAggregateInputType = {
 export type AvailabilityMinAggregateInputType = {
   id?: true
   managerId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -79,6 +87,8 @@ export type AvailabilityMinAggregateInputType = {
 export type AvailabilityMaxAggregateInputType = {
   id?: true
   managerId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -87,6 +97,8 @@ export type AvailabilityMaxAggregateInputType = {
 export type AvailabilityCountAggregateInputType = {
   id?: true
   managerId?: true
+  recurrence?: true
+  date?: true
   dayOfWeek?: true
   startTime?: true
   endTime?: true
@@ -182,7 +194,9 @@ export type AvailabilityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type AvailabilityGroupByOutputType = {
   id: string
   managerId: string
-  dayOfWeek: number
+  recurrence: $Enums.AvailabilityRecurrence
+  date: Date | null
+  dayOfWeek: number | null
   startTime: string
   endTime: string
   _count: AvailabilityCountAggregateOutputType | null
@@ -213,7 +227,9 @@ export type AvailabilityWhereInput = {
   NOT?: Prisma.AvailabilityWhereInput | Prisma.AvailabilityWhereInput[]
   id?: Prisma.StringFilter<"Availability"> | string
   managerId?: Prisma.StringFilter<"Availability"> | string
-  dayOfWeek?: Prisma.IntFilter<"Availability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"Availability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"Availability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"Availability"> | number | null
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
   manager?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -222,7 +238,9 @@ export type AvailabilityWhereInput = {
 export type AvailabilityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
-  dayOfWeek?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrderInput | Prisma.SortOrder
+  dayOfWeek?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   manager?: Prisma.UserOrderByWithRelationInput
@@ -234,7 +252,9 @@ export type AvailabilityWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AvailabilityWhereInput[]
   NOT?: Prisma.AvailabilityWhereInput | Prisma.AvailabilityWhereInput[]
   managerId?: Prisma.StringFilter<"Availability"> | string
-  dayOfWeek?: Prisma.IntFilter<"Availability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"Availability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"Availability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"Availability"> | number | null
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
   manager?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -243,7 +263,9 @@ export type AvailabilityWhereUniqueInput = Prisma.AtLeast<{
 export type AvailabilityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
-  dayOfWeek?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrderInput | Prisma.SortOrder
+  dayOfWeek?: Prisma.SortOrderInput | Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   _count?: Prisma.AvailabilityCountOrderByAggregateInput
@@ -259,14 +281,18 @@ export type AvailabilityScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AvailabilityScalarWhereWithAggregatesInput | Prisma.AvailabilityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Availability"> | string
   managerId?: Prisma.StringWithAggregatesFilter<"Availability"> | string
-  dayOfWeek?: Prisma.IntWithAggregatesFilter<"Availability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceWithAggregatesFilter<"Availability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableWithAggregatesFilter<"Availability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableWithAggregatesFilter<"Availability"> | number | null
   startTime?: Prisma.StringWithAggregatesFilter<"Availability"> | string
   endTime?: Prisma.StringWithAggregatesFilter<"Availability"> | string
 }
 
 export type AvailabilityCreateInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
   manager: Prisma.UserCreateNestedOneWithoutAvailabilityInput
@@ -275,14 +301,18 @@ export type AvailabilityCreateInput = {
 export type AvailabilityUncheckedCreateInput = {
   id?: string
   managerId: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
 }
 
 export type AvailabilityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   manager?: Prisma.UserUpdateOneRequiredWithoutAvailabilityNestedInput
@@ -291,7 +321,9 @@ export type AvailabilityUpdateInput = {
 export type AvailabilityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -299,14 +331,18 @@ export type AvailabilityUncheckedUpdateInput = {
 export type AvailabilityCreateManyInput = {
   id?: string
   managerId: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
 }
 
 export type AvailabilityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -314,7 +350,9 @@ export type AvailabilityUpdateManyMutationInput = {
 export type AvailabilityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -332,6 +370,8 @@ export type AvailabilityOrderByRelationAggregateInput = {
 export type AvailabilityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -344,6 +384,8 @@ export type AvailabilityAvgOrderByAggregateInput = {
 export type AvailabilityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -352,6 +394,8 @@ export type AvailabilityMaxOrderByAggregateInput = {
 export type AvailabilityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  recurrence?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -405,14 +449,18 @@ export type AvailabilityUncheckedUpdateManyWithoutManagerNestedInput = {
 
 export type AvailabilityCreateWithoutManagerInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
 }
 
 export type AvailabilityUncheckedCreateWithoutManagerInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
 }
@@ -449,35 +497,45 @@ export type AvailabilityScalarWhereInput = {
   NOT?: Prisma.AvailabilityScalarWhereInput | Prisma.AvailabilityScalarWhereInput[]
   id?: Prisma.StringFilter<"Availability"> | string
   managerId?: Prisma.StringFilter<"Availability"> | string
-  dayOfWeek?: Prisma.IntFilter<"Availability"> | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFilter<"Availability"> | $Enums.AvailabilityRecurrence
+  date?: Prisma.DateTimeNullableFilter<"Availability"> | Date | string | null
+  dayOfWeek?: Prisma.IntNullableFilter<"Availability"> | number | null
   startTime?: Prisma.StringFilter<"Availability"> | string
   endTime?: Prisma.StringFilter<"Availability"> | string
 }
 
 export type AvailabilityCreateManyManagerInput = {
   id?: string
-  dayOfWeek: number
+  recurrence?: $Enums.AvailabilityRecurrence
+  date?: Date | string | null
+  dayOfWeek?: number | null
   startTime: string
   endTime: string
 }
 
 export type AvailabilityUpdateWithoutManagerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AvailabilityUncheckedUpdateWithoutManagerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type AvailabilityUncheckedUpdateManyWithoutManagerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
+  recurrence?: Prisma.EnumAvailabilityRecurrenceFieldUpdateOperationsInput | $Enums.AvailabilityRecurrence
+  date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dayOfWeek?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -487,6 +545,8 @@ export type AvailabilityUncheckedUpdateManyWithoutManagerInput = {
 export type AvailabilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   managerId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -496,6 +556,8 @@ export type AvailabilitySelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type AvailabilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   managerId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -505,6 +567,8 @@ export type AvailabilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type AvailabilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   managerId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -514,12 +578,14 @@ export type AvailabilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type AvailabilitySelectScalar = {
   id?: boolean
   managerId?: boolean
+  recurrence?: boolean
+  date?: boolean
   dayOfWeek?: boolean
   startTime?: boolean
   endTime?: boolean
 }
 
-export type AvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "managerId" | "dayOfWeek" | "startTime" | "endTime", ExtArgs["result"]["availability"]>
+export type AvailabilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "managerId" | "recurrence" | "date" | "dayOfWeek" | "startTime" | "endTime", ExtArgs["result"]["availability"]>
 export type AvailabilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -538,7 +604,9 @@ export type $AvailabilityPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     managerId: string
-    dayOfWeek: number
+    recurrence: $Enums.AvailabilityRecurrence
+    date: Date | null
+    dayOfWeek: number | null
     startTime: string
     endTime: string
   }, ExtArgs["result"]["availability"]>
@@ -967,6 +1035,8 @@ export interface Prisma__AvailabilityClient<T, Null = never, ExtArgs extends run
 export interface AvailabilityFieldRefs {
   readonly id: Prisma.FieldRef<"Availability", 'String'>
   readonly managerId: Prisma.FieldRef<"Availability", 'String'>
+  readonly recurrence: Prisma.FieldRef<"Availability", 'AvailabilityRecurrence'>
+  readonly date: Prisma.FieldRef<"Availability", 'DateTime'>
   readonly dayOfWeek: Prisma.FieldRef<"Availability", 'Int'>
   readonly startTime: Prisma.FieldRef<"Availability", 'String'>
   readonly endTime: Prisma.FieldRef<"Availability", 'String'>

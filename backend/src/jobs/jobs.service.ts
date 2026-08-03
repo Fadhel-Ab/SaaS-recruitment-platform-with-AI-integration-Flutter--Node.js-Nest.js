@@ -6,6 +6,7 @@ import { UpdateJobDto } from './dto/update-job.dto.js';
 import { GenerateInterviewQuestionsDto } from './dto/generate-interview-questions.dto.js';
 import { StorageService } from '../common/storage/storage.service.js';
 import { AiService } from '../ai/ai.service.js';
+import { AvailabilityRecurrence } from '../generated/prisma/enums.js';
 
 @Injectable()
 export class JobsService {
@@ -43,7 +44,15 @@ export class JobsService {
 
         jobAvailability: {
           create: (dto.availability ?? []).map((slot) => ({
-            dayOfWeek: slot.dayOfWeek,
+            recurrence: slot.recurrence,
+            date:
+              slot.recurrence === AvailabilityRecurrence.SPECIFIC && slot.date
+                ? new Date(slot.date)
+                : null,
+            dayOfWeek:
+              slot.recurrence === AvailabilityRecurrence.RECURRING
+                ? slot.dayOfWeek
+                : null,
             startTime: slot.startTime,
             endTime: slot.endTime,
           })),
@@ -68,14 +77,31 @@ export class JobsService {
   }
 
   async getDefaultAvailability(managerId: string) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const upcomingOrRecurring = {
+      OR: [
+        { recurrence: AvailabilityRecurrence.RECURRING },
+        {
+          recurrence: AvailabilityRecurrence.SPECIFIC,
+          date: { gte: today },
+        },
+      ],
+    };
+
     const lastJob = await this.prisma.job.findFirst({
       where: { managerId },
       orderBy: { createdAt: 'desc' },
-      include: { jobAvailability: true },
+      include: {
+        jobAvailability: { where: upcomingOrRecurring },
+      },
     });
 
     if (lastJob && lastJob.jobAvailability.length > 0) {
       return lastJob.jobAvailability.map((a) => ({
+        recurrence: a.recurrence,
+        date: a.date,
         dayOfWeek: a.dayOfWeek,
         startTime: a.startTime,
         endTime: a.endTime,
@@ -83,10 +109,12 @@ export class JobsService {
     }
 
     const generalAvailability = await this.prisma.availability.findMany({
-      where: { managerId },
+      where: { managerId, ...upcomingOrRecurring },
     });
 
     return generalAvailability.map((a) => ({
+      recurrence: a.recurrence,
+      date: a.date,
       dayOfWeek: a.dayOfWeek,
       startTime: a.startTime,
       endTime: a.endTime,

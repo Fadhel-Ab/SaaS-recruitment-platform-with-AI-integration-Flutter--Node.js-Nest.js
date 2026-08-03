@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
@@ -136,7 +137,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           final request = CreateApplicationRequest(
             fullName: fullNameController.text.trim(),
             email: emailController.text.trim(),
-            phone: phoneController.text.trim(),
+            phone: '+973${phoneController.text.trim()}',
             resumeFileName: state.fileName!,
           );
 
@@ -269,13 +270,49 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                               TextFormField(
                                 controller: phoneController,
                                 keyboardType: TextInputType.phone,
-                                decoration: const InputDecoration(
-                                  hintText: '+1 (555) 000-0000',
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(8),
+                                ],
+                                decoration: InputDecoration(
+                                  hintText: '3XXX XXXX',
+                                  prefixIcon: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          '🇧🇭',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          '+973',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF111827),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  prefixIconConstraints: const BoxConstraints(
+                                    minWidth: 0,
+                                    minHeight: 0,
+                                  ),
                                 ),
-                                validator: (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                    ? 'Phone number is mandatory'
-                                    : null,
+                                validator: (v) {
+                                  final digits = (v ?? '').trim();
+                                  if (digits.isEmpty) {
+                                    return 'Phone number is mandatory';
+                                  }
+                                  if (digits.length != 8) {
+                                    return 'Enter a valid 8-digit Bahrain phone number';
+                                  }
+                                  return null;
+                                },
                               ),
 
                               const FormLabel(label: 'Curriculum Vitae (CV)'),

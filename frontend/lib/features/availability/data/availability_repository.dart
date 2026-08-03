@@ -14,31 +14,13 @@ class AvailabilityRepository {
         .toList();
   }
 
-  Future<AvailabilitySlot> create({
-    required int dayOfWeek,
-    required String startTime,
-    required String endTime,
-  }) async {
-    final data = await api.createAvailability(
-      dayOfWeek: dayOfWeek,
-      startTime: startTime,
-      endTime: endTime,
-    );
+  Future<AvailabilitySlot> create(AvailabilitySlot slot) async {
+    final data = await api.createAvailability(slot.toJson());
     return AvailabilitySlot.fromJson(data);
   }
 
-  Future<AvailabilitySlot> update(
-    String id, {
-    required int dayOfWeek,
-    required String startTime,
-    required String endTime,
-  }) async {
-    final data = await api.updateAvailability(
-      id,
-      dayOfWeek: dayOfWeek,
-      startTime: startTime,
-      endTime: endTime,
-    );
+  Future<AvailabilitySlot> update(String id, AvailabilitySlot slot) async {
+    final data = await api.updateAvailability(id, slot.toJson());
     return AvailabilitySlot.fromJson(data);
   }
 

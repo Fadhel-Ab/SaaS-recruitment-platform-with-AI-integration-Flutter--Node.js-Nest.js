@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { generateSlots } from './util/time-slots.js';
 import { createDateFromSlot } from './util/scheduler.utils.js';
+import { expandAvailabilityWindows } from './util/expand-availability-windows.js';
 import { ConfirmScheduleDto } from './dto/confirm-schedule.dto.js';
 import { Interview } from '../generated/prisma/client.js';
 
@@ -31,29 +32,26 @@ export class SchedulingService {
     });
 
     const availability = await this.prisma.availability.findMany({
-      where: {
-        managerId,
-      },
-      orderBy: {
-        dayOfWeek: 'asc',
-      },
+      where: { managerId },
     });
 
+    const windows = expandAvailabilityWindows(availability);
+
     const slots: {
-      dayOfWeek: number;
+      date: Date;
       time: string;
     }[] = [];
 
-    for (const availabilitySlot of availability) {
+    for (const window of windows) {
       const generatedSlots = generateSlots(
-        availabilitySlot.startTime,
-        availabilitySlot.endTime,
+        window.startTime,
+        window.endTime,
         duration,
       );
 
       slots.push(
         ...generatedSlots.map((time) => ({
-          dayOfWeek: availabilitySlot.dayOfWeek,
+          date: window.date,
           time,
         })),
       );
@@ -99,7 +97,7 @@ export class SchedulingService {
           data: {
             applicationId: item.applicationId,
             managerId,
-            scheduledAt: createDateFromSlot(item.dayOfWeek, item.time),
+            scheduledAt: createDateFromSlot(item.date, item.time),
             duration: dto.duration,
             status: InterviewStatus.SCHEDULED,
           },

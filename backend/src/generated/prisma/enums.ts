@@ -80,3 +80,11 @@ export const JobStatus = {
 } as const
 
 export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
+
+
+export const AvailabilityRecurrence = {
+  RECURRING: 'RECURRING',
+  SPECIFIC: 'SPECIFIC'
+} as const
+
+export type AvailabilityRecurrence = (typeof AvailabilityRecurrence)[keyof typeof AvailabilityRecurrence]
