@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:frontend/features/applications/bloc/job_applicants_bloc.dart';
+import 'package:frontend/features/applications/bloc/job_applicants_event.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_state.dart';
+import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/model/applicant_summary.dart';
 import 'package:frontend/features/applications/model/application_status.dart';
 
@@ -11,8 +13,9 @@ enum _SortOption { latest, highestScore, oldest }
 
 class JobApplicantsScreen extends StatefulWidget {
   final String jobId;
+  final String? jobTitle;
 
-  const JobApplicantsScreen({super.key, required this.jobId});
+  const JobApplicantsScreen({super.key, required this.jobId, this.jobTitle});
 
   @override
   State<JobApplicantsScreen> createState() => _JobApplicantsScreenState();
@@ -22,6 +25,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   final Set<String> _selectedStatuses = {};
   RangeValues _scoreRange = const RangeValues(0, 100);
   _SortOption _sort = _SortOption.latest;
+
+  bool _selectionMode = false;
+  final Set<String> _selectedIds = {};
+  bool _isBulkUpdating = false;
 
   List<ApplicantSummary> _apply(List<ApplicantSummary> applicants) {
     final filtered = applicants.where((applicant) {
@@ -54,15 +61,71 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return filtered;
   }
 
+  void _toggleSelectionMode() {
+    setState(() {
+      _selectionMode = !_selectionMode;
+      if (!_selectionMode) _selectedIds.clear();
+    });
+  }
+
+  Future<void> _bulkUpdate(String status) async {
+    if (_selectedIds.isEmpty || _isBulkUpdating) return;
+
+    setState(() => _isBulkUpdating = true);
+    try {
+      final (updated, skipped) = await context
+          .read<ApplicationRepository>()
+          .bulkUpdateStatus(_selectedIds.toList(), status);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            skipped == 0
+                ? 'Updated $updated candidate(s)'
+                : 'Updated $updated candidate(s), skipped $skipped (invalid transition)',
+          ),
+        ),
+      );
+
+      setState(() {
+        _selectedIds.clear();
+        _selectionMode = false;
+      });
+      context.read<JobApplicantsBloc>().add(LoadJobApplicants(widget.jobId));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Bulk update failed: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isBulkUpdating = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
       appBar: AppBar(
-        title: const Text('Candidates'),
+        title: Text(
+          widget.jobTitle != null ? 'Candidates — ${widget.jobTitle}' : 'Candidates',
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF111827),
         elevation: 0,
+        actions: [
+          IconButton(
+            tooltip: _selectionMode ? 'Cancel selection' : 'Select candidates',
+            icon: Icon(
+              _selectionMode ? Icons.close : Icons.checklist,
+              color: _selectionMode ? const Color(0xFF4F46E5) : null,
+            ),
+            onPressed: _toggleSelectionMode,
+          ),
+        ],
       ),
       body: BlocBuilder<JobApplicantsBloc, JobApplicantsState>(
         builder: (context, state) {
@@ -130,22 +193,107 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final applicant = filtered[index];
                           return _ApplicantCard(
                             applicant: applicant,
-                            onTap: () => context.push(
-                              '/manager/applications/${applicant.id}',
-                            ),
+                            selectionMode: _selectionMode,
+                            selected: _selectedIds.contains(applicant.id),
+                            onTap: () {
+                              if (_selectionMode) {
+                                setState(() {
+                                  if (_selectedIds.contains(applicant.id)) {
+                                    _selectedIds.remove(applicant.id);
+                                  } else {
+                                    _selectedIds.add(applicant.id);
+                                  }
+                                });
+                              } else {
+                                context.push(
+                                  '/manager/applications/${applicant.id}',
+                                );
+                              }
+                            },
                           );
                         },
                       ),
               ),
+              if (_selectionMode && _selectedIds.isNotEmpty)
+                _BulkActionBar(
+                  count: _selectedIds.length,
+                  isUpdating: _isBulkUpdating,
+                  onShortlist: () => _bulkUpdate('SHORTLISTED'),
+                  onReject: () => _bulkUpdate('REJECTED'),
+                ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _BulkActionBar extends StatelessWidget {
+  final int count;
+  final bool isUpdating;
+  final VoidCallback onShortlist;
+  final VoidCallback onReject;
+
+  const _BulkActionBar({
+    required this.count,
+    required this.isUpdating,
+    required this.onShortlist,
+    required this.onReject,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '$count selected',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF111827),
+            ),
+          ),
+          const Spacer(),
+          OutlinedButton(
+            onPressed: isUpdating ? null : onReject,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFC5221F),
+              side: const BorderSide(color: Color(0xFFC5221F)),
+            ),
+            child: const Text('Reject Selected'),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton(
+            onPressed: isUpdating ? null : onShortlist,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4F46E5),
+              foregroundColor: Colors.white,
+            ),
+            child: isUpdating
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text('Shortlist Selected'),
+          ),
+        ],
       ),
     );
   }
@@ -268,8 +416,15 @@ class _FilterBar extends StatelessWidget {
 class _ApplicantCard extends StatelessWidget {
   final ApplicantSummary applicant;
   final VoidCallback onTap;
+  final bool selectionMode;
+  final bool selected;
 
-  const _ApplicantCard({required this.applicant, required this.onTap});
+  const _ApplicantCard({
+    required this.applicant,
+    required this.onTap,
+    this.selectionMode = false,
+    this.selected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -278,9 +433,12 @@ class _ApplicantCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(
+          color: selected ? const Color(0xFF4F46E5) : const Color(0xFFE5E7EB),
+          width: selected ? 1.5 : 1,
+        ),
       ),
-      color: Colors.white,
+      color: selected ? const Color(0xFFF5F6FF) : Colors.white,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -288,6 +446,14 @@ class _ApplicantCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
+              if (selectionMode) ...[
+                Checkbox(
+                  value: selected,
+                  activeColor: const Color(0xFF4F46E5),
+                  onChanged: (_) => onTap(),
+                ),
+                const SizedBox(width: 4),
+              ],
               CircleAvatar(
                 radius: 22,
                 backgroundColor: const Color(0xFFEEF2FF),

@@ -299,7 +299,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF6366F1),
+            color: Color(0xFF4F46E5),
             letterSpacing: 0.4,
           ),
         ),
@@ -430,14 +430,14 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected
-                      ? const Color(0xFF6366F1)
+                      ? const Color(0xFF4F46E5)
                       : const Color(0xFF475569),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                   side: BorderSide(
                     color: isSelected
-                        ? const Color(0xFF6366F1)
+                        ? const Color(0xFF4F46E5)
                         : const Color(0xFFE2E8F0),
                   ),
                 ),
@@ -495,7 +495,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 return ElevatedButton(
                   onPressed: isGenerating ? null : _submitDetails,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1), // Indigo
+                    backgroundColor: const Color(0xFF4F46E5), // Indigo
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -581,7 +581,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
           onPressed: _addQuestion,
           icon: const Icon(Icons.add, size: 18),
           label: const Text('Add Question'),
-          style: TextButton.styleFrom(foregroundColor: const Color(0xFF6366F1)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF4F46E5)),
         ),
         const SizedBox(height: 32),
         BlocBuilder<CreateJobBloc, CreateJobState>(
@@ -612,7 +612,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                   child: ElevatedButton(
                     onPressed: isLoading ? null : _approveQuestions,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
+                      backgroundColor: const Color(0xFF4F46E5),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -727,7 +727,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
           onPressed: _addAvailabilitySlot,
           icon: const Icon(Icons.add, size: 18),
           label: const Text('Add Slot'),
-          style: TextButton.styleFrom(foregroundColor: const Color(0xFF6366F1)),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF4F46E5)),
         ),
         const SizedBox(height: 32),
         BlocBuilder<CreateJobBloc, CreateJobState>(
@@ -757,7 +757,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                   child: ElevatedButton(
                     onPressed: isSubmitting ? null : _publish,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
+                      backgroundColor: const Color(0xFF4F46E5),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

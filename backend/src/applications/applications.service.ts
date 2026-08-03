@@ -13,7 +13,7 @@ import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.
 import { allowedTransitions } from './utils/status-transition.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
-import { UserRole } from '../generated/prisma/enums.js';
+import { ApplicationStatus, UserRole } from '../generated/prisma/enums.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
 import { StorageService } from '../common/storage/storage.service.js';
 
@@ -199,6 +199,37 @@ export class ApplicationsService {
       },
     });
   }
+
+  async bulkUpdateStatus(
+    managerId: string,
+    applicationIds: string[],
+    status: ApplicationStatus,
+  ) {
+    const applications = await this.prisma.application.findMany({
+      where: {
+        id: { in: applicationIds },
+        job: { managerId },
+      },
+    });
+
+    const updated: string[] = [];
+    const skipped: string[] = [];
+
+    for (const application of applications) {
+      if (allowedTransitions[application.status].includes(status)) {
+        await this.prisma.application.update({
+          where: { id: application.id },
+          data: { status },
+        });
+        updated.push(application.id);
+      } else {
+        skipped.push(application.id);
+      }
+    }
+
+    return { updated, skipped };
+  }
+
   async getJobApplications(managerId: string, jobId: string) {
     const job = await this.prisma.job.findFirst({
       where: {

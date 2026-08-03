@@ -94,8 +94,10 @@ class ManagerJobsScreen extends StatelessWidget {
 
                 return _JobCard(
                   job: job,
-                  onCandidatesTap: () =>
-                      context.push('/manager/jobs/${job.id}/applicants'),
+                  onCandidatesTap: () => context.push(
+                    '/manager/jobs/${job.id}/applicants',
+                    extra: job.title,
+                  ),
                   onEditTap: () async {
                     final result = await context.push<bool>(
                       '/manager/jobs/${job.id}/edit',

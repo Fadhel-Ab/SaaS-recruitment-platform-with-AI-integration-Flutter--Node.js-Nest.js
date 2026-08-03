@@ -4,6 +4,8 @@ import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
+import 'package:frontend/features/search/data/search_repository.dart';
+import 'package:frontend/features/search/manager_search_delegate.dart';
 import 'package:go_router/go_router.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -25,6 +27,17 @@ class AppScaffold extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Recruitment Platform'),
             actions: [
+              if (user?.role == UserRole.manager)
+                IconButton(
+                  tooltip: 'Search jobs and candidates',
+                  icon: const Icon(Icons.search),
+                  onPressed: () => showSearch(
+                    context: context,
+                    delegate: ManagerSearchDelegate(
+                      context.read<SearchRepository>(),
+                    ),
+                  ),
+                ),
               if (user?.role == UserRole.manager)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 1),

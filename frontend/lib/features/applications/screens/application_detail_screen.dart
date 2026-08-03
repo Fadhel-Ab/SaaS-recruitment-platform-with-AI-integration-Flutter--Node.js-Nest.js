@@ -24,7 +24,16 @@ class ApplicationDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
       appBar: AppBar(
-        title: const Text('Candidate Review'),
+        title: BlocBuilder<ApplicationDetailBloc, ApplicationDetailState>(
+          builder: (context, state) {
+            final jobTitle = state.application?.jobTitle;
+            return Text(
+              jobTitle != null && jobTitle.isNotEmpty
+                  ? 'Candidate Review — $jobTitle'
+                  : 'Candidate Review',
+            );
+          },
+        ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF111827),
         elevation: 0,

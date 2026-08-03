@@ -16,6 +16,7 @@ import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { multerConfig } from '../common/multer.config.js';
 import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
+import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
@@ -116,5 +117,18 @@ export class ApplicationsController {
     dto: UpdateApplicationStatusDto,
   ) {
     return this.applicationsService.updateStatus(user.id, applicationId, dto);
+  }
+
+  @Patch('bulk-status')
+  @Roles(UserRole.MANAGER)
+  bulkUpdateStatus(
+    @CurrentUser() user: CurrentUserData,
+    @Body() dto: BulkUpdateStatusDto,
+  ) {
+    return this.applicationsService.bulkUpdateStatus(
+      user.id,
+      dto.applicationIds,
+      dto.status,
+    );
   }
 }

@@ -67,4 +67,15 @@ class ApplicationApi {
     );
     return Map<String, dynamic>.from(response.data as Map);
   }
+
+  Future<Map<String, dynamic>> bulkUpdateStatus(
+    List<String> applicationIds,
+    String status,
+  ) async {
+    final response = await dio.patch(
+      '/applications/bulk-status',
+      data: {'applicationIds': applicationIds, 'status': status},
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
 }

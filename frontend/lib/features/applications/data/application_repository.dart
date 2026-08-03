@@ -69,4 +69,15 @@ class ApplicationRepository {
         .map((e) => PipelineEntry.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
+
+  /// Returns (updatedCount, skippedCount).
+  Future<(int, int)> bulkUpdateStatus(
+    List<String> applicationIds,
+    String status,
+  ) async {
+    final response = await api.bulkUpdateStatus(applicationIds, status);
+    final updated = (response['updated'] as List?)?.length ?? 0;
+    final skipped = (response['skipped'] as List?)?.length ?? 0;
+    return (updated, skipped);
+  }
 }

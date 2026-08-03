@@ -13,6 +13,8 @@ import 'package:frontend/features/dashboard/data/dashboard_api.dart';
 import 'package:frontend/features/dashboard/data/dashboard_repository.dart';
 import 'package:frontend/features/jobs/data/jobs_api.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
+import 'package:frontend/features/search/data/search_api.dart';
+import 'package:frontend/features/search/data/search_repository.dart';
 
 import 'app/app.dart';
 
@@ -33,8 +35,10 @@ void main() {
   final dashboardApi = DashboardApi(dioClient.dio);
   final applicationApi = ApplicationApi(dioClient.dio);
   final availabilityApi = AvailabilityApi(dioClient.dio);
+  final searchApi = SearchApi(dioClient.dio);
 
   final availabilityRepository = AvailabilityRepository(availabilityApi);
+  final searchRepository = SearchRepository(searchApi);
 
   // Auth
   final authRepository = AuthRepository(authApi, tokenStorage);
@@ -52,6 +56,7 @@ void main() {
         RepositoryProvider.value(value: applicationRepository),
         RepositoryProvider.value(value: dashboardRepository),
         RepositoryProvider.value(value: availabilityRepository),
+        RepositoryProvider.value(value: searchRepository),
       ],
 
       child: BlocProvider(

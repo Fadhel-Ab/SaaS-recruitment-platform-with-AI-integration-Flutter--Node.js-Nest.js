@@ -20,6 +20,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { AiInterviewModule } from './ai-interview/ai-interview.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
 import { TwilioModule } from './twilio/twilio.module.js';
+import { SearchModule } from './search/search.module.js';
 
 ConfigModule.forRoot({
   isGlobal: true,
@@ -44,6 +45,7 @@ ConfigModule.forRoot({
     AiInterviewModule,
     DashboardModule,
     TwilioModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [

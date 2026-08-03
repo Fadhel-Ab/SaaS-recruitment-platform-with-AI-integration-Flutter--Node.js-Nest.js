@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const Text(
                               'Welcome Back',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF111827),
                                 letterSpacing: -0.5,
