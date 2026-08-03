@@ -73,6 +73,20 @@ export class ApplicationsService {
       });
     }
 
+    if (
+      currentUser?.role === UserRole.CANDIDATE &&
+      !candidate.userId
+    ) {
+      candidate = await this.prisma.candidate.update({
+        where: {
+          id: candidate.id,
+        },
+        data: {
+          userId: currentUser.id,
+        },
+      });
+    }
+
     const existing = await this.prisma.application.findFirst({
       where: {
         candidateId: candidate.id,
@@ -215,9 +229,7 @@ export class ApplicationsService {
       },
 
       orderBy: {
-        aiScore: {
-          overallScore: 'desc',
-        },
+        appliedAt: 'desc',
       },
     });
   }
@@ -261,5 +273,52 @@ export class ApplicationsService {
     }
 
     return application;
+  }
+
+  async getMyApplications(userId: string, email: string) {
+    let candidate = await this.prisma.candidate.findFirst({
+      where: {
+        OR: [{ userId }, { email }],
+      },
+    });
+
+    if (!candidate) {
+      return [];
+    }
+
+    if (!candidate.userId) {
+      candidate = await this.prisma.candidate.update({
+        where: {
+          id: candidate.id,
+        },
+        data: {
+          userId,
+        },
+      });
+    }
+
+    return this.prisma.application.findMany({
+      where: {
+        candidateId: candidate.id,
+      },
+
+      include: {
+        job: {
+          select: {
+            title: true,
+            companyName: true,
+            location: true,
+          },
+        },
+
+        aiScore: true,
+
+        interview: true,
+      },
+
+      orderBy: {
+        appliedAt: 'desc',
+      },
+    });
   }
 }

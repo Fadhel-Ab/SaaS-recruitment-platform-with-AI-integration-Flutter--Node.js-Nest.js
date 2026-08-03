@@ -399,6 +399,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Job: 'Job',
+  JobAvailability: 'JobAvailability',
   Candidate: 'Candidate',
   Application: 'Application',
   AIScore: 'AIScore',
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "job" | "candidate" | "application" | "aIScore" | "availability" | "interview" | "aIInterviewSession"
+    modelProps: "user" | "job" | "jobAvailability" | "candidate" | "application" | "aIScore" | "availability" | "interview" | "aIInterviewSession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -569,6 +570,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.JobCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.JobCountAggregateOutputType> | number
+        }
+      }
+    }
+    JobAvailability: {
+      payload: Prisma.$JobAvailabilityPayload<ExtArgs>
+      fields: Prisma.JobAvailabilityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobAvailabilityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobAvailabilityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        findFirst: {
+          args: Prisma.JobAvailabilityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobAvailabilityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        findMany: {
+          args: Prisma.JobAvailabilityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>[]
+        }
+        create: {
+          args: Prisma.JobAvailabilityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        createMany: {
+          args: Prisma.JobAvailabilityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobAvailabilityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>[]
+        }
+        delete: {
+          args: Prisma.JobAvailabilityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        update: {
+          args: Prisma.JobAvailabilityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobAvailabilityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobAvailabilityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobAvailabilityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobAvailabilityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobAvailabilityPayload>
+        }
+        aggregate: {
+          args: Prisma.JobAvailabilityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobAvailability>
+        }
+        groupBy: {
+          args: Prisma.JobAvailabilityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobAvailabilityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobAvailabilityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobAvailabilityCountAggregateOutputType> | number
         }
       }
     }
@@ -1089,12 +1164,25 @@ export const JobScalarFieldEnum = {
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
 
 
+export const JobAvailabilityScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  dayOfWeek: 'dayOfWeek',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  createdAt: 'createdAt'
+} as const
+
+export type JobAvailabilityScalarFieldEnum = (typeof JobAvailabilityScalarFieldEnum)[keyof typeof JobAvailabilityScalarFieldEnum]
+
+
 export const CandidateScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
   email: 'email',
   resumeFileName: 'resumeFileName',
   phone: 'phone',
+  userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1314,6 +1402,20 @@ export type ListEnumJobStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'ApplicationStatus'
  */
 export type EnumApplicationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApplicationStatus'>
@@ -1352,20 +1454,6 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1549,6 +1637,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   job?: Prisma.JobOmit
+  jobAvailability?: Prisma.JobAvailabilityOmit
   candidate?: Prisma.CandidateOmit
   application?: Prisma.ApplicationOmit
   aIScore?: Prisma.AIScoreOmit

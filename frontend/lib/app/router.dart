@@ -9,10 +9,14 @@ import 'package:frontend/features/applications/bloc/application_detail_event.dar
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_bloc.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_event.dart';
+import 'package:frontend/features/applications/bloc/my_applications_bloc.dart';
+import 'package:frontend/features/applications/bloc/my_applications_event.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
 import 'package:frontend/features/applications/screens/application_detail_screen.dart';
 import 'package:frontend/features/applications/screens/application_screen.dart';
 import 'package:frontend/features/applications/screens/job_applicants_screen.dart';
+import 'package:frontend/features/applications/screens/my_applications_screen.dart';
+import 'package:frontend/features/availability/screens/availability_screen.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
@@ -30,7 +34,9 @@ import 'package:frontend/features/jobs/bloc/jobs_event.dart';
 import 'package:frontend/features/jobs/bloc/manager_jobs_bloc.dart';
 import 'package:frontend/features/jobs/bloc/manager_jobs_event.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
+import 'package:frontend/features/jobs/models/job_model.dart';
 import 'package:frontend/features/jobs/screens/create_job_screen.dart';
+import 'package:frontend/features/jobs/screens/edit_job_screen.dart';
 import 'package:frontend/features/jobs/screens/job_details_screen.dart';
 import 'package:frontend/features/jobs/screens/jobs_screen.dart';
 import 'package:frontend/features/jobs/screens/manager_jobs_screen.dart';
@@ -78,8 +84,11 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
         GoRoute(path: '/apply/:shareToken', builder: (context, state) { final shareToken = state.pathParameters['shareToken']!; return BlocProvider(create: (context) { final bloc = ApplicationBloc(context.read<ApplicationRepository>(), context.read<JobsRepository>()); bloc.add(LoadApplicationJob(shareToken)); return bloc; }, child: ApplicationScreen(shareToken: shareToken)); }),
         GoRoute(path: '/manager/jobs', builder: (context, state) => BlocProvider(create: (_) => ManagerJobsBloc(context.read<JobsRepository>())..add(LoadManagerJobs()), child: ManagerJobsScreen())),
         GoRoute(path: '/manager/create-job', builder: (context, state) => BlocProvider(create: (_) => CreateJobBloc(context.read<JobsRepository>()), child: const CreateJobScreen())),
+        GoRoute(path: '/manager/jobs/:jobId/edit', builder: (context, state) => EditJobScreen(job: state.extra as JobModel)),
         GoRoute(path: '/manager/jobs/:jobId/applicants', builder: (context, state) { final jobId = state.pathParameters['jobId']!; return BlocProvider(create: (context) => JobApplicantsBloc(context.read<ApplicationRepository>())..add(LoadJobApplicants(jobId)), child: JobApplicantsScreen(jobId: jobId)); }),
         GoRoute(path: '/manager/applications/:applicationId', builder: (context, state) { final applicationId = state.pathParameters['applicationId']!; return BlocProvider(create: (context) => ApplicationDetailBloc(context.read<ApplicationRepository>())..add(LoadApplicationDetail(applicationId)), child: ApplicationDetailScreen(applicationId: applicationId)); }),
+        GoRoute(path: '/my-applications', builder: (context, state) => BlocProvider(create: (_) => MyApplicationsBloc(context.read<ApplicationRepository>())..add(LoadMyApplications()), child: const MyApplicationsScreen())),
+        GoRoute(path: '/manager/availability', builder: (context, state) => const AvailabilityScreen()),
       ],
     ),
   ],

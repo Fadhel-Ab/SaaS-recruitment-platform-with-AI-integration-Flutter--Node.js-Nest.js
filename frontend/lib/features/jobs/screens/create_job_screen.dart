@@ -1,12 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
+import 'package:frontend/features/availability/model/availability_slot.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bloc/create_job_bloc.dart';
 import '../bloc/create_job_event.dart';
 import '../bloc/create_job_state.dart';
 import '../models/create_job_request.dart';
+
+const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+class _EditableSlot {
+  int dayOfWeek;
+  TimeOfDay start;
+  TimeOfDay end;
+
+  _EditableSlot({
+    required this.dayOfWeek,
+    required this.start,
+    required this.end,
+  });
+
+  factory _EditableSlot.fromAvailabilitySlot(AvailabilitySlot slot) {
+    return _EditableSlot(
+      dayOfWeek: slot.dayOfWeek,
+      start: _parseTime(slot.startTime),
+      end: _parseTime(slot.endTime),
+    );
+  }
+
+  static TimeOfDay _parseTime(String value) {
+    final parts = value.split(':');
+    return TimeOfDay(
+      hour: int.tryParse(parts[0]) ?? 9,
+      minute: parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0,
+    );
+  }
+
+  static String _formatTime(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  AvailabilitySlot toAvailabilitySlot() {
+    return AvailabilitySlot(
+      dayOfWeek: dayOfWeek,
+      startTime: _formatTime(start),
+      endTime: _formatTime(end),
+    );
+  }
+}
 
 class CreateJobScreen extends StatefulWidget {
   const CreateJobScreen({super.key});
@@ -27,8 +70,10 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
   String employmentType = 'FULL_TIME';
   String skillLevel = 'ENTRY';
 
-  bool _showQuestionsStep = false;
+  // 0 = details, 1 = interview questions, 2 = interview availability
+  int _step = 0;
   final List<TextEditingController> _questionControllers = [];
+  final List<_EditableSlot> _availabilitySlots = [];
 
   final employmentTypes = const [
     'FULL_TIME',
@@ -76,7 +121,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
   void _goBackToDetails() {
     context.read<CreateJobBloc>().add(BackToJobDetailsRequested());
     setState(() {
-      _showQuestionsStep = false;
+      _step = 0;
       for (final controller in _questionControllers) {
         controller.dispose();
       }
@@ -92,7 +137,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
     setState(() => _questionControllers.removeAt(index).dispose());
   }
 
-  void _publish() {
+  void _approveQuestions() {
     final questions = _questionControllers
         .map((c) => c.text.trim())
         .where((text) => text.isNotEmpty)
@@ -105,7 +150,53 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       return;
     }
 
-    context.read<CreateJobBloc>().add(PublishJobRequested(questions));
+    context.read<CreateJobBloc>().add(QuestionsApproved(questions));
+  }
+
+  void _goBackToQuestions() {
+    context.read<CreateJobBloc>().add(BackToQuestionsRequested());
+    setState(() => _step = 1);
+  }
+
+  void _addAvailabilitySlot() {
+    setState(
+      () => _availabilitySlots.add(
+        _EditableSlot(
+          dayOfWeek: 1,
+          start: const TimeOfDay(hour: 9, minute: 0),
+          end: const TimeOfDay(hour: 17, minute: 0),
+        ),
+      ),
+    );
+  }
+
+  void _removeAvailabilitySlot(int index) {
+    setState(() => _availabilitySlots.removeAt(index));
+  }
+
+  Future<void> _pickSlotStart(_EditableSlot slot) async {
+    final result = await showTimePicker(context: context, initialTime: slot.start);
+    if (result != null) setState(() => slot.start = result);
+  }
+
+  Future<void> _pickSlotEnd(_EditableSlot slot) async {
+    final result = await showTimePicker(context: context, initialTime: slot.end);
+    if (result != null) setState(() => slot.end = result);
+  }
+
+  void _publish() {
+    if (_availabilitySlots.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add at least one availability slot')),
+      );
+      return;
+    }
+
+    context.read<CreateJobBloc>().add(
+      PublishJobRequested(
+        _availabilitySlots.map((s) => s.toAvailabilitySlot()).toList(),
+      ),
+    );
   }
 
   @override
@@ -121,12 +212,34 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       body: BlocListener<CreateJobBloc, CreateJobState>(
         listener: (context, state) {
           if (state.status == CreateJobStatus.questionsReady &&
-              !_showQuestionsStep) {
+              _questionControllers.isEmpty) {
             setState(() {
-              _showQuestionsStep = true;
+              _step = 1;
               _questionControllers.addAll(
                 state.questions.map((q) => TextEditingController(text: q)),
               );
+            });
+          }
+
+          if (state.status == CreateJobStatus.availabilityReady &&
+              _availabilitySlots.isEmpty) {
+            setState(() {
+              _step = 2;
+              if (state.defaultAvailability.isEmpty) {
+                _availabilitySlots.add(
+                  _EditableSlot(
+                    dayOfWeek: 1,
+                    start: const TimeOfDay(hour: 9, minute: 0),
+                    end: const TimeOfDay(hour: 17, minute: 0),
+                  ),
+                );
+              } else {
+                _availabilitySlots.addAll(
+                  state.defaultAvailability.map(
+                    _EditableSlot.fromAvailabilitySlot,
+                  ),
+                );
+              }
             });
           }
 
@@ -163,9 +276,11 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 elevation: 0,
                 child: Padding(
                   padding: const EdgeInsets.all(32),
-                  child: _showQuestionsStep
-                      ? _buildQuestionsStep()
-                      : _buildDetailsStep(),
+                  child: switch (_step) {
+                    0 => _buildDetailsStep(),
+                    1 => _buildQuestionsStep(),
+                    _ => _buildAvailabilityStep(),
+                  },
                 ),
               ),
             ),
@@ -215,7 +330,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStepLabel(
-            'STEP 1 OF 2',
+            'STEP 1 OF 3',
             'Position Specifications',
             'Fill out the template data fields below to feed our candidate matching AI engine.',
           ),
@@ -417,9 +532,9 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStepLabel(
-          'STEP 2 OF 2',
+          'STEP 2 OF 3',
           'Review Interview Questions',
-          'These AI-generated questions will be asked during the candidate\'s phone interview. Edit, remove, or add your own before publishing.',
+          'These AI-generated questions will be asked during the candidate\'s phone interview. Edit, remove, or add your own before continuing.',
         ),
         ...List.generate(_questionControllers.length, (index) {
           return Padding(
@@ -471,12 +586,158 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         const SizedBox(height: 32),
         BlocBuilder<CreateJobBloc, CreateJobState>(
           builder: (context, state) {
+            final isLoading =
+                state.status == CreateJobStatus.loadingAvailabilityDefaults;
+            return Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: isLoading ? null : _goBackToDetails,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF475569),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Back',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _approveQuestions,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6366F1),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Next: Set Interview Availability',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvailabilityStep() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildStepLabel(
+          'STEP 3 OF 3',
+          'Set Interview Availability',
+          'Candidates who pass the AI screening will be automatically scheduled into one of these slots. Pre-filled from your last job — edit as needed.',
+        ),
+        ...List.generate(_availabilitySlots.length, (index) {
+          final slot = _availabilitySlots[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: slot.dayOfWeek,
+                        isExpanded: true,
+                        items: [
+                          for (int i = 1; i <= 7; i++)
+                            DropdownMenuItem(
+                              value: i,
+                              child: Text(_dayLabels[i - 1]),
+                            ),
+                        ],
+                        onChanged: (v) =>
+                            setState(() => slot.dayOfWeek = v ?? slot.dayOfWeek),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 3,
+                  child: OutlinedButton(
+                    onPressed: () => _pickSlotStart(slot),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0F172A),
+                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    child: Text(slot.start.format(context)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 3,
+                  child: OutlinedButton(
+                    onPressed: () => _pickSlotEnd(slot),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0F172A),
+                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    child: Text(slot.end.format(context)),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    size: 18,
+                    color: Color(0xFF94A3B8),
+                  ),
+                  onPressed: () => _removeAvailabilitySlot(index),
+                  tooltip: 'Remove slot',
+                ),
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: 4),
+        TextButton.icon(
+          onPressed: _addAvailabilitySlot,
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('Add Slot'),
+          style: TextButton.styleFrom(foregroundColor: const Color(0xFF6366F1)),
+        ),
+        const SizedBox(height: 32),
+        BlocBuilder<CreateJobBloc, CreateJobState>(
+          builder: (context, state) {
             final isSubmitting = state.status == CreateJobStatus.submitting;
             return Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: isSubmitting ? null : _goBackToDetails,
+                    onPressed: isSubmitting ? null : _goBackToQuestions,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF475569),
                       padding: const EdgeInsets.symmetric(vertical: 16),

@@ -4,7 +4,6 @@ import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
-import 'package:frontend/features/availability/screens/availability_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -28,17 +27,13 @@ class AppScaffold extends StatelessWidget {
             actions: [
               if (user?.role == UserRole.manager)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 1),
                   child: FilledButton.icon(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => const AvailabilityDialog(),
-                    ),
+                    onPressed: () => context.push('/manager/availability'),
                     icon: const Icon(Icons.schedule, size: 18),
                     label: Text(isPhone ? 'Time' : 'Manager time'),
                   ),
                 ),
-              const SizedBox(width: 8),
               PopupMenuButton<String>(
                 tooltip: 'User menu',
                 icon: const Icon(Icons.account_circle_outlined),
@@ -100,6 +95,12 @@ class AppScaffold extends StatelessWidget {
                             selectedIcon: Icon(Icons.add_circle_rounded),
                             label: Text('Post Job'),
                           ),
+                        if (user != null && user.role != UserRole.manager)
+                          const NavigationRailDestination(
+                            icon: Icon(Icons.assignment_outlined),
+                            selectedIcon: Icon(Icons.assignment),
+                            label: Text('My Applications'),
+                          ),
                       ],
                     ),
                     const VerticalDivider(
@@ -130,6 +131,11 @@ class AppScaffold extends StatelessWidget {
                         icon: Icon(Icons.add_circle_outline),
                         label: 'Post',
                       ),
+                    if (user != null && user.role != UserRole.manager)
+                      const NavigationDestination(
+                        icon: Icon(Icons.assignment_outlined),
+                        label: 'Applications',
+                      ),
                   ],
                 )
               : null,
@@ -146,6 +152,7 @@ class AppScaffold extends StatelessWidget {
       // /manager/jobs and its applicant/detail sub-routes fall through here.
       return 1;
     }
+    if (location.startsWith('/my-applications')) return 1;
     return 0;
   }
 
@@ -159,7 +166,7 @@ class AppScaffold extends StatelessWidget {
             : '/manager/create-job',
       );
     } else {
-      context.go('/jobs');
+      context.go(index == 0 ? '/jobs' : '/my-applications');
     }
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -6,6 +14,7 @@ import { UserRole } from '../generated/prisma/enums.js';
 
 import { AvailabilityService } from './availability.service.js';
 import { CreateAvailabilityDto } from './dto/create-availability.dto.js';
+import { UpdateAvailabilityDto } from './dto/update-availability.dto.js';
 
 @Controller('availability')
 export class AvailabilityController {
@@ -21,5 +30,21 @@ export class AvailabilityController {
   @Roles(UserRole.MANAGER)
   findMine(@CurrentUser() user) {
     return this.availabilityService.findMine(user.id);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.MANAGER)
+  update(
+    @CurrentUser() user,
+    @Param('id') id: string,
+    @Body() dto: UpdateAvailabilityDto,
+  ) {
+    return this.availabilityService.update(user.id, id, dto);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.MANAGER)
+  remove(@CurrentUser() user, @Param('id') id: string) {
+    return this.availabilityService.remove(user.id, id);
   }
 }

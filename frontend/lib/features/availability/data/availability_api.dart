@@ -5,12 +5,12 @@ class AvailabilityApi {
 
   AvailabilityApi(this.dio);
 
-  Future<void> saveAvailability({
+  Future<Map<String, dynamic>> createAvailability({
     required int dayOfWeek,
     required String startTime,
     required String endTime,
   }) async {
-    await dio.post(
+    final response = await dio.post(
       '/availability',
       data: {
         'dayOfWeek': dayOfWeek,
@@ -18,15 +18,34 @@ class AvailabilityApi {
         'endTime': endTime,
       },
     );
+
+    return Map<String, dynamic>.from(response.data as Map);
   }
 
-  Future<Map<String, dynamic>?> getMyAvailability() async {
-    final response = await dio.get('/availability/me');
+  Future<List<dynamic>> getMyAvailability() async {
+    final response = await dio.get('/availability/my');
+    return response.data as List<dynamic>;
+  }
 
-    if (response.data == null) {
-      return null;
-    }
+  Future<Map<String, dynamic>> updateAvailability(
+    String id, {
+    required int dayOfWeek,
+    required String startTime,
+    required String endTime,
+  }) async {
+    final response = await dio.patch(
+      '/availability/$id',
+      data: {
+        'dayOfWeek': dayOfWeek,
+        'startTime': startTime,
+        'endTime': endTime,
+      },
+    );
 
-    return response.data;
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<void> deleteAvailability(String id) async {
+    await dio.delete('/availability/$id');
   }
 }

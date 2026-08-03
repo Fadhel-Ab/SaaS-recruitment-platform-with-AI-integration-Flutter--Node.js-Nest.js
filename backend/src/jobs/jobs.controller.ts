@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { JobsService } from './jobs.service.js';
 import { CreateJobDto } from './dto/create-job.dto.js';
+import { UpdateJobDto } from './dto/update-job.dto.js';
 import { GenerateInterviewQuestionsDto } from './dto/generate-interview-questions.dto.js';
 import { Public } from '../auth/decorators/public.decorator.js';
 
@@ -34,6 +35,22 @@ export class JobsController {
   @Roles(UserRole.MANAGER)
   findMine(@CurrentUser() user) {
     return this.jobsService.findMine(user.id);
+  }
+
+  @Get('default-availability')
+  @Roles(UserRole.MANAGER)
+  getDefaultAvailability(@CurrentUser() user) {
+    return this.jobsService.getDefaultAvailability(user.id);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.MANAGER)
+  update(
+    @CurrentUser() user,
+    @Param('id') id: string,
+    @Body() dto: UpdateJobDto,
+  ) {
+    return this.jobsService.update(user.id, id, dto);
   }
 
   @Get(':id/applications')

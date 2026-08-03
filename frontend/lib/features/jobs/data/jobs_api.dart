@@ -38,4 +38,14 @@ class JobsApi {
 
     return response.data['questions'] as List<dynamic>;
   }
+
+  Future<List<dynamic>> getDefaultAvailability() async {
+    final response = await dio.get('/jobs/default-availability');
+    return response.data as List<dynamic>;
+  }
+
+  Future<dynamic> updateJob(String id, Map<String, dynamic> data) async {
+    final response = await dio.patch('/jobs/$id', data: data);
+    return response.data;
+  }
 }

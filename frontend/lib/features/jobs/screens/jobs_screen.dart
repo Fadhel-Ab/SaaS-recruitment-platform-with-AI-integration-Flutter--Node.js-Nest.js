@@ -46,11 +46,16 @@ class _JobsScreenState extends State<JobsScreen> {
     });
   }
 
+  String _normalizeType(dynamic type) {
+    return type.toString().toLowerCase().replaceAll(RegExp(r'[-_\s]'), '');
+  }
+
   List<JobModel> _filterJobs(List<JobModel> jobs) {
     final query = _searchController.text.trim().toLowerCase();
 
     return jobs.where((job) {
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           job.title.toString().toLowerCase().contains(query) ||
           job.description.toString().toLowerCase().contains(query) ||
           job.requirements.toString().toLowerCase().contains(query) ||
@@ -59,13 +64,17 @@ class _JobsScreenState extends State<JobsScreen> {
           (job.company?.toString().toLowerCase().contains(query) ?? false) ||
           (job.skillLevel?.toString().toLowerCase().contains(query) ?? false);
 
-      final matchesType = _selectedTypes.isEmpty ||
+      final matchesType =
+          _selectedTypes.isEmpty ||
           _selectedTypes.any(
-            (type) => job.employmentType.toString().toLowerCase() == type.toLowerCase(),
+            (type) => _normalizeType(job.employmentType) == _normalizeType(type),
           );
 
-      final matchesLocation = _selectedLocation == 'All Locations' ||
-          job.location.toString().toLowerCase().contains(_selectedLocation.toLowerCase());
+      final matchesLocation =
+          _selectedLocation == 'All Locations' ||
+          job.location.toString().toLowerCase().contains(
+            _selectedLocation.toLowerCase(),
+          );
 
       return matchesSearch && matchesType && matchesLocation;
     }).toList();
@@ -74,6 +83,11 @@ class _JobsScreenState extends State<JobsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.sizeOf(context).width > 900;
+    final loadedJobs = context.watch<JobsBloc>().state.jobs;
+    final availableLocations = <String>{
+      'All Locations',
+      ...loadedJobs.map((j) => j.location).where((l) => l.trim().isNotEmpty),
+    }.toList();
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
       // Drawer filter for mobile screens
@@ -83,6 +97,7 @@ class _JobsScreenState extends State<JobsScreen> {
                 child: JobsFilterPanel(
                   selectedTypes: _selectedTypes,
                   selectedLocation: _selectedLocation,
+                  locations: availableLocations,
                   onFilterChanged: _handleFiltersChanged,
                 ),
               ),
@@ -104,8 +119,6 @@ class _JobsScreenState extends State<JobsScreen> {
                   context.go('/manager/create-job');
                 },
               ),
-              const SizedBox(height: 20),
-
               // Layout Body (Sidebar + Main Content Grid)
               Expanded(
                 child: LayoutBuilder(
@@ -120,6 +133,7 @@ class _JobsScreenState extends State<JobsScreen> {
                           JobsFilterPanel(
                             selectedTypes: _selectedTypes,
                             selectedLocation: _selectedLocation,
+                            locations: availableLocations,
                             onFilterChanged: _handleFiltersChanged,
                           ),
                           const SizedBox(width: 24),
@@ -157,7 +171,14 @@ class _JobsScreenState extends State<JobsScreen> {
           children: [
             Icon(Icons.push_pin_outlined, color: Color(0xFFF97316)),
             SizedBox(width: 8),
-            Text('Urgent pinned jobs', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF9A3412))),
+            Text(
+              'Urgent pinned jobs',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF9A3412),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -190,12 +211,29 @@ class _JobsScreenState extends State<JobsScreen> {
                             label: Text('URGENT'),
                             avatar: Icon(Icons.local_fire_department, size: 16),
                             backgroundColor: Color(0xFFFED7AA),
-                            labelStyle: TextStyle(color: Color(0xFF9A3412), fontWeight: FontWeight.w800),
+                            labelStyle: TextStyle(
+                              color: Color(0xFF9A3412),
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                           const Spacer(),
-                          Text(job.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF7C2D12))),
+                          Text(
+                            job.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF7C2D12),
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          Text('${job.company ?? 'TalentHQ'} • ${job.location}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFC2410C))),
+                          Text(
+                            '${job.company ?? 'TalentHQ'} • ${job.location}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Color(0xFFC2410C)),
+                          ),
                         ],
                       ),
                     ),
@@ -269,22 +307,32 @@ class _JobsScreenState extends State<JobsScreen> {
         children: [
           Text(
             'Showing ${startIndex + 1}-${startIndex + visibleCount} of $totalJobs jobs',
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Row(
             children: [
               IconButton(
                 tooltip: 'Previous page',
-                onPressed: currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                onPressed: currentPage > 1
+                    ? () => setState(() => _currentPage--)
+                    : null,
                 icon: const Icon(Icons.chevron_left),
               ),
               Text(
                 'Page $currentPage of $totalPages',
-                style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF111827),
+                ),
               ),
               IconButton(
                 tooltip: 'Next page',
-                onPressed: currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                onPressed: currentPage < totalPages
+                    ? () => setState(() => _currentPage++)
+                    : null,
                 icon: const Icon(Icons.chevron_right),
               ),
             ],
@@ -318,27 +366,42 @@ class _JobsScreenState extends State<JobsScreen> {
 
             final filteredJobs = _filterJobs(state.jobs);
             if (filteredJobs.isEmpty) {
-              return const Center(child: Text('No jobs match your search or filters'));
+              return const Center(
+                child: Text('No jobs match your search or filters'),
+              );
             }
 
             final totalPages = (filteredJobs.length / _jobsPerPage).ceil();
             final safePage = _currentPage.clamp(1, totalPages);
             final startIndex = (safePage - 1) * _jobsPerPage;
-            final pagedJobs = filteredJobs.skip(startIndex).take(_jobsPerPage).toList();
-            final urgentJobs = pagedJobs.where((job) => job.isUrgent || job.isPinned).toList();
-            final regularJobs = pagedJobs.where((job) => !urgentJobs.contains(job)).toList();
+            final pagedJobs = filteredJobs
+                .skip(startIndex)
+                .take(_jobsPerPage)
+                .toList();
+            final urgentJobs = pagedJobs
+                .where((job) => job.isUrgent || job.isPinned)
+                .toList();
+            final regularJobs = pagedJobs
+                .where((job) => !urgentJobs.contains(job))
+                .toList();
 
             return Column(
               children: [
                 Expanded(
                   child: ListView.separated(
-                    itemCount: regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemCount:
+                        regularJobs.length + (urgentJobs.isNotEmpty ? 1 : 0),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       if (urgentJobs.isNotEmpty && index == 0) {
-                        return _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop);
+                        return _buildUrgentPinnedJobs(
+                          urgentJobs,
+                          isDesktop: isDesktop,
+                        );
                       }
-                      final job = regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
+                      final job =
+                          regularJobs[index - (urgentJobs.isNotEmpty ? 1 : 0)];
                       return JobCard(
                         job: job,
                         index: startIndex + index,

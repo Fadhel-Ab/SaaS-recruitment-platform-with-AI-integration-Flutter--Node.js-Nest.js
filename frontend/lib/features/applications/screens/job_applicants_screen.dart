@@ -7,10 +7,52 @@ import 'package:frontend/features/applications/bloc/job_applicants_state.dart';
 import 'package:frontend/features/applications/model/applicant_summary.dart';
 import 'package:frontend/features/applications/model/application_status.dart';
 
-class JobApplicantsScreen extends StatelessWidget {
+enum _SortOption { latest, highestScore, oldest }
+
+class JobApplicantsScreen extends StatefulWidget {
   final String jobId;
 
   const JobApplicantsScreen({super.key, required this.jobId});
+
+  @override
+  State<JobApplicantsScreen> createState() => _JobApplicantsScreenState();
+}
+
+class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
+  final Set<String> _selectedStatuses = {};
+  RangeValues _scoreRange = const RangeValues(0, 100);
+  _SortOption _sort = _SortOption.latest;
+
+  List<ApplicantSummary> _apply(List<ApplicantSummary> applicants) {
+    final filtered = applicants.where((applicant) {
+      final matchesStatus =
+          _selectedStatuses.isEmpty ||
+          _selectedStatuses.contains(applicant.status);
+
+      final score = applicant.overallScore;
+      final matchesScore =
+          score == null ||
+          (score >= _scoreRange.start && score <= _scoreRange.end);
+
+      return matchesStatus && matchesScore;
+    }).toList();
+
+    switch (_sort) {
+      case _SortOption.latest:
+        filtered.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));
+        break;
+      case _SortOption.oldest:
+        filtered.sort((a, b) => a.appliedAt.compareTo(b.appliedAt));
+        break;
+      case _SortOption.highestScore:
+        filtered.sort(
+          (a, b) => (b.overallScore ?? -1).compareTo(a.overallScore ?? -1),
+        );
+        break;
+    }
+
+    return filtered;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +102,164 @@ class JobApplicantsScreen extends StatelessWidget {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: state.applicants.length,
-            itemBuilder: (context, index) {
-              final applicant = state.applicants[index];
-              return _ApplicantCard(
-                applicant: applicant,
-                onTap: () =>
-                    context.push('/manager/applications/${applicant.id}'),
-              );
-            },
+          final filtered = _apply(state.applicants);
+
+          return Column(
+            children: [
+              _FilterBar(
+                selectedStatuses: _selectedStatuses,
+                scoreRange: _scoreRange,
+                sort: _sort,
+                onStatusToggled: (status) => setState(() {
+                  if (_selectedStatuses.contains(status)) {
+                    _selectedStatuses.remove(status);
+                  } else {
+                    _selectedStatuses.add(status);
+                  }
+                }),
+                onScoreRangeChanged: (range) =>
+                    setState(() => _scoreRange = range),
+                onSortChanged: (sort) => setState(() => _sort = sort),
+              ),
+              Expanded(
+                child: filtered.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No candidates match your filters',
+                          style: TextStyle(color: Color(0xFF6B7280)),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final applicant = filtered[index];
+                          return _ApplicantCard(
+                            applicant: applicant,
+                            onTap: () => context.push(
+                              '/manager/applications/${applicant.id}',
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _FilterBar extends StatelessWidget {
+  final Set<String> selectedStatuses;
+  final RangeValues scoreRange;
+  final _SortOption sort;
+  final ValueChanged<String> onStatusToggled;
+  final ValueChanged<RangeValues> onScoreRangeChanged;
+  final ValueChanged<_SortOption> onSortChanged;
+
+  const _FilterBar({
+    required this.selectedStatuses,
+    required this.scoreRange,
+    required this.sort,
+    required this.onStatusToggled,
+    required this.onScoreRangeChanged,
+    required this.onSortChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: allowedStatusTransitions.keys.map((status) {
+                    final isSelected = selectedStatuses.contains(status);
+                    return FilterChip(
+                      label: Text(statusLabel(status)),
+                      selected: isSelected,
+                      onSelected: (_) => onStatusToggled(status),
+                      selectedColor: const Color(0xFFEEF2FF),
+                      checkmarkColor: const Color(0xFF4F46E5),
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? const Color(0xFF4F46E5)
+                            : const Color(0xFF374151),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: isSelected
+                              ? const Color(0xFF4F46E5)
+                              : const Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      backgroundColor: Colors.white,
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 12),
+              DropdownButton<_SortOption>(
+                value: sort,
+                underline: const SizedBox(),
+                items: const [
+                  DropdownMenuItem(
+                    value: _SortOption.latest,
+                    child: Text('Latest'),
+                  ),
+                  DropdownMenuItem(
+                    value: _SortOption.highestScore,
+                    child: Text('Highest Score'),
+                  ),
+                  DropdownMenuItem(
+                    value: _SortOption.oldest,
+                    child: Text('Oldest'),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) onSortChanged(value);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Text(
+                'AI Score',
+                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+              Expanded(
+                child: RangeSlider(
+                  values: scoreRange,
+                  min: 0,
+                  max: 100,
+                  divisions: 20,
+                  activeColor: const Color(0xFF4F46E5),
+                  labels: RangeLabels(
+                    scoreRange.start.round().toString(),
+                    scoreRange.end.round().toString(),
+                  ),
+                  onChanged: onScoreRangeChanged,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

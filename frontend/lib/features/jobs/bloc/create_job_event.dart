@@ -1,3 +1,5 @@
+import 'package:frontend/features/availability/model/availability_slot.dart';
+
 import '../models/create_job_request.dart';
 
 abstract class CreateJobEvent {}
@@ -8,10 +10,18 @@ class GenerateQuestionsRequested extends CreateJobEvent {
   GenerateQuestionsRequested(this.details);
 }
 
-class PublishJobRequested extends CreateJobEvent {
-  final List<String> approvedQuestions;
+class BackToJobDetailsRequested extends CreateJobEvent {}
 
-  PublishJobRequested(this.approvedQuestions);
+class QuestionsApproved extends CreateJobEvent {
+  final List<String> questions;
+
+  QuestionsApproved(this.questions);
 }
 
-class BackToJobDetailsRequested extends CreateJobEvent {}
+class BackToQuestionsRequested extends CreateJobEvent {}
+
+class PublishJobRequested extends CreateJobEvent {
+  final List<AvailabilitySlot> availability;
+
+  PublishJobRequested(this.availability);
+}

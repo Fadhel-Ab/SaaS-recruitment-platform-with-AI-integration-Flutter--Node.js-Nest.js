@@ -1,3 +1,5 @@
+import 'package:frontend/features/availability/model/availability_slot.dart';
+
 class CreateJobRequest {
   final String title;
   final String description;
@@ -7,6 +9,7 @@ class CreateJobRequest {
   final String skillLevel;
   final String location;
   final List<String>? interviewQuestions;
+  final List<AvailabilitySlot>? availability;
 
   CreateJobRequest({
     required this.title,
@@ -17,9 +20,13 @@ class CreateJobRequest {
     required this.skillLevel,
     required this.location,
     this.interviewQuestions,
+    this.availability,
   });
 
-  CreateJobRequest copyWith({List<String>? interviewQuestions}) {
+  CreateJobRequest copyWith({
+    List<String>? interviewQuestions,
+    List<AvailabilitySlot>? availability,
+  }) {
     return CreateJobRequest(
       title: title,
       description: description,
@@ -29,6 +36,7 @@ class CreateJobRequest {
       skillLevel: skillLevel,
       location: location,
       interviewQuestions: interviewQuestions ?? this.interviewQuestions,
+      availability: availability ?? this.availability,
     );
   }
 
@@ -42,6 +50,8 @@ class CreateJobRequest {
       'skillLevel': skillLevel,
       'location': location,
       if (interviewQuestions != null) 'interviewQuestions': interviewQuestions,
+      if (availability != null)
+        'availability': availability!.map((a) => a.toJson()).toList(),
     };
   }
 }

@@ -1,3 +1,4 @@
+import 'package:frontend/features/availability/model/availability_slot.dart';
 import 'package:frontend/features/jobs/data/jobs_api.dart';
 import 'package:frontend/features/jobs/models/create_job_request.dart';
 import 'package:frontend/features/jobs/models/job_model.dart';
@@ -24,6 +25,17 @@ class JobsRepository {
 
   Future<void> createJob(CreateJobRequest request) async {
     await api.createJob(request.toJson());
+  }
+
+  Future<List<AvailabilitySlot>> getDefaultAvailability() async {
+    final data = await api.getDefaultAvailability();
+    return data
+        .map((e) => AvailabilitySlot.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
+  Future<void> updateJob(String id, Map<String, dynamic> data) {
+    return api.updateJob(id, data);
   }
 
   Future<List<String>> generateInterviewQuestions(

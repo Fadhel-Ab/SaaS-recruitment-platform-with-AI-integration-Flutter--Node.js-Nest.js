@@ -201,6 +201,7 @@ export type UserWhereInput = {
   availability?: Prisma.AvailabilityListRelationFilter
   jobs?: Prisma.JobListRelationFilter
   interviews?: Prisma.InterviewListRelationFilter
+  candidateProfile?: Prisma.XOR<Prisma.CandidateNullableScalarRelationFilter, Prisma.CandidateWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -214,6 +215,7 @@ export type UserOrderByWithRelationInput = {
   availability?: Prisma.AvailabilityOrderByRelationAggregateInput
   jobs?: Prisma.JobOrderByRelationAggregateInput
   interviews?: Prisma.InterviewOrderByRelationAggregateInput
+  candidateProfile?: Prisma.CandidateOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -230,6 +232,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   availability?: Prisma.AvailabilityListRelationFilter
   jobs?: Prisma.JobListRelationFilter
   interviews?: Prisma.InterviewListRelationFilter
+  candidateProfile?: Prisma.XOR<Prisma.CandidateNullableScalarRelationFilter, Prisma.CandidateWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -269,6 +272,7 @@ export type UserCreateInput = {
   availability?: Prisma.AvailabilityCreateNestedManyWithoutManagerInput
   jobs?: Prisma.JobCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -282,6 +286,7 @@ export type UserUncheckedCreateInput = {
   availability?: Prisma.AvailabilityUncheckedCreateNestedManyWithoutManagerInput
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -295,6 +300,7 @@ export type UserUpdateInput = {
   availability?: Prisma.AvailabilityUpdateManyWithoutManagerNestedInput
   jobs?: Prisma.JobUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -308,6 +314,7 @@ export type UserUncheckedUpdateInput = {
   availability?: Prisma.AvailabilityUncheckedUpdateManyWithoutManagerNestedInput
   jobs?: Prisma.JobUncheckedUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -375,6 +382,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -399,6 +411,22 @@ export type UserUpdateOneRequiredWithoutJobsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutJobsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutJobsInput, Prisma.UserUpdateWithoutJobsInput>, Prisma.UserUncheckedUpdateWithoutJobsInput>
+}
+
+export type UserCreateNestedOneWithoutCandidateProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCandidateProfileInput, Prisma.UserUncheckedCreateWithoutCandidateProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCandidateProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCandidateProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCandidateProfileInput, Prisma.UserUncheckedCreateWithoutCandidateProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCandidateProfileInput
+  upsert?: Prisma.UserUpsertWithoutCandidateProfileInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCandidateProfileInput, Prisma.UserUpdateWithoutCandidateProfileInput>, Prisma.UserUncheckedUpdateWithoutCandidateProfileInput>
 }
 
 export type UserCreateNestedOneWithoutAvailabilityInput = {
@@ -439,6 +467,7 @@ export type UserCreateWithoutJobsInput = {
   role?: $Enums.UserRole
   availability?: Prisma.AvailabilityCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJobsInput = {
@@ -451,6 +480,7 @@ export type UserUncheckedCreateWithoutJobsInput = {
   role?: $Enums.UserRole
   availability?: Prisma.AvailabilityUncheckedCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJobsInput = {
@@ -479,6 +509,7 @@ export type UserUpdateWithoutJobsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   availability?: Prisma.AvailabilityUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJobsInput = {
@@ -490,6 +521,75 @@ export type UserUncheckedUpdateWithoutJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   availability?: Prisma.AvailabilityUncheckedUpdateManyWithoutManagerNestedInput
+  interviews?: Prisma.InterviewUncheckedUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCandidateProfileInput = {
+  id?: string
+  fullName: string
+  email: string
+  password: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: $Enums.UserRole
+  availability?: Prisma.AvailabilityCreateNestedManyWithoutManagerInput
+  jobs?: Prisma.JobCreateNestedManyWithoutManagerInput
+  interviews?: Prisma.InterviewCreateNestedManyWithoutManagerInput
+}
+
+export type UserUncheckedCreateWithoutCandidateProfileInput = {
+  id?: string
+  fullName: string
+  email: string
+  password: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: $Enums.UserRole
+  availability?: Prisma.AvailabilityUncheckedCreateNestedManyWithoutManagerInput
+  jobs?: Prisma.JobUncheckedCreateNestedManyWithoutManagerInput
+  interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutManagerInput
+}
+
+export type UserCreateOrConnectWithoutCandidateProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCandidateProfileInput, Prisma.UserUncheckedCreateWithoutCandidateProfileInput>
+}
+
+export type UserUpsertWithoutCandidateProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCandidateProfileInput, Prisma.UserUncheckedUpdateWithoutCandidateProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCandidateProfileInput, Prisma.UserUncheckedCreateWithoutCandidateProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCandidateProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCandidateProfileInput, Prisma.UserUncheckedUpdateWithoutCandidateProfileInput>
+}
+
+export type UserUpdateWithoutCandidateProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  availability?: Prisma.AvailabilityUpdateManyWithoutManagerNestedInput
+  jobs?: Prisma.JobUpdateManyWithoutManagerNestedInput
+  interviews?: Prisma.InterviewUpdateManyWithoutManagerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCandidateProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  availability?: Prisma.AvailabilityUncheckedUpdateManyWithoutManagerNestedInput
+  jobs?: Prisma.JobUncheckedUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutManagerNestedInput
 }
 
@@ -503,6 +603,7 @@ export type UserCreateWithoutAvailabilityInput = {
   role?: $Enums.UserRole
   jobs?: Prisma.JobCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAvailabilityInput = {
@@ -515,6 +616,7 @@ export type UserUncheckedCreateWithoutAvailabilityInput = {
   role?: $Enums.UserRole
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutManagerInput
   interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAvailabilityInput = {
@@ -543,6 +645,7 @@ export type UserUpdateWithoutAvailabilityInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   jobs?: Prisma.JobUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAvailabilityInput = {
@@ -555,6 +658,7 @@ export type UserUncheckedUpdateWithoutAvailabilityInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   jobs?: Prisma.JobUncheckedUpdateManyWithoutManagerNestedInput
   interviews?: Prisma.InterviewUncheckedUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInterviewsInput = {
@@ -567,6 +671,7 @@ export type UserCreateWithoutInterviewsInput = {
   role?: $Enums.UserRole
   availability?: Prisma.AvailabilityCreateNestedManyWithoutManagerInput
   jobs?: Prisma.JobCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInterviewsInput = {
@@ -579,6 +684,7 @@ export type UserUncheckedCreateWithoutInterviewsInput = {
   role?: $Enums.UserRole
   availability?: Prisma.AvailabilityUncheckedCreateNestedManyWithoutManagerInput
   jobs?: Prisma.JobUncheckedCreateNestedManyWithoutManagerInput
+  candidateProfile?: Prisma.CandidateUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInterviewsInput = {
@@ -607,6 +713,7 @@ export type UserUpdateWithoutInterviewsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   availability?: Prisma.AvailabilityUpdateManyWithoutManagerNestedInput
   jobs?: Prisma.JobUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInterviewsInput = {
@@ -619,6 +726,7 @@ export type UserUncheckedUpdateWithoutInterviewsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   availability?: Prisma.AvailabilityUncheckedUpdateManyWithoutManagerNestedInput
   jobs?: Prisma.JobUncheckedUpdateManyWithoutManagerNestedInput
+  candidateProfile?: Prisma.CandidateUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -681,6 +789,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   availability?: boolean | Prisma.User$availabilityArgs<ExtArgs>
   jobs?: boolean | Prisma.User$jobsArgs<ExtArgs>
   interviews?: boolean | Prisma.User$interviewsArgs<ExtArgs>
+  candidateProfile?: boolean | Prisma.User$candidateProfileArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -719,6 +828,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   availability?: boolean | Prisma.User$availabilityArgs<ExtArgs>
   jobs?: boolean | Prisma.User$jobsArgs<ExtArgs>
   interviews?: boolean | Prisma.User$interviewsArgs<ExtArgs>
+  candidateProfile?: boolean | Prisma.User$candidateProfileArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -730,6 +840,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     availability: Prisma.$AvailabilityPayload<ExtArgs>[]
     jobs: Prisma.$JobPayload<ExtArgs>[]
     interviews: Prisma.$InterviewPayload<ExtArgs>[]
+    candidateProfile: Prisma.$CandidatePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1136,6 +1247,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   availability<T extends Prisma.User$availabilityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$availabilityArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AvailabilityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobs<T extends Prisma.User$jobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$jobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   interviews<T extends Prisma.User$interviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$interviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InterviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  candidateProfile<T extends Prisma.User$candidateProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$candidateProfileArgs<ExtArgs>>): Prisma.Prisma__CandidateClient<runtime.Types.Result.GetResult<Prisma.$CandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1634,6 +1746,25 @@ export type User$interviewsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.InterviewScalarFieldEnum | Prisma.InterviewScalarFieldEnum[]
+}
+
+/**
+ * User.candidateProfile
+ */
+export type User$candidateProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Candidate
+   */
+  select?: Prisma.CandidateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Candidate
+   */
+  omit?: Prisma.CandidateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CandidateInclude<ExtArgs> | null
+  where?: Prisma.CandidateWhereInput
 }
 
 /**

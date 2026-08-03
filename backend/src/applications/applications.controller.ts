@@ -40,6 +40,12 @@ export class ApplicationsController {
     return this.applicationsService.getJobApplications(user.id, jobId);
   }
 
+  @Get('mine')
+  @Roles(UserRole.CANDIDATE)
+  getMyApplications(@CurrentUser() user: CurrentUserData) {
+    return this.applicationsService.getMyApplications(user.id, user.email);
+  }
+
   @Get(':applicationId')
   @Roles(UserRole.MANAGER)
   getApplicationDetails(

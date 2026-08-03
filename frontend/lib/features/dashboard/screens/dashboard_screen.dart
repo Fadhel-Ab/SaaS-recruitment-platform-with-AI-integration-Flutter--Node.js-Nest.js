@@ -140,11 +140,12 @@ class DashboardScreen extends StatelessWidget {
                               default:
                                 return MetricCard(
                                   title: 'Average AI Match Score',
-                                  value: (summary.aiInterviews ?? 0).toString(),
+                                  value:
+                                      '${summary.averageAIScore.round()}%',
                                   icon: Icons.analytics_outlined,
                                   themeColor: Colors.green,
                                   backgroundColor: const Color(0xFFE6F4EA),
-                                  detailText: "Highest weekly match rate",
+                                  detailText: "Across all scored applicants",
                                 );
                             }
                           },

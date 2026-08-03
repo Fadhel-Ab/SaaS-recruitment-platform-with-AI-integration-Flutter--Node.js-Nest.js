@@ -12,8 +12,10 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
 
   CreateJobBloc(this.repository) : super(const CreateJobState()) {
     on<GenerateQuestionsRequested>(_generateQuestions);
+    on<BackToJobDetailsRequested>(_backToDetails);
+    on<QuestionsApproved>(_questionsApproved);
+    on<BackToQuestionsRequested>(_backToQuestions);
     on<PublishJobRequested>(_publish);
-    on<BackToJobDetailsRequested>(_back);
   }
 
   FutureOr<void> _generateQuestions(
@@ -41,6 +43,47 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
     }
   }
 
+  FutureOr<void> _backToDetails(
+    BackToJobDetailsRequested event,
+    Emitter<CreateJobState> emit,
+  ) {
+    emit(state.copyWith(status: CreateJobStatus.initial));
+  }
+
+  FutureOr<void> _questionsApproved(
+    QuestionsApproved event,
+    Emitter<CreateJobState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        status: CreateJobStatus.loadingAvailabilityDefaults,
+        approvedQuestions: event.questions,
+      ),
+    );
+
+    try {
+      final defaults = await repository.getDefaultAvailability();
+
+      emit(
+        state.copyWith(
+          status: CreateJobStatus.availabilityReady,
+          defaultAvailability: defaults,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(status: CreateJobStatus.failure, error: e.toString()),
+      );
+    }
+  }
+
+  FutureOr<void> _backToQuestions(
+    BackToQuestionsRequested event,
+    Emitter<CreateJobState> emit,
+  ) {
+    emit(state.copyWith(status: CreateJobStatus.questionsReady));
+  }
+
   FutureOr<void> _publish(
     PublishJobRequested event,
     Emitter<CreateJobState> emit,
@@ -52,7 +95,10 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
 
     try {
       await repository.createJob(
-        pendingJob.copyWith(interviewQuestions: event.approvedQuestions),
+        pendingJob.copyWith(
+          interviewQuestions: state.approvedQuestions,
+          availability: event.availability,
+        ),
       );
 
       emit(state.copyWith(status: CreateJobStatus.success));
@@ -61,12 +107,5 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
         state.copyWith(status: CreateJobStatus.failure, error: e.toString()),
       );
     }
-  }
-
-  FutureOr<void> _back(
-    BackToJobDetailsRequested event,
-    Emitter<CreateJobState> emit,
-  ) {
-    emit(state.copyWith(status: CreateJobStatus.initial));
   }
 }

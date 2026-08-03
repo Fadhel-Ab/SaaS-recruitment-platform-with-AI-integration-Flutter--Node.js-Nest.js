@@ -5,6 +5,7 @@ import 'package:frontend/features/applications/model/applicant_summary.dart';
 import 'package:frontend/features/applications/model/application_detail.dart';
 import 'package:frontend/features/applications/model/application_result.dart';
 import 'package:frontend/features/applications/model/create_application_request.dart';
+import 'package:frontend/features/applications/model/my_application_summary.dart';
 
 class ApplicationRepository {
   final ApplicationApi api;
@@ -46,5 +47,14 @@ class ApplicationRepository {
   ) async {
     await api.updateApplicationStatus(applicationId, status);
     return getApplicationDetails(applicationId);
+  }
+
+  Future<List<MyApplicationSummary>> getMyApplications() async {
+    final data = await api.getMyApplications();
+    return data
+        .map(
+          (e) => MyApplicationSummary.fromJson(Map<String, dynamic>.from(e)),
+        )
+        .toList();
   }
 }

@@ -4,12 +4,14 @@ class JobsFilterPanel extends StatefulWidget {
   final void Function(List<String> types, String? location)? onFilterChanged;
   final Set<String> selectedTypes;
   final String selectedLocation;
+  final List<String> locations;
 
   const JobsFilterPanel({
     super.key,
     this.onFilterChanged,
     this.selectedTypes = const {},
     this.selectedLocation = 'All Locations',
+    this.locations = const ['All Locations'],
   });
 
   @override
@@ -25,14 +27,6 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
     'Part-time',
     'Contract',
     'Internship',
-    'Remote',
-  ];
-
-  final List<String> _locations = [
-    'All Locations',
-    'San Francisco, CA',
-    'New York, NY',
-    'Austin, TX',
     'Remote',
   ];
 
@@ -79,7 +73,11 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.tune_rounded, size: 20, color: Color(0xFF111827)),
+                    Icon(
+                      Icons.tune_rounded,
+                      size: 20,
+                      color: Color(0xFF111827),
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Filters',
@@ -183,13 +181,16 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                 child: DropdownButton<String>(
                   value: _selectedLocation,
                   isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF6B7280)),
-                  style: const TextStyle(fontSize: 14, color: Color(0xFF374151)),
-                  items: _locations.map((loc) {
-                    return DropdownMenuItem(
-                      value: loc,
-                      child: Text(loc),
-                    );
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF6B7280),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF374151),
+                  ),
+                  items: widget.locations.map((loc) {
+                    return DropdownMenuItem(value: loc, child: Text(loc));
                   }).toList(),
                   onChanged: (val) {
                     if (val != null) {

@@ -36,6 +36,11 @@ class ApplicationApi {
     return response.data as List<dynamic>;
   }
 
+  Future<List<dynamic>> getMyApplications() async {
+    final response = await dio.get('/applications/mine');
+    return response.data as List<dynamic>;
+  }
+
   Future<Map<String, dynamic>> getApplicationDetails(
     String applicationId,
   ) async {

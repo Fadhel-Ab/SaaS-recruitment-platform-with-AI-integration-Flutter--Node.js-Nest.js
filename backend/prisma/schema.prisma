@@ -18,6 +18,7 @@ model User {
   availability Availability[]
   jobs         Job[]
   interviews   Interview[]
+  candidateProfile Candidate?
 }
 
 model Job {
@@ -39,6 +40,17 @@ model Job {
 
   applications Application[]
   manager      User          @relation(fields: managerId, references: id)
+  jobAvailability JobAvailability[]
+}
+
+model JobAvailability {
+  id        String   @id @default(uuid())
+  jobId     String
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  job       Job      @relation(fields: [jobId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Candidate {
@@ -47,9 +59,11 @@ model Candidate {
   email          String
   resumeFileName String?
   phone          String
+  userId         String?       @unique
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   applications   Application[]
+  user           User?         @relation(fields: [userId], references: [id])
 }
 
 model Application {

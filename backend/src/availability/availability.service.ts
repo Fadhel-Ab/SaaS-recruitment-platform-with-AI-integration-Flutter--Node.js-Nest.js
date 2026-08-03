@@ -1,46 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateAvailabilityDto } from './dto/create-availability.dto.js';
+import { UpdateAvailabilityDto } from './dto/update-availability.dto.js';
 
 @Injectable()
 export class AvailabilityService {
-
-  constructor(
-    private prisma: PrismaService,
-  ) {}
-
+  constructor(private prisma: PrismaService) {}
 
   async save(managerId: string, dto: CreateAvailabilityDto) {
-  const existing = await this.prisma.availability.findFirst({
-    where: { managerId },
-  });
+    return this.prisma.availability.create({
+      data: {
+        managerId,
+        ...dto,
+      },
+    });
+  }
 
-  if (existing) {
+  async update(managerId: string, id: string, dto: UpdateAvailabilityDto) {
+    const existing = await this.prisma.availability.findFirst({
+      where: { id, managerId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Availability slot not found');
+    }
+
     return this.prisma.availability.update({
-      where: { id: existing.id },
+      where: { id },
       data: dto,
     });
   }
 
-  return this.prisma.availability.create({
-    data: {
-      managerId,
-      ...dto,
-    },
-  });
-}
+  async remove(managerId: string, id: string) {
+    const existing = await this.prisma.availability.findFirst({
+      where: { id, managerId },
+    });
 
-async getMine(managerId: string) {
-  return this.prisma.availability.findFirst({
-    where: { managerId },
-  });
-}
+    if (!existing) {
+      throw new NotFoundException('Availability slot not found');
+    }
 
+    await this.prisma.availability.delete({ where: { id } });
 
-  findMine(managerId:string){
+    return { success: true };
+  }
+
+  findMine(managerId: string) {
     return this.prisma.availability.findMany({
-      where:{
+      where: {
         managerId,
+      },
+      orderBy: {
+        dayOfWeek: 'asc',
       },
     });
   }

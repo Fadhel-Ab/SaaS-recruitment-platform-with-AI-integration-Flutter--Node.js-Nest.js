@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { v4 as uuid } from 'uuid';
 import { CreateJobDto } from './dto/create-job.dto.js';
+import { UpdateJobDto } from './dto/update-job.dto.js';
 import { GenerateInterviewQuestionsDto } from './dto/generate-interview-questions.dto.js';
 import { StorageService } from '../common/storage/storage.service.js';
 import { AiService } from '../ai/ai.service.js';
@@ -39,8 +40,57 @@ export class JobsService {
             id: userId,
           },
         },
+
+        jobAvailability: {
+          create: (dto.availability ?? []).map((slot) => ({
+            dayOfWeek: slot.dayOfWeek,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+          })),
+        },
       },
     });
+  }
+
+  async update(userId: string, jobId: string, dto: UpdateJobDto) {
+    const job = await this.prisma.job.findFirst({
+      where: { id: jobId, managerId: userId },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+
+    return this.prisma.job.update({
+      where: { id: jobId },
+      data: dto,
+    });
+  }
+
+  async getDefaultAvailability(managerId: string) {
+    const lastJob = await this.prisma.job.findFirst({
+      where: { managerId },
+      orderBy: { createdAt: 'desc' },
+      include: { jobAvailability: true },
+    });
+
+    if (lastJob && lastJob.jobAvailability.length > 0) {
+      return lastJob.jobAvailability.map((a) => ({
+        dayOfWeek: a.dayOfWeek,
+        startTime: a.startTime,
+        endTime: a.endTime,
+      }));
+    }
+
+    const generalAvailability = await this.prisma.availability.findMany({
+      where: { managerId },
+    });
+
+    return generalAvailability.map((a) => ({
+      dayOfWeek: a.dayOfWeek,
+      startTime: a.startTime,
+      endTime: a.endTime,
+    }));
   }
 
   async generateInterviewQuestions(dto: GenerateInterviewQuestionsDto) {
