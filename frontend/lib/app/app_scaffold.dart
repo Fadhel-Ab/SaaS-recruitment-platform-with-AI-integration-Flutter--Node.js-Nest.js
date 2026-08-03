@@ -106,10 +106,12 @@ class AppScaffold extends StatelessWidget {
                             selectedIcon: Icon(Icons.dashboard_rounded),
                             label: Text('Dashboard'),
                           ),
-                        const NavigationRailDestination(
-                          icon: Icon(Icons.work_outline),
-                          selectedIcon: Icon(Icons.work_rounded),
-                          label: Text('Jobs'),
+                        NavigationRailDestination(
+                          icon: const Icon(Icons.work_outline),
+                          selectedIcon: const Icon(Icons.work_rounded),
+                          label: Text(
+                            user?.role == UserRole.manager ? 'My Jobs' : 'Jobs',
+                          ),
                         ),
                         if (user?.role == UserRole.manager)
                           const NavigationRailDestination(
@@ -150,9 +152,9 @@ class AppScaffold extends StatelessWidget {
                         icon: Icon(Icons.dashboard_outlined),
                         label: 'Dashboard',
                       ),
-                    const NavigationDestination(
-                      icon: Icon(Icons.work_outline),
-                      label: 'Jobs',
+                    NavigationDestination(
+                      icon: const Icon(Icons.work_outline),
+                      label: user?.role == UserRole.manager ? 'My Jobs' : 'Jobs',
                     ),
                     if (user?.role == UserRole.manager)
                       const NavigationDestination(

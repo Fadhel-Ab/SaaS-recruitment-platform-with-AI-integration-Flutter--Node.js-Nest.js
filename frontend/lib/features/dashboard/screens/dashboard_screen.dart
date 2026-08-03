@@ -133,6 +133,7 @@ class DashboardScreen extends StatelessWidget {
                                     'last week',
                                   ),
                                   sparklineData: summary.jobsSparkline,
+                                  onTap: () => context.push('/manager/jobs'),
                                 );
                               case 1:
                                 return MetricCard(
