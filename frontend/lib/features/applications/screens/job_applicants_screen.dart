@@ -61,6 +61,118 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return filtered;
   }
 
+  int get _activeFilterCount {
+    final scoreIsDefault = _scoreRange.start == 0 && _scoreRange.end == 100;
+    return _selectedStatuses.length + (scoreIsDefault ? 0 : 1);
+  }
+
+  void _toggleStatus(String status) {
+    setState(() {
+      if (_selectedStatuses.contains(status)) {
+        _selectedStatuses.remove(status);
+      } else {
+        _selectedStatuses.add(status);
+      }
+    });
+  }
+
+  Future<void> _openFilterSheet(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (sheetContext, sheetSetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+              ),
+              child: SafeArea(
+                top: false,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 36,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5E7EB),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Filters',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF111827),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedStatuses.clear();
+                                _scoreRange = const RangeValues(0, 100);
+                              });
+                              sheetSetState(() {});
+                            },
+                            child: const Text('Reset'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      _FilterControls(
+                        selectedStatuses: _selectedStatuses,
+                        scoreRange: _scoreRange,
+                        onStatusToggled: (status) {
+                          _toggleStatus(status);
+                          sheetSetState(() {});
+                        },
+                        onScoreRangeChanged: (range) {
+                          setState(() => _scoreRange = range);
+                          sheetSetState(() {});
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4F46E5),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Show Results'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _toggleSelectionMode() {
     setState(() {
       _selectionMode = !_selectionMode;
@@ -112,6 +224,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       appBar: AppBar(
         title: Text(
           widget.jobTitle != null ? 'Candidates — ${widget.jobTitle}' : 'Candidates',
+          overflow: TextOverflow.ellipsis,
         ),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF111827),
@@ -166,24 +279,26 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           }
 
           final filtered = _apply(state.applicants);
+          final isCompact = MediaQuery.sizeOf(context).width < 700;
 
           return Column(
             children: [
-              _FilterBar(
-                selectedStatuses: _selectedStatuses,
-                scoreRange: _scoreRange,
-                sort: _sort,
-                onStatusToggled: (status) => setState(() {
-                  if (_selectedStatuses.contains(status)) {
-                    _selectedStatuses.remove(status);
-                  } else {
-                    _selectedStatuses.add(status);
-                  }
-                }),
-                onScoreRangeChanged: (range) =>
-                    setState(() => _scoreRange = range),
-                onSortChanged: (sort) => setState(() => _sort = sort),
-              ),
+              isCompact
+                  ? _CompactFilterBar(
+                      activeFilterCount: _activeFilterCount,
+                      sort: _sort,
+                      onSortChanged: (sort) => setState(() => _sort = sort),
+                      onOpenFilters: () => _openFilterSheet(context),
+                    )
+                  : _FilterBar(
+                      selectedStatuses: _selectedStatuses,
+                      scoreRange: _scoreRange,
+                      sort: _sort,
+                      onStatusToggled: _toggleStatus,
+                      onScoreRangeChanged: (range) =>
+                          setState(() => _scoreRange = range),
+                      onSortChanged: (sort) => setState(() => _sort = sort),
+                    ),
               Expanded(
                 child: filtered.isEmpty
                     ? const Center(
@@ -256,7 +371,9 @@ class _BulkActionBar extends StatelessWidget {
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '$count selected',
@@ -266,32 +383,40 @@ class _BulkActionBar extends StatelessWidget {
               color: Color(0xFF111827),
             ),
           ),
-          const Spacer(),
-          OutlinedButton(
-            onPressed: isUpdating ? null : onReject,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFC5221F),
-              side: const BorderSide(color: Color(0xFFC5221F)),
-            ),
-            child: const Text('Reject Selected'),
-          ),
-          const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: isUpdating ? null : onShortlist,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              foregroundColor: Colors.white,
-            ),
-            child: isUpdating
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text('Shortlist Selected'),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: isUpdating ? null : onReject,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFC5221F),
+                    side: const BorderSide(color: Color(0xFFC5221F)),
+                  ),
+                  child: const Text('Reject Selected'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isUpdating ? null : onShortlist,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4F46E5),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: isUpdating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Shortlist Selected'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -299,6 +424,112 @@ class _BulkActionBar extends StatelessWidget {
   }
 }
 
+/// Sort dropdown, reused by both the desktop inline bar and the mobile bar.
+class _SortDropdown extends StatelessWidget {
+  final _SortOption sort;
+  final ValueChanged<_SortOption> onSortChanged;
+
+  const _SortDropdown({required this.sort, required this.onSortChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<_SortOption>(
+      value: sort,
+      underline: const SizedBox(),
+      items: const [
+        DropdownMenuItem(value: _SortOption.latest, child: Text('Latest')),
+        DropdownMenuItem(
+          value: _SortOption.highestScore,
+          child: Text('Highest Score'),
+        ),
+        DropdownMenuItem(value: _SortOption.oldest, child: Text('Oldest')),
+      ],
+      onChanged: (value) {
+        if (value != null) onSortChanged(value);
+      },
+    );
+  }
+}
+
+/// Status chips + AI score range slider, shared between the inline desktop
+/// filter bar and the mobile filter bottom sheet.
+class _FilterControls extends StatelessWidget {
+  final Set<String> selectedStatuses;
+  final RangeValues scoreRange;
+  final ValueChanged<String> onStatusToggled;
+  final ValueChanged<RangeValues> onScoreRangeChanged;
+
+  const _FilterControls({
+    required this.selectedStatuses,
+    required this.scoreRange,
+    required this.onStatusToggled,
+    required this.onScoreRangeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: allowedStatusTransitions.keys.map((status) {
+            final isSelected = selectedStatuses.contains(status);
+            return FilterChip(
+              label: Text(statusLabel(status)),
+              selected: isSelected,
+              onSelected: (_) => onStatusToggled(status),
+              selectedColor: const Color(0xFFEEF2FF),
+              checkmarkColor: const Color(0xFF4F46E5),
+              labelStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF4F46E5)
+                    : const Color(0xFF374151),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: isSelected
+                      ? const Color(0xFF4F46E5)
+                      : const Color(0xFFE5E7EB),
+                ),
+              ),
+              backgroundColor: Colors.white,
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const Text(
+              'AI Score',
+              style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            ),
+            Expanded(
+              child: RangeSlider(
+                values: scoreRange,
+                min: 0,
+                max: 100,
+                divisions: 20,
+                activeColor: const Color(0xFF4F46E5),
+                labels: RangeLabels(
+                  scoreRange.start.round().toString(),
+                  scoreRange.end.round().toString(),
+                ),
+                onChanged: onScoreRangeChanged,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Inline filter bar shown on wide (desktop/tablet) screens.
 class _FilterBar extends StatelessWidget {
   final Set<String> selectedStatuses;
   final RangeValues scoreRange;
@@ -327,86 +558,67 @@ class _FilterBar extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: allowedStatusTransitions.keys.map((status) {
-                    final isSelected = selectedStatuses.contains(status);
-                    return FilterChip(
-                      label: Text(statusLabel(status)),
-                      selected: isSelected,
-                      onSelected: (_) => onStatusToggled(status),
-                      selectedColor: const Color(0xFFEEF2FF),
-                      checkmarkColor: const Color(0xFF4F46E5),
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        color: isSelected
-                            ? const Color(0xFF4F46E5)
-                            : const Color(0xFF374151),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: isSelected
-                              ? const Color(0xFF4F46E5)
-                              : const Color(0xFFE5E7EB),
-                        ),
-                      ),
-                      backgroundColor: Colors.white,
-                    );
-                  }).toList(),
+                child: _FilterControls(
+                  selectedStatuses: selectedStatuses,
+                  scoreRange: scoreRange,
+                  onStatusToggled: onStatusToggled,
+                  onScoreRangeChanged: onScoreRangeChanged,
                 ),
               ),
               const SizedBox(width: 12),
-              DropdownButton<_SortOption>(
-                value: sort,
-                underline: const SizedBox(),
-                items: const [
-                  DropdownMenuItem(
-                    value: _SortOption.latest,
-                    child: Text('Latest'),
-                  ),
-                  DropdownMenuItem(
-                    value: _SortOption.highestScore,
-                    child: Text('Highest Score'),
-                  ),
-                  DropdownMenuItem(
-                    value: _SortOption.oldest,
-                    child: Text('Oldest'),
-                  ),
-                ],
-                onChanged: (value) {
-                  if (value != null) onSortChanged(value);
-                },
-              ),
+              _SortDropdown(sort: sort, onSortChanged: onSortChanged),
             ],
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Text(
-                'AI Score',
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-              ),
-              Expanded(
-                child: RangeSlider(
-                  values: scoreRange,
-                  min: 0,
-                  max: 100,
-                  divisions: 20,
-                  activeColor: const Color(0xFF4F46E5),
-                  labels: RangeLabels(
-                    scoreRange.start.round().toString(),
-                    scoreRange.end.round().toString(),
-                  ),
-                  onChanged: onScoreRangeChanged,
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact bar shown on narrow (phone) screens: a "Filters" button that
+/// opens a bottom sheet, plus the sort dropdown, so the applicant list is
+/// visible without the filters eating most of the viewport.
+class _CompactFilterBar extends StatelessWidget {
+  final int activeFilterCount;
+  final _SortOption sort;
+  final ValueChanged<_SortOption> onSortChanged;
+  final VoidCallback onOpenFilters;
+
+  const _CompactFilterBar({
+    required this.activeFilterCount,
+    required this.sort,
+    required this.onSortChanged,
+    required this.onOpenFilters,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      color: Colors.white,
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onOpenFilters,
+              icon: const Icon(Icons.tune_rounded, size: 18),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF374151),
+                side: const BorderSide(color: Color(0xFFE5E7EB)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ],
+              label: Text(
+                activeFilterCount > 0
+                    ? 'Filters ($activeFilterCount)'
+                    : 'Filters',
+              ),
+            ),
           ),
+          const SizedBox(width: 8),
+          _SortDropdown(sort: sort, onSortChanged: onSortChanged),
         ],
       ),
     );

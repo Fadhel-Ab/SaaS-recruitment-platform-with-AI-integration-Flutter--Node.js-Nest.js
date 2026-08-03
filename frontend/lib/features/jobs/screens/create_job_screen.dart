@@ -706,12 +706,12 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                         segments: const [
                           ButtonSegment(
                             value: AvailabilityRecurrence.recurring,
-                            label: Text('Repeats weekly'),
+                            label: Text('Weekly'),
                             icon: Icon(Icons.repeat, size: 14),
                           ),
                           ButtonSegment(
                             value: AvailabilityRecurrence.specific,
-                            label: Text('Specific date'),
+                            label: Text('Date'),
                             icon: Icon(Icons.event_outlined, size: 14),
                           ),
                         ],
@@ -733,73 +733,90 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: isRecurring
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<int>(
-                                  value: slot.dayOfWeek,
-                                  isExpanded: true,
-                                  items: [
-                                    for (int i = 1; i <= 7; i++)
-                                      DropdownMenuItem(
-                                        value: i,
-                                        child: Text(_dayLabels[i - 1]),
-                                      ),
-                                  ],
-                                  onChanged: (v) => setState(
-                                    () => slot.dayOfWeek = v ?? slot.dayOfWeek,
-                                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final dateOrDayPicker = isRecurring
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: slot.dayOfWeek,
+                                isExpanded: true,
+                                items: [
+                                  for (int i = 1; i <= 7; i++)
+                                    DropdownMenuItem(
+                                      value: i,
+                                      child: Text(_dayLabels[i - 1]),
+                                    ),
+                                ],
+                                onChanged: (v) => setState(
+                                  () => slot.dayOfWeek = v ?? slot.dayOfWeek,
                                 ),
                               ),
-                            )
-                          : OutlinedButton.icon(
-                              onPressed: () => _pickSlotDate(slot),
-                              icon: const Icon(Icons.calendar_today_outlined, size: 16),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: const Color(0xFF0F172A),
-                                side: const BorderSide(color: Color(0xFFE2E8F0)),
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
-                              ),
-                              label: Text(
-                                '${slot.date.year}-${slot.date.month.toString().padLeft(2, '0')}-${slot.date.day.toString().padLeft(2, '0')}',
-                                overflow: TextOverflow.ellipsis,
-                              ),
                             ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 3,
-                      child: OutlinedButton(
-                        onPressed: () => _pickSlotStart(slot),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF0F172A),
-                          side: const BorderSide(color: Color(0xFFE2E8F0)),
-                        ),
-                        child: Text(slot.start.format(context)),
+                          )
+                        : OutlinedButton.icon(
+                            onPressed: () => _pickSlotDate(slot),
+                            icon: const Icon(Icons.calendar_today_outlined, size: 16),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF0F172A),
+                              side: const BorderSide(color: Color(0xFFE2E8F0)),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            label: Text(
+                              '${slot.date.year}-${slot.date.month.toString().padLeft(2, '0')}-${slot.date.day.toString().padLeft(2, '0')}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+
+                    final startButton = OutlinedButton(
+                      onPressed: () => _pickSlotStart(slot),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF0F172A),
+                        side: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 3,
-                      child: OutlinedButton(
-                        onPressed: () => _pickSlotEnd(slot),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF0F172A),
-                          side: const BorderSide(color: Color(0xFFE2E8F0)),
-                        ),
-                        child: Text(slot.end.format(context)),
+                      child: Text(slot.start.format(context)),
+                    );
+
+                    final endButton = OutlinedButton(
+                      onPressed: () => _pickSlotEnd(slot),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF0F172A),
+                        side: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
-                    ),
-                  ],
+                      child: Text(slot.end.format(context)),
+                    );
+
+                    if (constraints.maxWidth < 420) {
+                      return Column(
+                        children: [
+                          SizedBox(width: double.infinity, child: dateOrDayPicker),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(child: startButton),
+                              const SizedBox(width: 8),
+                              Expanded(child: endButton),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(flex: 2, child: dateOrDayPicker),
+                        const SizedBox(width: 8),
+                        Expanded(flex: 3, child: startButton),
+                        const SizedBox(width: 8),
+                        Expanded(flex: 3, child: endButton),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

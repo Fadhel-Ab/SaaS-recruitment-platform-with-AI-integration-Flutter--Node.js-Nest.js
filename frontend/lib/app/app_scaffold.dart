@@ -25,7 +25,11 @@ class AppScaffold extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Recruitment Platform'),
+            title: Text(
+              isPhone ? 'TalentHQ' : 'Recruitment Platform',
+              overflow: TextOverflow.ellipsis,
+            ),
+            titleSpacing: isPhone ? 12 : null,
             actions: [
               if (user?.role == UserRole.manager)
                 IconButton(
@@ -43,6 +47,11 @@ class AppScaffold extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 1),
                   child: FilledButton.icon(
                     onPressed: () => context.push('/manager/availability'),
+                    style: isPhone
+                        ? FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          )
+                        : null,
                     icon: const Icon(Icons.schedule, size: 18),
                     label: Text(isPhone ? 'Time' : 'Manager time'),
                   ),

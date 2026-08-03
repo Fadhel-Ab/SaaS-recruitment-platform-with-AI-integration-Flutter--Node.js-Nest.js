@@ -382,12 +382,12 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
             segments: const [
               ButtonSegment(
                 value: AvailabilityRecurrence.recurring,
-                label: Text('Repeats weekly'),
+                label: Text('Weekly'),
                 icon: Icon(Icons.repeat, size: 16),
               ),
               ButtonSegment(
                 value: AvailabilityRecurrence.specific,
-                label: Text('Specific date'),
+                label: Text('Date'),
                 icon: Icon(Icons.event_outlined, size: 16),
               ),
             ],
