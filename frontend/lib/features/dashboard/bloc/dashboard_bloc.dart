@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/dashboard_repository.dart';
 
@@ -26,7 +27,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       emit(state.copyWith(status: DashboardStatus.success, summary: summary));
     } catch (e) {
       emit(
-        state.copyWith(status: DashboardStatus.failure, error: e.toString()),
+        state.copyWith(status: DashboardStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }

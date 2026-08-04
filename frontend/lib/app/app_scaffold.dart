@@ -26,7 +26,7 @@ class AppScaffold extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              isPhone ? 'TalentHQ' : 'Recruitment Platform',
+              isPhone ? 'TalentAI' : 'TalentAI',
               overflow: TextOverflow.ellipsis,
             ),
             titleSpacing: isPhone ? 12 : null,
@@ -162,7 +162,9 @@ class AppScaffold extends StatelessWidget {
                       ),
                     NavigationDestination(
                       icon: const Icon(Icons.work_outline),
-                      label: user?.role == UserRole.manager ? 'My Jobs' : 'Jobs',
+                      label: user?.role == UserRole.manager
+                          ? 'My Jobs'
+                          : 'Jobs',
                     ),
                     if (user?.role == UserRole.manager)
                       const NavigationDestination(

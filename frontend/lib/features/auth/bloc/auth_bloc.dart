@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/core/storage/token_storage.dart';
 import 'package:frontend/features/auth/data/models/user_model.dart';
 import '../data/auth_repository.dart';
@@ -30,7 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: AuthStatus.failure, error: e.toString()));
+      emit(state.copyWith(status: AuthStatus.failure, error: friendlyErrorMessage(e)));
     }
   }
 
@@ -56,7 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       print(user);
     } catch (e) {
-      emit(state.copyWith(status: AuthStatus.failure, error: e.toString()));
+      emit(state.copyWith(status: AuthStatus.failure, error: friendlyErrorMessage(e)));
     }
   }
 

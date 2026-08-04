@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/application_repository.dart';
 import 'application_detail_event.dart';
@@ -37,7 +38,7 @@ class ApplicationDetailBloc
       emit(
         state.copyWith(
           status: ApplicationDetailStatus.failure,
-          error: e.toString(),
+          error: friendlyErrorMessage(e),
         ),
       );
     }
@@ -64,7 +65,12 @@ class ApplicationDetailBloc
         ),
       );
     } catch (e) {
-      emit(state.copyWith(isUpdatingStatus: false, updateError: e.toString()));
+      emit(
+        state.copyWith(
+          isUpdatingStatus: false,
+          updateError: friendlyErrorMessage(e),
+        ),
+      );
     }
   }
 }

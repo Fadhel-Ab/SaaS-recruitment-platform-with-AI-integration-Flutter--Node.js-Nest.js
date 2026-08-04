@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/availability/data/availability_repository.dart';
 import 'package:frontend/features/availability/model/availability_slot.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
 import 'package:frontend/features/jobs/models/job_model.dart';
 
 const _monthLabels = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-String _formatSlotDate(DateTime date) => '${date.day} ${_monthLabels[date.month - 1]}';
+String _formatSlotDate(DateTime date) =>
+    '${date.day} ${_monthLabels[date.month - 1]}';
 
 String _describeSlot(AvailabilitySlot slot) {
   if (slot.recurrence == AvailabilityRecurrence.recurring) {
@@ -67,7 +79,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        _error = friendlyErrorMessage(e);
         _status = _LoadStatus.failure;
       });
     }
@@ -85,7 +97,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to add slot: $e')));
+        ).showSnackBar(
+          SnackBar(content: Text('Failed to add slot: ${friendlyErrorMessage(e)}')),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -104,7 +118,11 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update slot: $e')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update slot: ${friendlyErrorMessage(e)}'),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -122,7 +140,11 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to delete slot: $e')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete slot: ${friendlyErrorMessage(e)}'),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -163,10 +185,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     );
   }
 
-  Widget _buildSlotCard(
-    AvailabilitySlot slot, {
-    bool editable = true,
-  }) {
+  Widget _buildSlotCard(AvailabilitySlot slot, {bool editable = true}) {
     final isRecurring = slot.recurrence == AvailabilityRecurrence.recurring;
     return Card(
       elevation: 0,
@@ -295,9 +314,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                 ..._slots.map((slot) => _buildSlotCard(slot)),
               for (final job in _jobsWithAvailability) ...[
                 _buildSectionHeader('Job: ${job.title}'),
-                ...job.jobAvailability.map(
-                  (slot) => _buildSlotCard(slot),
-                ),
+                ...job.jobAvailability.map((slot) => _buildSlotCard(slot)),
               ],
             ],
           );
@@ -378,7 +395,9 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.initial == null ? 'Add Availability' : 'Edit Availability'),
+      title: Text(
+        widget.initial == null ? 'Add Availability' : 'Edit Availability',
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -400,7 +419,7 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
             onSelectionChanged: (selection) =>
                 setState(() => _recurrence = selection.first),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           DropdownButtonFormField<String?>(
             initialValue: _jobId,
             isExpanded: true,
@@ -418,7 +437,7 @@ class _SlotFormDialogState extends State<_SlotFormDialog> {
             ],
             onChanged: (v) => setState(() => _jobId = v),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           if (_recurrence == AvailabilityRecurrence.recurring)
             DropdownButtonFormField<int>(
               initialValue: _dayOfWeek,

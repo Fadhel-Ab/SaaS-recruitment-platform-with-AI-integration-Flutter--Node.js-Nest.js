@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/jobs_repository.dart';
 
@@ -26,7 +27,7 @@ class ManagerJobsBloc extends Bloc<ManagerJobsEvent, ManagerJobsState> {
       emit(state.copyWith(status: ManagerJobsStatus.success, jobs: jobs));
     } catch (e) {
       emit(
-        state.copyWith(status: ManagerJobsStatus.failure, error: e.toString()),
+        state.copyWith(status: ManagerJobsStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }

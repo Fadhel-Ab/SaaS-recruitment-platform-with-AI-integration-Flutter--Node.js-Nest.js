@@ -1,4 +1,13 @@
-import { Body, Controller, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import type { Response as ExpressResponse } from 'express';
 
 import { AiInterviewService } from './ai-interview.service.js';
@@ -9,6 +18,8 @@ import { AiService } from '../ai/ai.service.js';
 
 @Controller('ai-interview')
 export class AiInterviewController {
+  private readonly logger = new Logger(AiInterviewController.name);
+
   constructor(
     private readonly aiInterviewService: AiInterviewService,
     private readonly twilioService: TwilioService,
@@ -37,6 +48,7 @@ export class AiInterviewController {
 
   @Post('voice')
   @Public()
+  @SkipThrottle()
   async voice(
     @Query('applicationId') applicationId: string,
     @Res() res: ExpressResponse,
@@ -85,6 +97,7 @@ export class AiInterviewController {
   // --------------------------
   @Post('answer')
   @Public()
+  @SkipThrottle()
   async answer(
     @Query('applicationId') applicationId: string,
     @Body() body,
@@ -129,10 +142,9 @@ export class AiInterviewController {
       body.SpeechResult,
     );
 
-    console.log({
-      applicationId,
-      answer: body.SpeechResult,
-    });
+    this.logger.debug(
+      `Recorded answer for application ${applicationId} (${(body.SpeechResult ?? '').length} chars)`,
+    );
 
     const plan = await this.aiInterviewService.getInterviewPlan(applicationId);
     const limit = plan.length > 0 ? plan.length : 5;

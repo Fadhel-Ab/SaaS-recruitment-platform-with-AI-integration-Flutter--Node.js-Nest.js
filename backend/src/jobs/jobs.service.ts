@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { v4 as uuid } from 'uuid';
 import { CreateJobDto } from './dto/create-job.dto.js';
@@ -10,13 +10,15 @@ import { AvailabilityRecurrence } from '../generated/prisma/enums.js';
 
 @Injectable()
 export class JobsService {
+  private readonly logger = new Logger(JobsService.name);
+
   constructor(
     private prisma: PrismaService,
     private storageService: StorageService,
     private aiService: AiService,
   ) {}
   async create(userId: string, dto: CreateJobDto) {
-    console.log('Creating job for user:', userId);
+    this.logger.log(`Creating job for manager ${userId}`);
     return this.prisma.job.create({
       data: {
         title: dto.title,
@@ -207,8 +209,6 @@ export class JobsService {
         },
       },
     });
-
-    console.log('JOB FOUND:', job);
 
     return job;
   }

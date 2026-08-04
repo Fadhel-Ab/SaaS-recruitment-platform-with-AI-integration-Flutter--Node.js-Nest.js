@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/application_repository.dart';
 import 'pipeline_event.dart';
@@ -27,7 +28,7 @@ class PipelineBloc extends Bloc<PipelineEvent, PipelineState> {
       );
     } catch (e) {
       emit(
-        state.copyWith(status: PipelineStatus.failure, error: e.toString()),
+        state.copyWith(status: PipelineStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }

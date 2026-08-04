@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AIProviderService } from './ai.provider.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ResumeParserService } from './resume-parser.service.js';
@@ -6,6 +6,8 @@ import { StorageService } from '../common/storage/storage.service.js';
 
 @Injectable()
 export class AiService {
+  private readonly logger = new Logger(AiService.name);
+
   constructor(
     private prisma: PrismaService,
     private parser: ResumeParserService,
@@ -14,7 +16,7 @@ export class AiService {
   ) {}
 
   async processApplication(applicationId: string) {
-    console.log('AI PROCESS START:', applicationId);
+    this.logger.log(`Processing AI resume analysis for application ${applicationId}`);
 
     const application = await this.prisma.application.findUnique({
       where: {
@@ -38,16 +40,14 @@ export class AiService {
 
     const resumeText = await this.parser.extractText(filePath);
 
-    console.log('RESUME EXTRACTED LENGTH:', resumeText.length);
+    this.logger.debug(`Extracted ${resumeText.length} chars from resume`);
 
     const analysis = await this.aiProvider.analyzeResume(
       resumeText,
       application.job.description,
     );
 
-    console.log('AI ANALYSIS:', analysis);
-
-    console.log('CREATING AI SCORE:', analysis.score);
+    this.logger.debug(`AI resume score for ${applicationId}: ${analysis.score}`);
 
     await this.prisma.aIScore.upsert({
       where: {
@@ -74,7 +74,7 @@ export class AiService {
       },
     });
 
-    console.log('AI SCORE SAVED SUCCESSFULLY');
+    this.logger.log(`AI score saved for application ${applicationId}`);
 
     return analysis;
   }

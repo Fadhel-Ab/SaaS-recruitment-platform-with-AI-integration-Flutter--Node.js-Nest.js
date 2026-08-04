@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
@@ -120,7 +121,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not start the call: $e')),
+        SnackBar(content: Text('Could not start the call: ${friendlyErrorMessage(e)}')),
       );
     } finally {
       if (mounted) setState(() => _isRequestingCall = false);

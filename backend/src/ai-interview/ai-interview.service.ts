@@ -2,6 +2,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -18,6 +19,7 @@ import { expandAvailabilityWindows } from '../scheduling/util/expand-availabilit
 
 @Injectable()
 export class AiInterviewService {
+  private readonly logger = new Logger(AiInterviewService.name);
   private readonly SLOT_DURATION_MINUTES = 30;
 
   constructor(
@@ -163,11 +165,11 @@ export class AiInterviewService {
       },
     });
 
-    console.log('Evaluating AI interview transcript...');
+    this.logger.log(`Evaluating AI interview transcript for session ${sessionId}`);
 
     const evaluation = await this.aiService.evaluateInterview(transcript);
 
-    console.log('Interview evaluation:', evaluation);
+    this.logger.debug(`Interview evaluation score: ${evaluation.score}`);
 
     const aiScore = await this.prisma.aIScore.findUnique({
       where: {
@@ -181,7 +183,7 @@ export class AiInterviewService {
 
     const overallScore = Math.round((aiScore.cvScore + evaluation.score) / 2);
 
-    console.log('FINAL SCORE:', overallScore);
+    this.logger.log(`Final overall score for application ${session.applicationId}: ${overallScore}`);
 
     await this.prisma.aIScore.update({
       where: {

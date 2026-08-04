@@ -1,4 +1,13 @@
-import { Body, Controller, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { TwilioService } from './twilio.service.js';
 import { ConfigService } from '@nestjs/config';
 import { Public } from '../auth/decorators/public.decorator.js';
@@ -8,7 +17,10 @@ import { UserRole } from '../generated/prisma/enums.js';
 import { InterviewsService } from '../interviews/interviews.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 @Controller('twilio')
+@SkipThrottle()
 export class TwilioController {
+  private readonly logger = new Logger(TwilioController.name);
+
   constructor(
     private readonly twilio: TwilioService,
     private readonly aiInterviewService: AiInterviewService,
@@ -42,7 +54,7 @@ async callStatus(
 ) {
   const status = body.CallStatus;
 
-  console.log('CALL STATUS:', status);
+  this.logger.log(`Call status for application ${applicationId}: ${status}`);
 
   if (
     status === 'no-answer' ||

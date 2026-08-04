@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/jobs_repository.dart';
 
@@ -38,7 +39,7 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
       );
     } catch (e) {
       emit(
-        state.copyWith(status: CreateJobStatus.failure, error: e.toString()),
+        state.copyWith(status: CreateJobStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }
@@ -72,7 +73,7 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
       );
     } catch (e) {
       emit(
-        state.copyWith(status: CreateJobStatus.failure, error: e.toString()),
+        state.copyWith(status: CreateJobStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }
@@ -104,7 +105,7 @@ class CreateJobBloc extends Bloc<CreateJobEvent, CreateJobState> {
       emit(state.copyWith(status: CreateJobStatus.success));
     } catch (e) {
       emit(
-        state.copyWith(status: CreateJobStatus.failure, error: e.toString()),
+        state.copyWith(status: CreateJobStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }

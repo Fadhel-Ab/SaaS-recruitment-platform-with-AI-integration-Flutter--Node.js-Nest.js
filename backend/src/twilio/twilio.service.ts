@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import twilio from 'twilio';
 
 @Injectable()
 export class TwilioService {
+  private readonly logger = new Logger(TwilioService.name);
   private client;
 
   constructor(private config: ConfigService) {
@@ -24,7 +25,7 @@ export class TwilioService {
       ? `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice?applicationId=${applicationId}`
       : `${this.config.get<string>('TWILIO_WEBHOOK_URL')}/api/ai-interview/voice`;
 
-    console.log('Creating call...');
+    this.logger.log(`Creating call for application ${applicationId ?? 'test'}`);
 
     const call = await this.client.calls.create({
       to,
@@ -37,8 +38,7 @@ export class TwilioService {
       statusCallbackMethod: 'POST',
     });
 
-    console.log('Twilio SID:', call.sid);
-    console.log('Twilio status:', call.status);
+    this.logger.debug(`Twilio call ${call.sid} status: ${call.status}`);
 
     return call;
   }

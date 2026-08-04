@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_bloc.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_event.dart';
 import 'package:frontend/features/applications/bloc/job_applicants_state.dart';
@@ -210,7 +211,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Bulk update failed: $e')));
+        ).showSnackBar(
+          SnackBar(content: Text('Bulk update failed: ${friendlyErrorMessage(e)}')),
+        );
       }
     } finally {
       if (mounted) setState(() => _isBulkUpdating = false);

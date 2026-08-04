@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
 import 'package:go_router/go_router.dart';
 
@@ -112,7 +113,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update job: $e'),
+          content: Text('Failed to update job: ${friendlyErrorMessage(e)}'),
           backgroundColor: const Color(0xFFDC2626),
           behavior: SnackBarBehavior.floating,
         ),

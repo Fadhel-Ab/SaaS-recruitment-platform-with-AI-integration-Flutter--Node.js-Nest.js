@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/applications/bloc/application_event.dart';
 import 'package:frontend/features/applications/bloc/application_state.dart';
 import 'package:frontend/features/applications/data/application_repository.dart';
@@ -31,7 +32,7 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
       emit(state.copyWith(status: ApplicationStatus.success, fileName: result));
     } catch (e) {
       emit(
-        state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
+        state.copyWith(status: ApplicationStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }
@@ -49,7 +50,7 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
       emit(state.copyWith(status: ApplicationStatus.success, result: result));
     } catch (e) {
       emit(
-        state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
+        state.copyWith(status: ApplicationStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }
@@ -66,7 +67,7 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
       emit(state.copyWith(status: ApplicationStatus.initial, job: job));
     } catch (e) {
       emit(
-        state.copyWith(status: ApplicationStatus.failure, error: e.toString()),
+        state.copyWith(status: ApplicationStatus.failure, error: friendlyErrorMessage(e)),
       );
     }
   }

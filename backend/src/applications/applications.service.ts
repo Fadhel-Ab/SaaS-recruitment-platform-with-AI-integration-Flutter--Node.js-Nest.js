@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -19,6 +20,8 @@ import { StorageService } from '../common/storage/storage.service.js';
 
 @Injectable()
 export class ApplicationsService {
+  private readonly logger = new Logger(ApplicationsService.name);
+
   constructor(
     private prisma: PrismaService,
     private aiService: AiService,
@@ -140,18 +143,19 @@ export class ApplicationsService {
       });
 
       if (!aiScore) {
-        console.log('No AI score generated for:', applicationId);
+        this.logger.warn(`No AI score generated for application ${applicationId}`);
         return null;
       }
 
       const threshold = this.getAiInterviewThreshold();
 
-      console.log(`AI score: ${aiScore.overallScore}, threshold: ${threshold}`);
+      this.logger.debug(
+        `Application ${applicationId} AI score: ${aiScore.overallScore}, threshold: ${threshold}`,
+      );
 
       if (aiScore.overallScore >= threshold) {
-        console.log(
-          'Candidate passed AI threshold, starting interview:',
-          applicationId,
+        this.logger.log(
+          `Application ${applicationId} passed AI threshold, starting interview`,
         );
 
         await this.aiInterviewService.start({
@@ -162,11 +166,14 @@ export class ApplicationsService {
 
         return { aiScore: aiScore.overallScore, shouldStartAiCall: true };
       } else {
-        console.log('Candidate did not pass AI threshold:', applicationId);
+        this.logger.log(`Application ${applicationId} did not pass AI threshold`);
         return { aiScore: aiScore.overallScore, shouldStartAiCall: false };
       }
     } catch (error) {
-      console.error('AI application processing failed:', error);
+      this.logger.error(
+        `AI application processing failed for ${applicationId}`,
+        error instanceof Error ? error.stack : error,
+      );
       return null;
     }
   }

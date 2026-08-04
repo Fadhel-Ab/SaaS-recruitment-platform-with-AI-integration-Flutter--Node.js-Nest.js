@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/application_repository.dart';
 import 'my_applications_event.dart';
@@ -33,7 +34,7 @@ class MyApplicationsBloc
       emit(
         state.copyWith(
           status: MyApplicationsStatus.failure,
-          error: e.toString(),
+          error: friendlyErrorMessage(e),
         ),
       );
     }

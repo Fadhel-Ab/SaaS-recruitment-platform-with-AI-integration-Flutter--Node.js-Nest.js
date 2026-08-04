@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/app/app_scaffold.dart';
+import 'package:frontend/app/not_found_screen.dart';
 import 'package:frontend/features/applications/bloc/application_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_detail_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_detail_event.dart';
@@ -61,6 +62,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
 GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
   initialLocation: '/login',
   refreshListenable: GoRouterRefreshStream(authBloc.stream),
+  errorBuilder: (context, state) => const NotFoundScreen(),
   redirect: (context, state) {
     final authState = authBloc.state;
     final path = state.uri.path;

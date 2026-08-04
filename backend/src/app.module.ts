@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -21,15 +23,20 @@ import { AiInterviewModule } from './ai-interview/ai-interview.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
 import { TwilioModule } from './twilio/twilio.module.js';
 import { SearchModule } from './search/search.module.js';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 
-ConfigModule.forRoot({
-  isGlobal: true,
-});
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     StorageModule,
     PrismaModule,
     AuthModule,
@@ -52,11 +59,19 @@ ConfigModule.forRoot({
     AppService,
     {
       provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
     },
   ],
 })

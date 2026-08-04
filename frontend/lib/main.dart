@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +19,7 @@ import 'package:frontend/features/search/data/search_api.dart';
 import 'package:frontend/features/search/data/search_repository.dart';
 
 import 'app/app.dart';
+import 'app/error_fallback_widget.dart';
 
 import 'core/api/dio_client.dart';
 
@@ -25,6 +28,16 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 
 void main() {
+  ErrorWidget.builder = buildErrorFallback;
+
+  runZonedGuarded(_bootstrap, (error, stack) {
+    FlutterError.presentError(
+      FlutterErrorDetails(exception: error, stack: stack),
+    );
+  });
+}
+
+void _bootstrap() {
   final TokenStorage tokenStorage = kIsWeb
       ? WebTokenStorage()
       : SecureTokenStorage();

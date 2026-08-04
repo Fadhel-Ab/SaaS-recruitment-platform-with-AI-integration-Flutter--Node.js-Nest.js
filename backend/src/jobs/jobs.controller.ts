@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
@@ -21,12 +22,12 @@ export class JobsController {
   @Post()
   @Roles(UserRole.MANAGER)
   create(@CurrentUser() user, @Body() dto: CreateJobDto) {
-    console.log('CURRENT USER:', user);
     return this.jobsService.create(user.id, dto);
   }
 
   @Post('generate-interview-questions')
   @Roles(UserRole.MANAGER)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   generateInterviewQuestions(@Body() dto: GenerateInterviewQuestionsDto) {
     return this.jobsService.generateInterviewQuestions(dto);
   }

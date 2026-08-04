@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 
 import '../data/application_repository.dart';
 import 'job_applicants_event.dart';
@@ -32,7 +33,7 @@ class JobApplicantsBloc extends Bloc<JobApplicantsEvent, JobApplicantsState> {
       emit(
         state.copyWith(
           status: JobApplicantsStatus.failure,
-          error: e.toString(),
+          error: friendlyErrorMessage(e),
         ),
       );
     }

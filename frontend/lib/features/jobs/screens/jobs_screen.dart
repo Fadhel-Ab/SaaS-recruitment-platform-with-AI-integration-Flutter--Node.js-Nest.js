@@ -67,7 +67,8 @@ class _JobsScreenState extends State<JobsScreen> {
       final matchesType =
           _selectedTypes.isEmpty ||
           _selectedTypes.any(
-            (type) => _normalizeType(job.employmentType) == _normalizeType(type),
+            (type) =>
+                _normalizeType(job.employmentType) == _normalizeType(type),
           );
 
       final matchesLocation =
@@ -136,7 +137,7 @@ class _JobsScreenState extends State<JobsScreen> {
                             locations: availableLocations,
                             onFilterChanged: _handleFiltersChanged,
                           ),
-                          const SizedBox(width: 24),
+                          const SizedBox(width: 18),
                         ],
 
                         // Main Content Area
@@ -144,7 +145,7 @@ class _JobsScreenState extends State<JobsScreen> {
                           child: Column(
                             children: [
                               _buildSearchBar(isDesktop: isDesktop),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               Expanded(
                                 child: _buildJobList(isDesktop: isDesktop),
                               ),
@@ -319,7 +320,7 @@ class _JobsScreenState extends State<JobsScreen> {
     required int visibleCount,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -439,7 +440,7 @@ class _JobsScreenState extends State<JobsScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   _buildPagination(
                     currentPage: safePage,
                     totalPages: totalPages,
