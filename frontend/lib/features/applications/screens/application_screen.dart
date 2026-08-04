@@ -159,6 +159,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             _showAiCallingInterface = true;
           });
         }
+
+        if (state.status == ApplicationStatus.failure) {
+          StatusDialog.show(
+            context: context,
+            isSuccess: false,
+            title: 'Submission Failed',
+            message: state.error ?? 'Something went wrong. Please try again.',
+          );
+        }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F9FE), // Theme background match
@@ -324,29 +333,54 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                               ),
 
                               const SizedBox(height: 32),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _submitForm,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF4F46E5),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
+                              BlocBuilder<ApplicationBloc, ApplicationState>(
+                                builder: (context, state) {
+                                  final isSubmitting =
+                                      state.status ==
+                                          ApplicationStatus.uploading ||
+                                      state.status ==
+                                          ApplicationStatus.submitting;
+
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: isSubmitting
+                                          ? null
+                                          : _submitForm,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFF4F46E5,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      child: isSubmitting
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Submit Application',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
                                     ),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Submit Application',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ],
                           ),
