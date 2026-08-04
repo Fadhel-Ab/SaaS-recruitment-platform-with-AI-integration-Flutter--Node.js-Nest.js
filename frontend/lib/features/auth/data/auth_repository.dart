@@ -31,4 +31,6 @@ class AuthRepository {
 
     return UserModel.fromJson(response);
   }
+
+  Future<void> updateProfile(String phone) => api.updateProfile(phone);
 }

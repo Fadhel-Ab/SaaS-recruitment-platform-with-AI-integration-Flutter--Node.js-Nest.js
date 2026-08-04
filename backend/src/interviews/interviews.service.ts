@@ -43,4 +43,39 @@ export class InterviewsService {
 
     return interview;
   }
+
+  async getToday(managerId: string) {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(startOfDay.getTime() + 86400000);
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        managerId,
+        scheduledAt: { gte: startOfDay, lt: endOfDay },
+      },
+      include: {
+        application: {
+          include: {
+            candidate: { select: { fullName: true, email: true, phone: true } },
+            job: { select: { title: true } },
+          },
+        },
+      },
+      orderBy: { scheduledAt: 'asc' },
+    });
+
+    return interviews.map((interview) => ({
+      id: interview.id,
+      applicationId: interview.applicationId,
+      scheduledAt: interview.scheduledAt,
+      duration: interview.duration,
+      meetingLink: interview.meetingLink,
+      status: interview.status,
+      candidateName: interview.application.candidate.fullName,
+      candidateEmail: interview.application.candidate.email,
+      candidatePhone: interview.application.candidate.phone,
+      jobTitle: interview.application.job.title,
+    }));
+  }
 }

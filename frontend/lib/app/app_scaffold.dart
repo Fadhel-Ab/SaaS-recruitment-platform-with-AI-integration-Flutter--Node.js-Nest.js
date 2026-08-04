@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_event.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
+import 'package:frontend/features/auth/data/auth_repository.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
 import 'package:frontend/features/search/data/search_repository.dart';
 import 'package:frontend/features/search/manager_search_delegate.dart';
@@ -62,12 +65,17 @@ class AppScaffold extends StatelessWidget {
                       context.read<AuthBloc>().add(const LogoutRequested());
                     } else if (value == 'view-jobs') {
                       context.push('/jobs');
+                    } else if (value == 'phone') {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const _PhoneNumberDialog(),
+                      );
                     }
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(enabled: false, child: Text(user.email)),
                     const PopupMenuDivider(),
-                    if (user.role == UserRole.manager)
+                    if (user.role == UserRole.manager) ...[
                       const PopupMenuItem(
                         value: 'view-jobs',
                         child: ListTile(
@@ -75,6 +83,14 @@ class AppScaffold extends StatelessWidget {
                           title: Text('View Job Listings'),
                         ),
                       ),
+                      const PopupMenuItem(
+                        value: 'phone',
+                        child: ListTile(
+                          leading: Icon(Icons.phone_outlined),
+                          title: Text('Phone Number'),
+                        ),
+                      ),
+                    ],
                     const PopupMenuItem(
                       value: 'logout',
                       child: ListTile(
@@ -232,5 +248,95 @@ class AppScaffold extends StatelessWidget {
     } else {
       context.go(index == 0 ? '/jobs' : '/my-applications');
     }
+  }
+}
+
+class _PhoneNumberDialog extends StatefulWidget {
+  const _PhoneNumberDialog();
+
+  @override
+  State<_PhoneNumberDialog> createState() => _PhoneNumberDialogState();
+}
+
+class _PhoneNumberDialogState extends State<_PhoneNumberDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _phoneController = TextEditingController();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+    try {
+      await context.read<AuthRepository>().updateProfile(
+        '+973${_phoneController.text.trim()}',
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number saved.')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: ${friendlyErrorMessage(e)}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Phone Number'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          autofocus: true,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(8),
+          ],
+          decoration: const InputDecoration(
+            prefixText: '+973 ',
+            hintText: '3XXX XXXX',
+            helperText: 'Used for WhatsApp notifications, e.g. new applications.',
+          ),
+          validator: (v) {
+            final digits = (v ?? '').trim();
+            if (digits.length != 8) {
+              return 'Enter a valid 8-digit Bahrain phone number';
+            }
+            return null;
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _isSaving ? null : _save,
+          child: _isSaving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Save'),
+        ),
+      ],
+    );
   }
 }

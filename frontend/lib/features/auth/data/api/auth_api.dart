@@ -33,4 +33,9 @@ class AuthApi {
 
     return response.data;
   }
+
+  Future<Map<String, dynamic>> updateProfile(String phone) async {
+    final response = await dio.patch('/users/me', data: {'phone': phone});
+    return Map<String, dynamic>.from(response.data as Map);
+  }
 }

@@ -28,4 +28,9 @@ class AvailabilityApi {
   Future<void> deleteAvailability(String id) async {
     await dio.delete('/availability/$id');
   }
+
+  Future<List<dynamic>> getTodayInterviews() async {
+    final response = await dio.get('/interviews/today');
+    return response.data as List<dynamic>;
+  }
 }

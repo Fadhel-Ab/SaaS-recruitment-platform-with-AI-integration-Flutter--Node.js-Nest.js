@@ -7,6 +7,19 @@ import 'package:frontend/features/applications/bloc/application_detail_event.dar
 import 'package:frontend/features/applications/bloc/application_detail_state.dart';
 import 'package:frontend/features/applications/model/application_detail.dart';
 import 'package:frontend/features/applications/model/application_status.dart';
+import 'package:frontend/widgets/status_dialog.dart';
+
+const _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+String _formatDateTime(DateTime date) {
+  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+  final minute = date.minute.toString().padLeft(2, '0');
+  final period = date.hour >= 12 ? 'PM' : 'AM';
+  return '${_months[date.month - 1]} ${date.day}, ${date.year}, $hour:$minute $period';
+}
 
 Future<void> _openResume(String resumeUrl) async {
   // resumeUrl is now an absolute, time-limited signed URL from storage.
@@ -40,11 +53,29 @@ class ApplicationDetailScreen extends StatelessWidget {
       ),
       body: BlocConsumer<ApplicationDetailBloc, ApplicationDetailState>(
         listenWhen: (previous, current) =>
-            current.updateError != null &&
-            current.updateError != previous.updateError,
+            (current.updateError != null &&
+                current.updateError != previous.updateError) ||
+            (previous.isUpdatingStatus &&
+                !current.isUpdatingStatus &&
+                current.application?.status == 'INTERVIEW_SCHEDULED' &&
+                current.application?.interview?.scheduledAt != null),
         listener: (context, state) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.updateError!)),
+          if (state.updateError != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.updateError!)),
+            );
+            return;
+          }
+
+          final application = state.application!;
+          StatusDialog.show(
+            context: context,
+            isSuccess: true,
+            title: 'Interview Scheduled',
+            message:
+                '${application.candidateName} has been shortlisted. '
+                'Their interview is scheduled for '
+                '${_formatDateTime(application.interview!.scheduledAt!)}.',
           );
         },
         builder: (context, state) {

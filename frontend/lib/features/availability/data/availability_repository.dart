@@ -1,4 +1,5 @@
 import 'package:frontend/features/availability/model/availability_slot.dart';
+import 'package:frontend/features/availability/model/today_interview.dart';
 
 import 'availability_api.dart';
 
@@ -6,6 +7,13 @@ class AvailabilityRepository {
   final AvailabilityApi api;
 
   AvailabilityRepository(this.api);
+
+  Future<List<TodayInterview>> getTodayInterviews() async {
+    final data = await api.getTodayInterviews();
+    return data
+        .map((e) => TodayInterview.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
 
   Future<List<AvailabilitySlot>> getMine() async {
     final data = await api.getMyAvailability();

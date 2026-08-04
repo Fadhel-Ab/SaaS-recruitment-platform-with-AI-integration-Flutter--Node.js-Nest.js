@@ -46,6 +46,11 @@ export class ApplicationsService {
       where: {
         shareToken,
       },
+      include: {
+        manager: {
+          select: { phone: true },
+        },
+      },
     });
 
     if (!job) {
@@ -131,6 +136,13 @@ export class ApplicationsService {
     const aiResult = await this.processApplicationAI(application.id);
     const threshold = this.getAiInterviewThreshold();
 
+    await this.notifyManagerOfApplication(
+      job,
+      candidate.fullName,
+      aiResult,
+      threshold,
+    );
+
     return {
       applicationId: application.id,
       status: application.status,
@@ -144,6 +156,40 @@ export class ApplicationsService {
   }
   private getAiInterviewThreshold() {
     return this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+  }
+
+  // Soft-failed like the other Twilio side-effects: a WhatsApp hiccup should never block the candidate's apply response.
+  private async notifyManagerOfApplication(
+    job: { title: string; manager: { phone: string | null } },
+    candidateName: string,
+    aiResult: { aiScore: number; shouldStartAiCall: boolean } | null,
+    threshold: number,
+  ) {
+    try {
+      if (!job.manager.phone) {
+        this.logger.debug(
+          `Manager for job "${job.title}" has no phone on file - skipping application WhatsApp notification`,
+        );
+        return;
+      }
+
+      const scoreLine = aiResult
+        ? `AI Score: ${Math.round(aiResult.aiScore)}% (threshold ${threshold}%)` +
+          (aiResult.shouldStartAiCall
+            ? ' - qualifies for an AI phone interview.'
+            : ' - did not meet the AI interview threshold.')
+        : 'AI evaluation is not available yet.';
+
+      await this.twilio.sendWhatsApp(
+        job.manager.phone,
+        `New application received!\n\n${candidateName} applied for "${job.title}".\n${scoreLine}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to notify manager of new application for job "${job.title}"`,
+        error instanceof Error ? error.stack : error,
+      );
+    }
   }
 
   private async processApplicationAI(applicationId: string) {

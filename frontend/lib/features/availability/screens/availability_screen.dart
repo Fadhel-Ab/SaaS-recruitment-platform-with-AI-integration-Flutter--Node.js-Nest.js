@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/availability/data/availability_repository.dart';
 import 'package:frontend/features/availability/model/availability_slot.dart';
+import 'package:frontend/features/availability/model/today_interview.dart';
 import 'package:frontend/features/jobs/data/jobs_repository.dart';
 import 'package:frontend/features/jobs/models/job_model.dart';
 
@@ -27,6 +29,13 @@ const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 String _formatSlotDate(DateTime date) =>
     '${date.day} ${_monthLabels[date.month - 1]}';
 
+String _formatTime(DateTime date) {
+  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+  final minute = date.minute.toString().padLeft(2, '0');
+  final period = date.hour >= 12 ? 'PM' : 'AM';
+  return '$hour:$minute $period';
+}
+
 String _describeSlot(AvailabilitySlot slot) {
   if (slot.recurrence == AvailabilityRecurrence.recurring) {
     final label = slot.dayOfWeek != null
@@ -46,7 +55,10 @@ class AvailabilityScreen extends StatefulWidget {
 
 enum _LoadStatus { loading, success, failure }
 
-class _AvailabilityScreenState extends State<AvailabilityScreen> {
+class _AvailabilityScreenState extends State<AvailabilityScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
   _LoadStatus _status = _LoadStatus.loading;
   List<AvailabilitySlot> _slots = [];
   List<JobModel> _allJobs = [];
@@ -54,10 +66,41 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   String? _error;
   bool _isSaving = false;
 
+  _LoadStatus _todayStatus = _LoadStatus.loading;
+  List<TodayInterview> _todayInterviews = [];
+  String? _todayError;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this)
+      ..addListener(() => setState(() {}));
     _load();
+    _loadToday();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadToday() async {
+    setState(() => _todayStatus = _LoadStatus.loading);
+    try {
+      final interviews = await context
+          .read<AvailabilityRepository>()
+          .getTodayInterviews();
+      setState(() {
+        _todayInterviews = interviews;
+        _todayStatus = _LoadStatus.success;
+      });
+    } catch (e) {
+      setState(() {
+        _todayError = friendlyErrorMessage(e);
+        _todayStatus = _LoadStatus.failure;
+      });
+    }
   }
 
   Future<void> _load() async {
@@ -244,14 +287,42 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF111827),
         elevation: 0,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: const Color(0xFF4F46E5),
+          unselectedLabelColor: const Color(0xFF6B7280),
+          indicatorColor: const Color(0xFF4F46E5),
+          tabs: const [
+            Tab(text: 'Availability'),
+            Tab(text: "Today's Interviews"),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isSaving ? null : _addSlot,
-        backgroundColor: const Color(0xFF4F46E5),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Slot'),
+      floatingActionButton: _tabController.index == 0
+          ? FloatingActionButton.extended(
+              onPressed: _isSaving ? null : _addSlot,
+              backgroundColor: const Color(0xFF4F46E5),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Slot'),
+            )
+          : null,
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildAvailabilityTab(),
+          _TodayInterviewsTab(
+            status: _todayStatus,
+            interviews: _todayInterviews,
+            error: _todayError,
+            onRetry: _loadToday,
+          ),
+        ],
       ),
-      body: Builder(
+    );
+  }
+
+  Widget _buildAvailabilityTab() {
+    return Builder(
         builder: (context) {
           if (_status == _LoadStatus.loading) {
             return const Center(
@@ -319,6 +390,120 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             ],
           );
         },
+    );
+  }
+}
+
+class _TodayInterviewsTab extends StatelessWidget {
+  final _LoadStatus status;
+  final List<TodayInterview> interviews;
+  final String? error;
+  final VoidCallback onRetry;
+
+  const _TodayInterviewsTab({
+    required this.status,
+    required this.interviews,
+    required this.error,
+    required this.onRetry,
+  });
+
+  Future<void> _openMeetingLink(String link) async {
+    final uri = Uri.tryParse(link);
+    if (uri != null) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == _LoadStatus.loading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
+      );
+    }
+
+    if (status == _LoadStatus.failure) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              error ?? 'Failed to load today\'s interviews',
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
+            const SizedBox(height: 8),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    if (interviews.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event_available_outlined, size: 60, color: Color(0xFF9CA3AF)),
+            SizedBox(height: 16),
+            Text(
+              'No interviews scheduled for today',
+              style: TextStyle(color: Color(0xFF6B7280)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowColor: WidgetStateProperty.all(const Color(0xFFF3F4F6)),
+          columns: const [
+            DataColumn(label: Text('Time')),
+            DataColumn(label: Text('Candidate')),
+            DataColumn(label: Text('Job')),
+            DataColumn(label: Text('Duration')),
+            DataColumn(label: Text('Status')),
+            DataColumn(label: Text('Meeting')),
+          ],
+          rows: interviews.map((interview) {
+            final scheduledAt = interview.scheduledAt;
+            return DataRow(
+              cells: [
+                DataCell(Text(scheduledAt != null ? _formatTime(scheduledAt) : '—')),
+                DataCell(
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        interview.candidateName,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        interview.candidateEmail,
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                      ),
+                    ],
+                  ),
+                ),
+                DataCell(Text(interview.jobTitle)),
+                DataCell(Text('${interview.duration} min')),
+                DataCell(Text(interview.status)),
+                DataCell(
+                  interview.meetingLink != null
+                      ? TextButton(
+                          onPressed: () => _openMeetingLink(interview.meetingLink!),
+                          child: const Text('Join'),
+                        )
+                      : const Text('—'),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
       ),
     );
   }
