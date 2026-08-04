@@ -17,10 +17,12 @@ import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 import { ApplicationStatus, UserRole } from '../generated/prisma/enums.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
 import { StorageService } from '../common/storage/storage.service.js';
+import { findNextAvailableSlot } from '../scheduling/util/find-next-slot.js';
 
 @Injectable()
 export class ApplicationsService {
   private readonly logger = new Logger(ApplicationsService.name);
+  private readonly MIN_NOTICE_HOURS = 12;
 
   constructor(
     private prisma: PrismaService,
@@ -197,7 +199,7 @@ export class ApplicationsService {
     if (!allowedTransitions[application.status].includes(dto.status)) {
       throw new BadRequestException('Invalid status transition');
     }
-    return this.prisma.application.update({
+    let updated = await this.prisma.application.update({
       where: {
         id: applicationId,
       },
@@ -205,6 +207,18 @@ export class ApplicationsService {
         status: dto.status,
       },
     });
+
+    if (dto.status === ApplicationStatus.SHORTLISTED) {
+      const scheduled = await this.autoScheduleOnApproval(applicationId);
+
+      if (scheduled) {
+        updated = await this.prisma.application.findUniqueOrThrow({
+          where: { id: applicationId },
+        });
+      }
+    }
+
+    return updated;
   }
 
   async bulkUpdateStatus(
@@ -229,12 +243,85 @@ export class ApplicationsService {
           data: { status },
         });
         updated.push(application.id);
+
+        if (status === ApplicationStatus.SHORTLISTED) {
+          await this.autoScheduleOnApproval(application.id);
+        }
       } else {
         skipped.push(application.id);
       }
     }
 
     return { updated, skipped };
+  }
+
+  /**
+   * Auto-books the next available interview slot once a manager shortlists a
+   * candidate, respecting a minimum notice window, and notifies the
+   * candidate over WhatsApp. Side-effects are soft-failed (logged, not
+   * thrown) so a Twilio/scheduling hiccup never blocks the status change
+   * itself. Returns whether an interview was actually created.
+   */
+  private async autoScheduleOnApproval(
+    applicationId: string,
+  ): Promise<boolean> {
+    try {
+      const application = await this.prisma.application.findUnique({
+        where: { id: applicationId },
+        include: { candidate: true, job: true, interview: true },
+      });
+
+      if (!application || application.interview) {
+        return false;
+      }
+
+      const scheduledAt = await findNextAvailableSlot(this.prisma, {
+        jobId: application.job.id,
+        managerId: application.job.managerId,
+        minNoticeHours: this.MIN_NOTICE_HOURS,
+      });
+
+      await this.prisma.$transaction(async (tx) => {
+        await tx.interview.create({
+          data: {
+            applicationId: application.id,
+            managerId: application.job.managerId,
+            status: 'SCHEDULED',
+            scheduledAt,
+            duration: 30,
+          },
+        });
+
+        await tx.application.update({
+          where: { id: application.id },
+          data: { status: ApplicationStatus.INTERVIEW_SCHEDULED },
+        });
+      });
+
+      if (application.candidate.phone) {
+        const formatted = scheduledAt.toLocaleString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        });
+
+        await this.twilio.sendWhatsApp(
+          application.candidate.phone,
+          `Hi ${application.candidate.fullName}, great news! You've been shortlisted for "${application.job.title}".\n\n` +
+            `Your interview is scheduled for ${formatted}. We'll follow up with more details soon.`,
+        );
+      }
+
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Auto-scheduling failed for application ${applicationId}`,
+        error instanceof Error ? error.stack : error,
+      );
+      return false;
+    }
   }
 
   async getJobApplications(managerId: string, jobId: string) {

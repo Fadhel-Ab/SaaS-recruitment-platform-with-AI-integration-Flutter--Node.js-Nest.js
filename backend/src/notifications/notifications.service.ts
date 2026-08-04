@@ -1,0 +1,90 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { TwilioService } from '../twilio/twilio.service.js';
+import { InterviewStatus } from '../generated/prisma/enums.js';
+
+@Injectable()
+export class NotificationsService {
+  private readonly logger = new Logger(NotificationsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private twilio: TwilioService,
+  ) {}
+
+  /**
+   * Every morning at 8am, tells each manager how many interviews they have
+   * scheduled today, with candidate names and AI summary scores, over
+   * WhatsApp. Only covers interviews already SCHEDULED (i.e. candidates the
+   * manager previously approved and got auto-booked), grouped by manager.
+   */
+  @Cron('0 8 * * *')
+  async sendManagerDailyDigest() {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        status: InterviewStatus.SCHEDULED,
+        scheduledAt: { gte: startOfDay, lt: endOfDay },
+      },
+      include: {
+        manager: true,
+        application: {
+          include: {
+            candidate: true,
+            aiScore: true,
+          },
+        },
+      },
+      orderBy: { scheduledAt: 'asc' },
+    });
+
+    const byManager = new Map<string, typeof interviews>();
+
+    for (const interview of interviews) {
+      const list = byManager.get(interview.managerId) ?? [];
+      list.push(interview);
+      byManager.set(interview.managerId, list);
+    }
+
+    for (const [managerId, managerInterviews] of byManager) {
+      const manager = managerInterviews[0].manager;
+
+      if (!manager.phone) {
+        this.logger.warn(
+          `Manager ${managerId} has ${managerInterviews.length} interview(s) today but no phone on file, skipping digest`,
+        );
+        continue;
+      }
+
+      const lines = managerInterviews.map((interview, index) => {
+        const time = interview.scheduledAt!.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+        });
+        const name = interview.application.candidate.fullName;
+        const score = interview.application.aiScore?.overallScore;
+
+        return `${index + 1}. ${name} at ${time}${score != null ? ` — AI score: ${score}%` : ''}`;
+      });
+
+      const message =
+        `Good morning ${manager.fullName}! You have ${managerInterviews.length} interview${managerInterviews.length === 1 ? '' : 's'} scheduled today:\n\n` +
+        lines.join('\n');
+
+      try {
+        await this.twilio.sendWhatsApp(manager.phone, message);
+      } catch (error) {
+        this.logger.error(
+          `Failed to send daily digest to manager ${managerId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      }
+    }
+  }
+}

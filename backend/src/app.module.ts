@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -24,12 +25,14 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
 import { TwilioModule } from './twilio/twilio.module.js';
 import { SearchModule } from './search/search.module.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         name: 'default',
@@ -53,6 +56,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
     DashboardModule,
     TwilioModule,
     SearchModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

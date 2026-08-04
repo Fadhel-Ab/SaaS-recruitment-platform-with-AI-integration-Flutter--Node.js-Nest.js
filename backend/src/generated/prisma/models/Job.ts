@@ -631,10 +631,6 @@ export type JobCreateinterviewQuestionsInput = {
   set: string[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type EnumEmploymentTypeFieldUpdateOperationsInput = {
   set?: $Enums.EmploymentType
 }

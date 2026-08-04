@@ -15,12 +15,13 @@ import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { ConfigService } from '@nestjs/config';
-import { expandAvailabilityWindows } from '../scheduling/util/expand-availability-windows.js';
+import { findNextAvailableSlot } from '../scheduling/util/find-next-slot.js';
 
 @Injectable()
 export class AiInterviewService {
   private readonly logger = new Logger(AiInterviewService.name);
   private readonly SLOT_DURATION_MINUTES = 30;
+  private readonly MIN_NOTICE_HOURS = 12;
 
   constructor(
     private prisma: PrismaService,
@@ -29,92 +30,6 @@ export class AiInterviewService {
     private twilioService: TwilioService,
     private config: ConfigService,
   ) {}
-
-  /**
-   * Finds the next free interview slot for a manager, preferring the job's
-   * own availability windows and falling back to the manager's general
-   * availability, then to "tomorrow" if neither is configured. Availability
-   * windows can be recurring weekdays or one-off calendar dates; both are
-   * expanded into concrete dated occurrences and walked in order, checking
-   * against already-booked interviews for that manager so two candidates
-   * never land on the same time.
-   */
-  private async findNextAvailableSlot(
-    jobId: string,
-    managerId: string,
-  ): Promise<Date> {
-    const now = new Date();
-
-    const jobWindows = await this.prisma.availability.findMany({
-      where: { jobId },
-    });
-
-    let windows = expandAvailabilityWindows(jobWindows, { from: now });
-
-    if (windows.length === 0) {
-      const managerWindows = await this.prisma.availability.findMany({
-        where: { managerId, jobId: null },
-      });
-
-      windows = expandAvailabilityWindows(managerWindows, { from: now });
-    }
-
-    const fallbackTomorrow = () => {
-      const fallback = new Date();
-      fallback.setDate(fallback.getDate() + 1);
-      return fallback;
-    };
-
-    if (windows.length === 0) {
-      return fallbackTomorrow();
-    }
-
-    const horizon = windows.reduce(
-      (latest, w) => (w.date > latest ? w.date : latest),
-      windows[0].date,
-    );
-
-    const existingInterviews = await this.prisma.interview.findMany({
-      where: {
-        managerId,
-        status: { not: 'CANCELLED' },
-        scheduledAt: { gte: now, lte: horizon },
-      },
-      select: { scheduledAt: true },
-    });
-
-    const taken = new Set(
-      existingInterviews
-        .filter((i) => i.scheduledAt)
-        .map((i) => i.scheduledAt!.getTime()),
-    );
-
-    for (const window of windows) {
-      const [startHour, startMinute] = window.startTime.split(':').map(Number);
-      const [endHour, endMinute] = window.endTime.split(':').map(Number);
-
-      const windowStart = new Date(window.date);
-      windowStart.setHours(startHour, startMinute, 0, 0);
-
-      const windowEnd = new Date(window.date);
-      windowEnd.setHours(endHour, endMinute, 0, 0);
-
-      const slot = new Date(windowStart);
-
-      while (
-        slot.getTime() + this.SLOT_DURATION_MINUTES * 60000 <=
-        windowEnd.getTime()
-      ) {
-        if (slot.getTime() > now.getTime() && !taken.has(slot.getTime())) {
-          return new Date(slot);
-        }
-
-        slot.setMinutes(slot.getMinutes() + this.SLOT_DURATION_MINUTES);
-      }
-    }
-
-    return fallbackTomorrow();
-  }
 
   async start(dto: StartInterviewDto) {
     const application = await this.prisma.application.findUnique({
@@ -216,10 +131,12 @@ export class AiInterviewService {
         throw new Error('Application not found');
       }
 
-      const scheduledAt = await this.findNextAvailableSlot(
-        application.job.id,
-        application.job.managerId,
-      );
+      const scheduledAt = await findNextAvailableSlot(this.prisma, {
+        jobId: application.job.id,
+        managerId: application.job.managerId,
+        durationMinutes: this.SLOT_DURATION_MINUTES,
+        minNoticeHours: this.MIN_NOTICE_HOURS,
+      });
 
       await this.prisma.interview.create({
         data: {

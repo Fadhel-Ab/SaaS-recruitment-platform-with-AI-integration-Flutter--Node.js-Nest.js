@@ -16,6 +16,7 @@ import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { InterviewsService } from '../interviews/interviews.service.js';
 import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
+import { TestWhatsAppDto } from './dto/test-whatsapp.dto.js';
 @Controller('twilio')
 @SkipThrottle()
 export class TwilioController {
@@ -77,4 +78,32 @@ async callStatus(
     }
   }
 }
+
+  @Roles(UserRole.MANAGER)
+  @Post('test-whatsapp')
+  testWhatsApp(@Body() dto: TestWhatsAppDto) {
+    const delayMs = (dto.delaySeconds ?? 0) * 1000;
+    const message =
+      dto.message ??
+      'This is a test WhatsApp message from the recruitment platform.';
+
+    setTimeout(() => {
+      this.twilio.sendWhatsApp(dto.phone, message).catch((error) => {
+        this.logger.error(
+          `Test WhatsApp send failed for ${dto.phone}`,
+          error instanceof Error ? error.stack : error,
+        );
+      });
+    }, delayMs);
+
+    this.logger.log(
+      `Test WhatsApp to ${dto.phone} scheduled in ${dto.delaySeconds ?? 0}s`,
+    );
+
+    return {
+      scheduled: true,
+      phone: dto.phone,
+      willSendAt: new Date(Date.now() + delayMs).toISOString(),
+    };
+  }
 }
