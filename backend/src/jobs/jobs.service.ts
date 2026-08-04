@@ -229,7 +229,7 @@ export class JobsService {
       },
     });
 
-    return applications.map((application) => ({
+    return Promise.all(applications.map(async (application) => ({
       applicationId: application.id,
 
       candidateId: application.candidate.id,
@@ -241,7 +241,7 @@ export class JobsService {
       phone: application.candidate.phone,
 
       resumeUrl: application.candidate.resumeFileName
-        ? this.storageService.getResumeUrl(application.candidate.resumeFileName)
+        ? await this.storageService.getResumeUrl(application.candidate.resumeFileName)
         : null,
 
       overallScore: application.aiScore?.overallScore ?? null,
@@ -257,6 +257,6 @@ export class JobsService {
       status: application.status,
 
       appliedAt: application.createdAt,
-    }));
+    })));
   }
 }

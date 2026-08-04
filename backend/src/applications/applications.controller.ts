@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
-import { multerConfig } from '../common/multer.config.js';
+import { multerConfig, generateResumeFileName } from '../common/multer.config.js';
 import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
 import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto.js';
 import { UserRole } from '../generated/prisma/enums.js';
@@ -24,12 +24,14 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Public } from '../auth/decorators/public.decorator.js';
 import { JwtService } from '@nestjs/jwt';
+import { StorageService } from '../common/storage/storage.service.js';
 
 @Controller('applications')
 export class ApplicationsController {
   constructor(
     private readonly applicationsService: ApplicationsService,
     private readonly jwtService: JwtService,
+    private readonly storageService: StorageService,
   ) {}
 
   @Get('job/:jobId')
@@ -68,10 +70,11 @@ export class ApplicationsController {
   @Post('upload')
   @Public()
   @UseInterceptors(FileInterceptor('cvs', multerConfig))
-  uploadCv(@UploadedFile() file: Express.Multer.File) {
-    return {
-      fileName: file.filename,
-    };
+  async uploadCv(@UploadedFile() file: Express.Multer.File) {
+    const fileName = generateResumeFileName(file.originalname);
+    await this.storageService.uploadResume(fileName, file.buffer, file.mimetype);
+
+    return { fileName };
   }
 
   @Post(':shareToken')

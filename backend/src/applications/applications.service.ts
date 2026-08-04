@@ -274,17 +274,19 @@ export class ApplicationsService {
       },
     });
 
-    return applications.map((application) => ({
-      ...application,
-      candidate: {
-        ...application.candidate,
-        resumeUrl: application.candidate.resumeFileName
-          ? this.storageService.getResumeUrl(
-              application.candidate.resumeFileName,
-            )
-          : null,
-      },
-    }));
+    return Promise.all(
+      applications.map(async (application) => ({
+        ...application,
+        candidate: {
+          ...application.candidate,
+          resumeUrl: application.candidate.resumeFileName
+            ? await this.storageService.getResumeUrl(
+                application.candidate.resumeFileName,
+              )
+            : null,
+        },
+      })),
+    );
   }
   async getApplicationDetails(managerId: string, applicationId: string) {
     const application = await this.prisma.application.findUnique({
@@ -330,7 +332,7 @@ export class ApplicationsService {
       candidate: {
         ...application.candidate,
         resumeUrl: application.candidate.resumeFileName
-          ? this.storageService.getResumeUrl(
+          ? await this.storageService.getResumeUrl(
               application.candidate.resumeFileName,
             )
           : null,

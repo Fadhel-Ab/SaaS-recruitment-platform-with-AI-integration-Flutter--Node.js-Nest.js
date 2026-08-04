@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:frontend/core/api/api_constants.dart';
 import 'package:frontend/features/applications/bloc/application_detail_bloc.dart';
 import 'package:frontend/features/applications/bloc/application_detail_event.dart';
 import 'package:frontend/features/applications/bloc/application_detail_state.dart';
@@ -10,7 +9,8 @@ import 'package:frontend/features/applications/model/application_detail.dart';
 import 'package:frontend/features/applications/model/application_status.dart';
 
 Future<void> _openResume(String resumeUrl) async {
-  final uri = Uri.parse('${ApiConstants.serverOrigin}$resumeUrl');
+  // resumeUrl is now an absolute, time-limited signed URL from storage.
+  final uri = Uri.parse(resumeUrl);
   await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 

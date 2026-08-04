@@ -34,11 +34,11 @@ export class AiService {
       );
     }
 
-    const filePath = this.storage.getResumePath(
+    const resumeBuffer = await this.storage.downloadResume(
       application.candidate.resumeFileName,
     );
 
-    const resumeText = await this.parser.extractText(filePath);
+    const resumeText = await this.parser.extractText(resumeBuffer);
 
     this.logger.debug(`Extracted ${resumeText.length} chars from resume`);
 

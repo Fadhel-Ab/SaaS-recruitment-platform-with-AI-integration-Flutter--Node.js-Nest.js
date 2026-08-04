@@ -1,18 +1,9 @@
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
 export const multerConfig = {
-  storage: diskStorage({
-    destination: './uploads/cvs',
-
-    filename: (_, file, callback) => {
-      callback(
-        null,
-        `${randomUUID()}${extname(file.originalname)}`,
-      );
-    },
-  }),
+  storage: memoryStorage(),
 
   fileFilter: (_, file, callback) => {
     const allowed = [
@@ -27,3 +18,7 @@ export const multerConfig = {
     );
   },
 };
+
+export function generateResumeFileName(originalName: string) {
+  return `${randomUUID()}${extname(originalName)}`;
+}
