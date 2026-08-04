@@ -43,6 +43,38 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   bool _isSubmitting = false;
 
   @override
+  void initState() {
+    super.initState();
+    _prefillFromProfile();
+  }
+
+  Future<void> _prefillFromProfile() async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState.status != AuthStatus.authenticated ||
+        authState.user?.role != UserRole.candidate) {
+      return;
+    }
+
+    try {
+      final profile = await context.read<ApplicationRepository>().getMyProfile();
+      if (!mounted) return;
+      setState(() {
+        fullNameController.text = (profile['fullName'] as String?) ?? '';
+        emailController.text = (profile['email'] as String?) ?? '';
+        phoneController.text = _localPhoneDigits(profile['phone'] as String?);
+      });
+    } catch (_) {
+      // Prefill is a convenience, not required - leave the form blank on failure.
+    }
+  }
+
+  String _localPhoneDigits(String? phone) {
+    if (phone == null) return '';
+    final digits = phone.replaceAll(RegExp(r'\D'), '');
+    return digits.length > 8 ? digits.substring(digits.length - 8) : digits;
+  }
+
+  @override
   void dispose() {
     fullNameController.dispose();
     emailController.dispose();

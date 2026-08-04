@@ -45,6 +45,11 @@ class ApplicationApi {
     return response.data as List<dynamic>;
   }
 
+  Future<Map<String, dynamic>> getMyProfile() async {
+    final response = await dio.get('/applications/mine/profile');
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
   Future<List<dynamic>> getPipeline() async {
     final response = await dio.get('/applications/pipeline');
     return response.data as List<dynamic>;

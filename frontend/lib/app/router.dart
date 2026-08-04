@@ -67,10 +67,16 @@ GoRouter createAppRouter(AuthBloc authBloc) => GoRouter(
     final authState = authBloc.state;
     final path = state.uri.path;
     final isAuthPage = path == '/login' || path == '/register';
+    final isPublicPage =
+        path == '/jobs' ||
+        path.startsWith('/jobs/') ||
+        path.startsWith('/apply/');
     final isChecking = authState.status == AuthStatus.initial || authState.status == AuthStatus.loading;
 
     if (isChecking) return null;
-    if (authState.status != AuthStatus.authenticated) return isAuthPage ? null : '/login';
+    if (authState.status != AuthStatus.authenticated) {
+      return (isAuthPage || isPublicPage) ? null : '/login';
+    }
     if (isAuthPage) return authState.user?.role == UserRole.manager ? '/dashboard' : '/jobs';
     if (path.startsWith('/manager') || path == '/dashboard') {
       return authState.user?.role == UserRole.manager ? null : '/jobs';

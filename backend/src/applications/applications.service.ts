@@ -52,52 +52,64 @@ export class ApplicationsService {
       throw new NotFoundException('Job not found');
     }
 
-    let candidate = await this.prisma.candidate.findFirst({
-      where: {
-        email: dto.email,
-      },
-    });
+    const isCandidateUser = currentUser?.role === UserRole.CANDIDATE;
+
+    // A logged-in candidate always applies as themselves, even if they type
+    // a different contact email on the form, so the application stays
+    // attached to their account instead of fragmenting into a separate,
+    // unlinked candidate profile that "My Applications" can't find.
+    let candidate = isCandidateUser
+      ? await this.prisma.candidate.findFirst({
+          where: { userId: currentUser.id },
+        })
+      : null;
+
+    const foundByAccount = !!candidate;
 
     if (!candidate) {
-      candidate = await this.prisma.candidate.create({
-        data: {
-          fullName: dto.fullName,
-          email: dto.email,
-          phone: dto.phone,
-          resumeFileName: dto.resumeFileName,
-        },
-      });
-    } else {
-      candidate = await this.prisma.candidate.update({
-        where: {
-          id: candidate.id,
-        },
-        data: {
-          fullName: dto.fullName,
-          phone: dto.phone,
-          resumeFileName: dto.resumeFileName,
-        },
+      candidate = await this.prisma.candidate.findFirst({
+        where: { email: dto.email },
       });
     }
 
-    if (
-      currentUser?.role === UserRole.CANDIDATE &&
-      !candidate.userId
-    ) {
-      candidate = await this.prisma.candidate.update({
-        where: {
-          id: candidate.id,
-        },
-        data: {
-          userId: currentUser.id,
-        },
-      });
-    }
+    // Only claim the userId if it's unclaimed or already ours - never steal
+    // the link from a candidate profile belonging to a different account.
+    const shouldLinkUser =
+      isCandidateUser &&
+      (!candidate?.userId || candidate.userId === currentUser.id);
+    const userId = shouldLinkUser ? currentUser.id : undefined;
 
-    const existing = await this.prisma.application.findFirst({
+    candidate = candidate
+      ? await this.prisma.candidate.update({
+          where: { id: candidate.id },
+          data: {
+            fullName: dto.fullName,
+            phone: dto.phone,
+            resumeFileName: dto.resumeFileName,
+            // A candidate can apply with whatever contact email they type,
+            // but an already-linked account keeps its own email on file -
+            // identity and history are tracked by account, not by which
+            // email was used on any given submission.
+            ...(foundByAccount ? {} : { email: dto.email }),
+            ...(userId ? { userId } : {}),
+          },
+        })
+      : await this.prisma.candidate.create({
+          data: {
+            fullName: dto.fullName,
+            email: dto.email,
+            phone: dto.phone,
+            resumeFileName: dto.resumeFileName,
+            ...(userId ? { userId } : {}),
+          },
+        });
+
+    const existing = await this.prisma.application.findUnique({
       where: {
-        candidateId: candidate.id,
-        jobId: job.id,
+        candidateId_jobId: {
+          candidateId: candidate.id,
+          jobId: job.id,
+        },
       },
     });
 
@@ -145,7 +157,9 @@ export class ApplicationsService {
       });
 
       if (!aiScore) {
-        this.logger.warn(`No AI score generated for application ${applicationId}`);
+        this.logger.warn(
+          `No AI score generated for application ${applicationId}`,
+        );
         return null;
       }
 
@@ -168,7 +182,9 @@ export class ApplicationsService {
 
         return { aiScore: aiScore.overallScore, shouldStartAiCall: true };
       } else {
-        this.logger.log(`Application ${applicationId} did not pass AI threshold`);
+        this.logger.log(
+          `Application ${applicationId} did not pass AI threshold`,
+        );
         return { aiScore: aiScore.overallScore, shouldStartAiCall: false };
       }
     } catch (error) {
@@ -510,5 +526,31 @@ export class ApplicationsService {
         appliedAt: 'desc',
       },
     });
+  }
+
+  // Prefills the application form: candidate profile if they've applied before, else account details.
+  async getMyProfile(userId: string, email: string) {
+    const candidate = await this.prisma.candidate.findFirst({
+      where: { userId },
+    });
+
+    if (candidate) {
+      return {
+        fullName: candidate.fullName,
+        email: candidate.email,
+        phone: candidate.phone,
+      };
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { fullName: true, email: true, phone: true },
+    });
+
+    return {
+      fullName: user?.fullName ?? '',
+      email: user?.email ?? email,
+      phone: user?.phone ?? '',
+    };
   }
 }

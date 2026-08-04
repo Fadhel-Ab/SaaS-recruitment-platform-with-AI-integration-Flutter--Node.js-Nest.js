@@ -50,6 +50,12 @@ export class ApplicationsController {
     return this.applicationsService.getMyApplications(user.id, user.email);
   }
 
+  @Get('mine/profile')
+  @Roles(UserRole.CANDIDATE)
+  getMyProfile(@CurrentUser() user: CurrentUserData) {
+    return this.applicationsService.getMyProfile(user.id, user.email);
+  }
+
   @Get('pipeline')
   @Roles(UserRole.MANAGER)
   getPipeline(@CurrentUser() user: CurrentUserData) {

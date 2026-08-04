@@ -48,39 +48,42 @@ class AppScaffold extends StatelessWidget {
                   icon: const Icon(Icons.travel_explore_outlined),
                   onPressed: () => context.push('/jobs'),
                 ),
-              PopupMenuButton<String>(
-                tooltip: 'User menu',
-                icon: const Icon(Icons.account_circle_outlined),
-                onSelected: (value) {
-                  if (value == 'logout') {
-                    context.read<AuthBloc>().add(const LogoutRequested());
-                  } else if (value == 'view-jobs') {
-                    context.push('/jobs');
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    enabled: false,
-                    child: Text(user?.email ?? 'User'),
-                  ),
-                  const PopupMenuDivider(),
-                  if (user?.role == UserRole.manager)
+              if (user == null)
+                TextButton(
+                  onPressed: () => context.go('/login'),
+                  child: const Text('Log in'),
+                )
+              else
+                PopupMenuButton<String>(
+                  tooltip: 'User menu',
+                  icon: const Icon(Icons.account_circle_outlined),
+                  onSelected: (value) {
+                    if (value == 'logout') {
+                      context.read<AuthBloc>().add(const LogoutRequested());
+                    } else if (value == 'view-jobs') {
+                      context.push('/jobs');
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(enabled: false, child: Text(user.email)),
+                    const PopupMenuDivider(),
+                    if (user.role == UserRole.manager)
+                      const PopupMenuItem(
+                        value: 'view-jobs',
+                        child: ListTile(
+                          leading: Icon(Icons.travel_explore_outlined),
+                          title: Text('View Job Listings'),
+                        ),
+                      ),
                     const PopupMenuItem(
-                      value: 'view-jobs',
+                      value: 'logout',
                       child: ListTile(
-                        leading: Icon(Icons.travel_explore_outlined),
-                        title: Text('View Job Listings'),
+                        leading: Icon(Icons.logout),
+                        title: Text('Logout'),
                       ),
                     ),
-                  const PopupMenuItem(
-                    value: 'logout',
-                    child: ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text('Logout'),
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(width: 8),
             ],
           ),

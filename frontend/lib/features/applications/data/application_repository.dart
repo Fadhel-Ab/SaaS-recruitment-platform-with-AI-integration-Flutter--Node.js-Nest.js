@@ -59,6 +59,10 @@ class ApplicationRepository {
         .toList();
   }
 
+  Future<Map<String, dynamic>> getMyProfile() {
+    return api.getMyProfile();
+  }
+
   Future<void> startAiCall(String applicationId) {
     return api.startAiCall(applicationId);
   }
