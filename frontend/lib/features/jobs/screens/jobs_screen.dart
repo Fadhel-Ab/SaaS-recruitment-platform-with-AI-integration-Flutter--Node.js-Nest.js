@@ -106,7 +106,9 @@ class _JobsScreenState extends State<JobsScreen> {
           : null,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 10.0, 24.0, 20.0),
+          padding: isDesktop
+              ? const EdgeInsets.fromLTRB(24.0, 10.0, 24.0, 20.0)
+              : const EdgeInsets.fromLTRB(12.0, 6.0, 12.0, 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -145,7 +147,7 @@ class _JobsScreenState extends State<JobsScreen> {
                           child: Column(
                             children: [
                               _buildSearchBar(isDesktop: isDesktop),
-                              const SizedBox(height: 12),
+                              SizedBox(height: isDesktop ? 12 : 8),
                               Expanded(
                                 child: _buildJobList(isDesktop: isDesktop),
                               ),
@@ -273,7 +275,7 @@ class _JobsScreenState extends State<JobsScreen> {
 
   Widget _buildSearchBar({required bool isDesktop}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 16 : 12, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -281,14 +283,21 @@ class _JobsScreenState extends State<JobsScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Color(0xFF9CA3AF)),
-          const SizedBox(width: 12),
+          const Icon(Icons.search, color: Color(0xFF9CA3AF), size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _searchController,
               onChanged: _handleSearchChanged,
-              decoration: const InputDecoration(
-                hintText: 'Search jobs by title, skills, or location...',
+              style: const TextStyle(fontSize: 14),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: isDesktop ? 14 : 10,
+                ),
+                hintText: isDesktop
+                    ? 'Search jobs by title, skills, or location...'
+                    : 'Search jobs...',
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -426,7 +435,7 @@ class _JobsScreenState extends State<JobsScreen> {
                     child: ListView.separated(
                       itemCount: pagedJobs.length,
                       separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12),
+                          SizedBox(height: isDesktop ? 12 : 6),
                       itemBuilder: (context, index) {
                         final job = pagedJobs[index];
                         return JobCard(

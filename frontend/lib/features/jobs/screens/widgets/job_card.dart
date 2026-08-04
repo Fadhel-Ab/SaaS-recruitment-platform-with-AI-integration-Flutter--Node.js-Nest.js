@@ -67,7 +67,7 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: isDesktop ? 16 : 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
@@ -77,7 +77,7 @@ class JobCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(isDesktop ? 24.0 : 12.0),
           child: isDesktop
               ? _buildDesktopLayout(context)
               : _buildMobileLayout(context),
@@ -186,81 +186,66 @@ class JobCard extends StatelessWidget {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildIconBox(),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
+        _buildIconBox(size: 36, iconSize: 18),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    job.title ?? 'Senior Software Engineer',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF111827),
+                  Expanded(
+                    child: Text(
+                      job.title ?? 'Senior Software Engineer',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF111827),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${job.company ?? 'TalentHQ'} • ${job.location ?? 'Remote'}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF6B7280),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  // Mobile Relative Time String
-                  Text(
-                    _getRelativeTimeString(job.createdAt),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF9CA3AF),
-                    ),
-                  ),
+                  const SizedBox(width: 6),
+                  _buildStatusPill(job.status ?? 'Active', compact: true),
                 ],
               ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.share_outlined,
-                color: Color(0xFF6B7280),
-                size: 18,
+              const SizedBox(height: 3),
+              Text(
+                '${job.company ?? 'TalentHQ'} • ${job.location ?? 'Remote'}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
               ),
-              onPressed: () => _copyShareLink(context),
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(4),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                '${job.applications ?? 0} applicants • ${_getRelativeTimeString(job.createdAt)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
-        const Divider(color: Color(0xFFF3F4F6), height: 1),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                _buildMobileInlineMetric(
-                  'Applications:',
-                  '${job.applications ?? 0}',
-                ),
-                const SizedBox(width: 16),
-              ],
-            ),
-            _buildStatusPill(job.status ?? 'Active'),
-          ],
+        IconButton(
+          icon: const Icon(
+            Icons.share_outlined,
+            color: Color(0xFF6B7280),
+            size: 16,
+          ),
+          onPressed: () => _copyShareLink(context),
+          constraints: const BoxConstraints(),
+          padding: const EdgeInsets.only(left: 6),
         ),
       ],
     );
   }
 
-  Widget _buildIconBox() {
+  Widget _buildIconBox({double size = 48, double iconSize = 22}) {
     final List<Color> colors = [
       const Color(0xFF4F46E5),
       Colors.blue,
@@ -276,8 +261,8 @@ class JobCard extends StatelessWidget {
     final int colorIndex = index % colors.length;
 
     return Container(
-      width: 48,
-      height: 48,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: bgs[colorIndex],
         borderRadius: BorderRadius.circular(10),
@@ -286,7 +271,7 @@ class JobCard extends StatelessWidget {
         child: Icon(
           Icons.business_center_outlined,
           color: colors[colorIndex],
-          size: 22,
+          size: iconSize,
         ),
       ),
     );
@@ -314,31 +299,15 @@ class JobCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMobileInlineMetric(String label, String value) {
-    return Row(
-      children: [
-        Text(
-          '$label ',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111827),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusPill(String status) {
+  Widget _buildStatusPill(String status, {bool compact = false}) {
     final bool isPhase =
         status.toLowerCase().contains('phase') ||
         status.toLowerCase().contains('offer');
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 3 : 6,
+      ),
       decoration: BoxDecoration(
         color: isPhase ? const Color(0xFFFFF3E0) : const Color(0xFFE6F4EA),
         borderRadius: BorderRadius.circular(8),
@@ -348,7 +317,7 @@ class JobCard extends StatelessWidget {
         style: TextStyle(
           color: isPhase ? const Color(0xFFE65100) : const Color(0xFF137333),
           fontWeight: FontWeight.w600,
-          fontSize: 12,
+          fontSize: compact ? 10 : 12,
         ),
       ),
     );

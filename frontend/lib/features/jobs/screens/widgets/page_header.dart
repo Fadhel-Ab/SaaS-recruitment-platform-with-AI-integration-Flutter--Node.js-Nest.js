@@ -24,32 +24,34 @@ class PageHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 20,
+          style: TextStyle(
+            fontSize: isDesktop ? 20 : 17,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF111827), // Dashboard charcoal black
+            color: const Color(0xFF111827), // Dashboard charcoal black
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF6B7280), // Dashboard subtitle grey
+        if (isDesktop) ...[
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF6B7280), // Dashboard subtitle grey
+            ),
           ),
-        ),
+        ],
       ],
     );
 
     final actionButton = ElevatedButton.icon(
       onPressed: onButtonPressed,
-      icon: const Icon(Icons.add, size: 18, color: Colors.white),
+      icon: Icon(Icons.add, size: isDesktop ? 18 : 16, color: Colors.white),
       label: Text(
         buttonLabel,
-        style: const TextStyle(
-          fontSize: 14,
+        style: TextStyle(
+          fontSize: isDesktop ? 14 : 13,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
@@ -57,7 +59,10 @@ class PageHeader extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF4F46E5), // Dashboard primary blue
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 18 : 14,
+          vertical: isDesktop ? 12 : 8,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
@@ -79,13 +84,13 @@ class PageHeader extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          headerTextGroup,
-          const SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: actionButton),
+          Expanded(child: headerTextGroup),
+          const SizedBox(width: 10),
+          actionButton,
         ],
       ),
     );
