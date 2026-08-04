@@ -40,6 +40,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   double _aiThreshold = 0.0;
   String? _applicationId;
   bool _isRequestingCall = false;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -75,6 +76,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   void _submitForm() {
+    if (_isSubmitting) return;
+
     final authState = context.read<AuthBloc>().state;
     if (authState.status == AuthStatus.authenticated &&
         authState.user?.role == UserRole.manager) {
@@ -100,6 +103,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       );
       return;
     }
+
+    // Guards the whole click-to-completion flow: the bloc briefly sits in a
+    // "success" (upload done, not yet submitted) state before the submit
+    // request is dispatched, during which the button would otherwise
+    // re-enable and allow a second, concurrent application submission.
+    setState(() => _isSubmitting = true);
 
     // 3. Dispatch file streaming request to your Bloc layer
     context.read<ApplicationBloc>().add(
@@ -161,6 +170,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         }
 
         if (state.status == ApplicationStatus.failure) {
+          setState(() => _isSubmitting = false);
           StatusDialog.show(
             context: context,
             isSuccess: false,
@@ -335,16 +345,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                               const SizedBox(height: 32),
                               BlocBuilder<ApplicationBloc, ApplicationState>(
                                 builder: (context, state) {
-                                  final isSubmitting =
-                                      state.status ==
-                                          ApplicationStatus.uploading ||
-                                      state.status ==
-                                          ApplicationStatus.submitting;
-
                                   return SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton(
-                                      onPressed: isSubmitting
+                                      onPressed: _isSubmitting
                                           ? null
                                           : _submitForm,
                                       style: ElevatedButton.styleFrom(
@@ -362,7 +366,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: isSubmitting
+                                      child: _isSubmitting
                                           ? const SizedBox(
                                               width: 18,
                                               height: 18,

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Headers,
@@ -71,6 +72,12 @@ export class ApplicationsController {
   @Public()
   @UseInterceptors(FileInterceptor('cvs', multerConfig))
   async uploadCv(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException(
+        'No file uploaded, or the file is not a PDF/DOC/DOCX.',
+      );
+    }
+
     const fileName = generateResumeFileName(file.originalname);
     await this.storageService.uploadResume(fileName, file.buffer, file.mimetype);
 
