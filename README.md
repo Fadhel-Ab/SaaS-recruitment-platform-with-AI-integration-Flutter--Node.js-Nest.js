@@ -2,6 +2,22 @@
 
 A full-stack recruitment SaaS platform that helps hiring managers publish jobs, collect candidate applications, evaluate resumes with AI, run phone-based AI interview workflows, schedule interviews, and monitor hiring pipeline performance from a Flutter interface backed by a NestJS API.
 
+## Contents
+
+- [Project at a Glance](#project-at-a-glance)
+- [Repository Structure](#repository-structure)
+- [Core Product Capabilities](#core-product-capabilities)
+- [Backend Overview](#backend-overview)
+- [Database Model Summary](#database-model-summary)
+- [Frontend Overview](#frontend-overview)
+- [Configuration](#configuration)
+- [WhatsApp Sandbox Opt-In (Required for Testers and Recruiters)](#whatsapp-sandbox-opt-in-required-for-testers-and-recruiters)
+- [Local Development](#local-development)
+- [Typical User Flows](#typical-user-flows)
+- [Testing Status and Existing Test Layout](#testing-status-and-existing-test-layout)
+- [Security and Privacy Notes](#security-and-privacy-notes)
+- [Current Implementation Notes](#current-implementation-notes)
+
 ## Project at a Glance
 
 - **Frontend:** Flutter application for web, mobile, and desktop targets.
@@ -292,6 +308,42 @@ static const String baseUrl = 'http://localhost:3000/api';
 
 For Android emulator local backend access, use `http://10.0.2.2:3000/api`.
 
+## WhatsApp Sandbox Opt-In (Required for Testers and Recruiters)
+
+**Before testing anything WhatsApp-related, send this message from WhatsApp to opt in:**
+
+> Send **`join prevent-activity`** to **+1 415-523-8886**
+
+This project uses the standard **Twilio WhatsApp Sandbox** (a free trial environment), not a fully-approved WhatsApp Business sender. Twilio's sandbox only delivers messages to phone numbers that have explicitly opted in first — so any phone number involved in a WhatsApp-triggered flow (see below) must join the sandbox before it will receive anything.
+
+### Steps
+
+1. Open WhatsApp on the phone whose number you registered/applied with.
+2. Start a new chat with **+1 415-523-8886**.
+3. Send this exact message:
+
+   ```text
+   join prevent-activity
+   ```
+
+4. Wait for Twilio's confirmation reply — you're now opted in and will receive any WhatsApp messages this app sends to your number.
+
+> **Two different numbers, two different purposes — don't mix them up:**
+> - **+1 415-523-8886** — Twilio WhatsApp Sandbox. Text `join prevent-activity` here to opt in and receive WhatsApp messages.
+> - **+1 908-493-4924** — this project's Twilio Voice number. AI interview phone *calls* come from this number; you don't message it, you just answer/expect calls from it.
+
+### Who this applies to
+
+- **Recruiters/Managers** — the phone number on your account receives WhatsApp alerts for new applications and AI-interview passes, and can reply `CALL` to re-trigger a candidate's AI interview call.
+- **Testers/Candidates** — the phone number entered on a job application receives WhatsApp messages for interview confirmations and missed-call follow-ups.
+
+Everyone testing either side of the flow needs to opt in with the exact phone number they registered or applied with.
+
+> **Notes:**
+> - Sandbox opt-in expires after a period of inactivity. If messages stop arriving partway through testing, just re-send the join message.
+> - This is a limitation of Twilio's free Sandbox, not the app itself — it won't be required once the account moves to an approved WhatsApp Business sender in production.
+> - Also double-check the phone number format the app itself expects: candidate/manager phone fields are validated as 8-digit Bahrain numbers and stored with a `+973` prefix. Use a real, reachable Bahrain-format number if you want to receive the WhatsApp messages tied to it.
+
 ## Local Development
 
 ### Prerequisites
@@ -372,6 +424,7 @@ The backend includes Jest unit test files beside most controllers/services and a
 - Request validation strips unknown fields and rejects non-whitelisted input.
 - Helmet is enabled on the backend.
 - Public endpoints should be reviewed carefully before production launch because they include resume upload and public application submission.
+- Resume and interview-transcript text passed to the AI provider is wrapped with explicit delimiters and instructions telling the model to treat it as untrusted data, not commands — a mitigation against prompt-injection attempts embedded in an uploaded CV (e.g. hidden text instructing the model to assign a high score).
 
 ## Current Implementation Notes
 

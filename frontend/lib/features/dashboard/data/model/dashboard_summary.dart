@@ -10,9 +10,12 @@ class DashboardSummary {
   final double averageAIScore;
   final int pendingApplications;
   final int shortlisted;
-  final int interviewsCompleted;
+  final int interviewScheduled;
+  final int interviewCompleted;
+  final int offers;
   final int hired;
   final int rejected;
+  final int withdrawn;
 
   final int jobsTrendPct;
   final int applicationsTrendPct;
@@ -34,9 +37,12 @@ class DashboardSummary {
     required this.topCandidates,
     required this.pendingApplications,
     required this.shortlisted,
-    required this.interviewsCompleted,
+    required this.interviewScheduled,
+    required this.interviewCompleted,
+    required this.offers,
     required this.hired,
     required this.rejected,
+    required this.withdrawn,
     this.jobsTrendPct = 0,
     this.applicationsTrendPct = 0,
     this.aiInterviewsYesterday = 0,
@@ -62,9 +68,12 @@ class DashboardSummary {
           .toList(),
       pendingApplications: json['pendingApplications'] ?? 0,
       shortlisted: json['shortlisted'] ?? 0,
-      interviewsCompleted: json['completedInterviews'] ?? 0,
+      interviewScheduled: json['interviewScheduled'] ?? 0,
+      interviewCompleted: json['interviewCompleted'] ?? 0,
+      offers: json['offers'] ?? 0,
       hired: json['hired'] ?? 0,
       rejected: json['rejected'] ?? 0,
+      withdrawn: json['withdrawn'] ?? 0,
       jobsTrendPct: json['jobsTrendPct'] ?? 0,
       applicationsTrendPct: json['applicationsTrendPct'] ?? 0,
       aiInterviewsYesterday: json['aiInterviewsYesterday'] ?? 0,

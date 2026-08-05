@@ -170,6 +170,7 @@ class AppScaffold extends StatelessWidget {
                 ),
           bottomNavigationBar: isPhone
               ? NavigationBar(
+                  height: 64,
                   selectedIndex: selectedIndex,
                   onDestinationSelected: (index) =>
                       _go(context, index, user?.role),

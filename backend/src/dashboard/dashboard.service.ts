@@ -100,6 +100,7 @@ export class DashboardService {
     // Future manager interviews
     const scheduledInterviews = await this.prisma.interview.count({
       where: {
+        status: 'SCHEDULED',
         application: {
           job: {
             managerId,
@@ -128,6 +129,12 @@ export class DashboardService {
       pendingApplications: 0,
 
       shortlisted: 0,
+
+      interviewScheduled: 0,
+
+      interviewCompleted: 0,
+
+      withdrawn: 0,
 
       // AI interviews
       aiInterviews: aiInterviews.length,
@@ -181,6 +188,14 @@ export class DashboardService {
           summary.shortlisted++;
           break;
 
+        case 'INTERVIEW_SCHEDULED':
+          summary.interviewScheduled++;
+          break;
+
+        case 'INTERVIEW_COMPLETED':
+          summary.interviewCompleted++;
+          break;
+
         case 'OFFERED':
           summary.offers++;
           break;
@@ -191,6 +206,10 @@ export class DashboardService {
 
         case 'REJECTED':
           summary.rejected++;
+          break;
+
+        case 'WITHDRAWN':
+          summary.withdrawn++;
           break;
       }
 

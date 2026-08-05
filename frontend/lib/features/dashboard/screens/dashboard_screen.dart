@@ -187,9 +187,11 @@ class DashboardScreen extends StatelessWidget {
                             child: PipelineChartCard(
                               pending: summary.pendingApplications,
                               shortlisted: summary.shortlisted,
-                              interviews: summary.interviewsCompleted,
-                              hired: summary.hired,
-                              rejected: summary.rejected,
+                              interviews:
+                                  summary.interviewScheduled +
+                                  summary.interviewCompleted,
+                              hired: summary.offers + summary.hired,
+                              rejected: summary.rejected + summary.withdrawn,
                               onViewAll: () =>
                                   context.push('/manager/candidates'),
                             ),
@@ -211,9 +213,11 @@ class DashboardScreen extends StatelessWidget {
                       PipelineChartCard(
                         pending: summary.pendingApplications,
                         shortlisted: summary.shortlisted,
-                        interviews: summary.interviewsCompleted,
-                        hired: summary.hired,
-                        rejected: summary.rejected,
+                        interviews:
+                            summary.interviewScheduled +
+                            summary.interviewCompleted,
+                        hired: summary.offers + summary.hired,
+                        rejected: summary.rejected + summary.withdrawn,
                         onViewAll: () => context.push('/manager/candidates'),
                       ),
                       const SizedBox(height: 24),
