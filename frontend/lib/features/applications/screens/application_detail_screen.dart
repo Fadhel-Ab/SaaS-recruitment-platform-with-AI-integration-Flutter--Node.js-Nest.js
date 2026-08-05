@@ -21,10 +21,20 @@ String _formatDateTime(DateTime date) {
   return '${_months[date.month - 1]} ${date.day}, ${date.year}, $hour:$minute $period';
 }
 
-Future<void> _openResume(String resumeUrl) async {
+Future<void> _openResume(BuildContext context, String resumeUrl) async {
   // resumeUrl is now an absolute, time-limited signed URL from storage.
   final uri = Uri.parse(resumeUrl);
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
+  var launched = false;
+  try {
+    launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    launched = false;
+  }
+  if (!launched && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not open the resume link.')),
+    );
+  }
 }
 
 class ApplicationDetailScreen extends StatelessWidget {
@@ -239,7 +249,8 @@ class _CandidateHeaderCard extends StatelessWidget {
                   if (application.resumeUrl != null) ...[
                     const SizedBox(height: 10),
                     OutlinedButton.icon(
-                      onPressed: () => _openResume(application.resumeUrl!),
+                      onPressed: () =>
+                          _openResume(context, application.resumeUrl!),
                       icon: const Icon(Icons.description_outlined, size: 16),
                       label: const Text('View Resume'),
                       style: OutlinedButton.styleFrom(
