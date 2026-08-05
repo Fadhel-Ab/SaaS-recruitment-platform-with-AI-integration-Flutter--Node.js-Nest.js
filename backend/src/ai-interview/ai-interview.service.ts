@@ -177,6 +177,34 @@ export class AiInterviewService {
     }
   }
 
+  // Called from the Twilio call-status webhook when a call ends before the
+  // candidate answered every planned question (hang-up, dropped call,
+  // etc). The normal path (complete() from AiInterviewController.answer)
+  // only fires once the full question count is reached, so without this
+  // fallback an interview that ends early never gets scored at all.
+  async completeIfPending(applicationId: string) {
+    const session = await this.prisma.aIInterviewSession.findUnique({
+      where: { applicationId },
+    });
+
+    if (!session || session.status !== AIInterviewStatus.IN_PROGRESS) {
+      return;
+    }
+
+    if (!session.transcript || session.questionCount === 0) {
+      this.logger.debug(
+        `Call for application ${applicationId} ended with no recorded answers - skipping scoring`,
+      );
+      return;
+    }
+
+    this.logger.log(
+      `Call for application ${applicationId} ended early after ${session.questionCount} answer(s) - scoring on partial transcript`,
+    );
+
+    await this.complete(session.id, session.transcript);
+  }
+
   async saveAnswer(applicationId: string, answer: string) {
     const session = await this.prisma.aIInterviewSession.findUnique({
       where: {

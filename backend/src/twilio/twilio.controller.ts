@@ -89,6 +89,21 @@ async callStatus(
       );
     }
   }
+
+  if (status === 'completed') {
+    // The call connected but may have ended before every planned question
+    // was answered (candidate hung up, network drop, etc). Score whatever
+    // was captured instead of leaving the interview unscored - this is a
+    // no-op if it was already completed via the full-question-count path.
+    await this.aiInterviewService
+      .completeIfPending(applicationId)
+      .catch((error) => {
+        this.logger.error(
+          `Failed to finalize AI interview score for application ${applicationId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      });
+  }
 }
 
   @Roles(UserRole.MANAGER)
