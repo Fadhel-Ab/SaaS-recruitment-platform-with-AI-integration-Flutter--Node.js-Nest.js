@@ -45,7 +45,19 @@ export class TwilioController {
       return;
     }
 
-    await this.aiInterviewService.startAiCall(application.id);
+    // Wait a few seconds before re-dialing so the previous call has time to
+    // fully release on Twilio's side - dialing immediately after the "CALL"
+    // reply can collide with the prior call still tearing down.
+    const RETRY_CALL_DELAY_MS = 8000;
+
+    setTimeout(() => {
+      this.aiInterviewService.startAiCall(application.id).catch((error) => {
+        this.logger.error(
+          `Retry call failed for application ${application.id}`,
+          error instanceof Error ? error.stack : error,
+        );
+      });
+    }, RETRY_CALL_DELAY_MS);
   }
 @Public()
 @Post('call-status')

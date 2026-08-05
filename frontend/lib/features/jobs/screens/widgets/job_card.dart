@@ -168,6 +168,10 @@ class JobCard extends StatelessWidget {
           ),
         ),
 
+        if (job.isUrgent == true) ...[
+          _buildUrgentBadge(),
+          const SizedBox(width: 12),
+        ],
         _buildStatusPill(job.status ?? 'Active'),
         const SizedBox(width: 12),
 
@@ -211,6 +215,10 @@ class JobCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 6),
+                  if (job.isUrgent == true) ...[
+                    _buildUrgentBadge(compact: true),
+                    const SizedBox(width: 6),
+                  ],
                   _buildStatusPill(job.status ?? 'Active', compact: true),
                 ],
               ),
@@ -246,6 +254,24 @@ class JobCard extends StatelessWidget {
   }
 
   Widget _buildIconBox({double size = 48, double iconSize = 22}) {
+    if (job.isUrgent == true) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFEDD5),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.local_fire_department,
+            color: const Color(0xFFEA580C),
+            size: iconSize,
+          ),
+        ),
+      );
+    }
+
     final List<Color> colors = [
       const Color(0xFF4F46E5),
       Colors.blue,
@@ -273,6 +299,38 @@ class JobCard extends StatelessWidget {
           color: colors[colorIndex],
           size: iconSize,
         ),
+      ),
+    );
+  }
+
+  Widget _buildUrgentBadge({bool compact = false}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 3 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFED7AA),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.local_fire_department,
+            size: compact ? 11 : 14,
+            color: const Color(0xFF9A3412),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'URGENT',
+            style: TextStyle(
+              color: const Color(0xFF9A3412),
+              fontWeight: FontWeight.w800,
+              fontSize: compact ? 9 : 11,
+            ),
+          ),
+        ],
       ),
     );
   }

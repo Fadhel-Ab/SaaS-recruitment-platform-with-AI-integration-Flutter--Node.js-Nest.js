@@ -158,7 +158,7 @@ export class ApplicationsService {
     };
   }
   private getAiInterviewThreshold() {
-    return this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+    return Number(this.config.get<string>('AI_INTERVIEW_THRESHOLD', '60'));
   }
 
   // Soft-failed like the other Twilio side-effects: a WhatsApp hiccup should never block the candidate's apply response.

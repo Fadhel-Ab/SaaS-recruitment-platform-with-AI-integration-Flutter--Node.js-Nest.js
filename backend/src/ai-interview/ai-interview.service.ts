@@ -110,7 +110,9 @@ export class AiInterviewService {
       },
     });
 
-    const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
+    const threshold = Number(
+      this.config.get<string>('AI_INTERVIEW_THRESHOLD', '60'),
+    );
 
     if (overallScore >= threshold) {
       // Passing the AI interview no longer auto-books a slot - the manager

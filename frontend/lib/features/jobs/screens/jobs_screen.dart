@@ -426,9 +426,16 @@ class _JobsScreenState extends State<JobsScreen> {
 
             return Column(
               children: [
-                if (urgentJobs.isNotEmpty) ...[
+                if (urgentJobs.length > 1) ...[
                   _buildUrgentPinnedJobs(urgentJobs, isDesktop: isDesktop),
                   const SizedBox(height: 16),
+                ] else if (urgentJobs.length == 1) ...[
+                  JobCard(
+                    job: urgentJobs.first,
+                    index: 0,
+                    isDesktop: isDesktop,
+                    onTap: () => context.go('/jobs/${urgentJobs.first.shareToken}'),
+                  ),
                 ],
                 if (regularJobs.isNotEmpty) ...[
                   Expanded(
