@@ -1,3 +1,12 @@
+# Pre Seeded Credentials
+
+login as Manager or create an account
+
+(Note: current phone number for this manager account is set to my personal number, for testing you can change it by clicking Profile/User icon on top right on Dashboard page)
+
+Jasim@test.com
+123456
+
 # Testing Guide
 
 Quick-start guide for manually testing the SaaS Recruitment Platform. This is for testers/QA/recruiters trying out the app — see [README.md](README.md) for full architecture, setup, and configuration docs.
