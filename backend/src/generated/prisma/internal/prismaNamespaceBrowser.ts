@@ -180,6 +180,7 @@ export const InterviewScalarFieldEnum = {
   meetingLink: 'meetingLink',
   notes: 'notes',
   status: 'status',
+  reminderSentAt: 'reminderSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

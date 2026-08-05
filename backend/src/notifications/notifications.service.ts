@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { InterviewStatus } from '../generated/prisma/enums.js';
+import { DEFAULT_MIN_NOTICE_HOURS } from '../scheduling/util/find-next-slot.js';
 
 @Injectable()
 export class NotificationsService {
@@ -82,6 +83,64 @@ export class NotificationsService {
       } catch (error) {
         this.logger.error(
           `Failed to send daily digest to manager ${managerId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      }
+    }
+  }
+
+  /**
+   * Every 15 minutes, WhatsApps a reminder to any candidate whose interview
+   * has crossed the `DEFAULT_MIN_NOTICE_HOURS`-before mark (the same notice
+   * window candidates were promised when the slot was booked - see
+   * find-next-slot.ts). `reminderSentAt` guards against re-sending on the
+   * next tick.
+   */
+  @Cron('*/15 * * * *')
+  async sendInterviewReminders() {
+    const now = new Date();
+    const reminderThreshold = new Date(
+      now.getTime() + DEFAULT_MIN_NOTICE_HOURS * 60 * 60000,
+    );
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        status: InterviewStatus.SCHEDULED,
+        reminderSentAt: null,
+        scheduledAt: { gte: now, lte: reminderThreshold },
+      },
+      include: {
+        application: {
+          include: { candidate: true, job: true },
+        },
+      },
+    });
+
+    for (const interview of interviews) {
+      const { candidate, job } = interview.application;
+
+      if (!candidate.phone) {
+        this.logger.debug(
+          `Interview ${interview.id} candidate has no phone on file, skipping reminder`,
+        );
+        continue;
+      }
+
+      try {
+        await this.twilio.sendInterviewReminder(
+          candidate.phone,
+          candidate.fullName,
+          job.title,
+          interview.scheduledAt!,
+        );
+
+        await this.prisma.interview.update({
+          where: { id: interview.id },
+          data: { reminderSentAt: now },
+        });
+      } catch (error) {
+        this.logger.error(
+          `Failed to send interview reminder for interview ${interview.id}`,
           error instanceof Error ? error.stack : error,
         );
       }

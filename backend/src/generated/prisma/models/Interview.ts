@@ -43,6 +43,7 @@ export type InterviewMinAggregateOutputType = {
   meetingLink: string | null
   notes: string | null
   status: $Enums.InterviewStatus | null
+  reminderSentAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type InterviewMaxAggregateOutputType = {
   meetingLink: string | null
   notes: string | null
   status: $Enums.InterviewStatus | null
+  reminderSentAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type InterviewCountAggregateOutputType = {
   meetingLink: number
   notes: number
   status: number
+  reminderSentAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type InterviewMinAggregateInputType = {
   meetingLink?: true
   notes?: true
   status?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type InterviewMaxAggregateInputType = {
   meetingLink?: true
   notes?: true
   status?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type InterviewCountAggregateInputType = {
   meetingLink?: true
   notes?: true
   status?: true
+  reminderSentAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type InterviewGroupByOutputType = {
   meetingLink: string | null
   notes: string | null
   status: $Enums.InterviewStatus
+  reminderSentAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: InterviewCountAggregateOutputType | null
@@ -254,6 +261,7 @@ export type InterviewWhereInput = {
   meetingLink?: Prisma.StringNullableFilter<"Interview"> | string | null
   notes?: Prisma.StringNullableFilter<"Interview"> | string | null
   status?: Prisma.EnumInterviewStatusFilter<"Interview"> | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
@@ -269,6 +277,7 @@ export type InterviewOrderByWithRelationInput = {
   meetingLink?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   application?: Prisma.ApplicationOrderByWithRelationInput
@@ -287,6 +296,7 @@ export type InterviewWhereUniqueInput = Prisma.AtLeast<{
   meetingLink?: Prisma.StringNullableFilter<"Interview"> | string | null
   notes?: Prisma.StringNullableFilter<"Interview"> | string | null
   status?: Prisma.EnumInterviewStatusFilter<"Interview"> | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
@@ -302,6 +312,7 @@ export type InterviewOrderByWithAggregationInput = {
   meetingLink?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.InterviewCountOrderByAggregateInput
@@ -323,6 +334,7 @@ export type InterviewScalarWhereWithAggregatesInput = {
   meetingLink?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Interview"> | string | null
   status?: Prisma.EnumInterviewStatusWithAggregatesFilter<"Interview"> | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Interview"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Interview"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Interview"> | Date | string
 }
@@ -334,6 +346,7 @@ export type InterviewCreateInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   application: Prisma.ApplicationCreateNestedOneWithoutInterviewInput
@@ -349,6 +362,7 @@ export type InterviewUncheckedCreateInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -360,6 +374,7 @@ export type InterviewUpdateInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneRequiredWithoutInterviewNestedInput
@@ -375,6 +390,7 @@ export type InterviewUncheckedUpdateInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -388,6 +404,7 @@ export type InterviewCreateManyInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -399,6 +416,7 @@ export type InterviewUpdateManyMutationInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -412,6 +430,7 @@ export type InterviewUncheckedUpdateManyInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -440,6 +459,7 @@ export type InterviewCountOrderByAggregateInput = {
   meetingLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -457,6 +477,7 @@ export type InterviewMaxOrderByAggregateInput = {
   meetingLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -470,6 +491,7 @@ export type InterviewMinOrderByAggregateInput = {
   meetingLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reminderSentAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -571,6 +593,7 @@ export type InterviewCreateWithoutManagerInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   application: Prisma.ApplicationCreateNestedOneWithoutInterviewInput
@@ -584,6 +607,7 @@ export type InterviewUncheckedCreateWithoutManagerInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -626,6 +650,7 @@ export type InterviewScalarWhereInput = {
   meetingLink?: Prisma.StringNullableFilter<"Interview"> | string | null
   notes?: Prisma.StringNullableFilter<"Interview"> | string | null
   status?: Prisma.EnumInterviewStatusFilter<"Interview"> | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.DateTimeNullableFilter<"Interview"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Interview"> | Date | string
 }
@@ -637,6 +662,7 @@ export type InterviewCreateWithoutApplicationInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   manager: Prisma.UserCreateNestedOneWithoutInterviewsInput
@@ -650,6 +676,7 @@ export type InterviewUncheckedCreateWithoutApplicationInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -677,6 +704,7 @@ export type InterviewUpdateWithoutApplicationInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   manager?: Prisma.UserUpdateOneRequiredWithoutInterviewsNestedInput
@@ -690,6 +718,7 @@ export type InterviewUncheckedUpdateWithoutApplicationInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -702,6 +731,7 @@ export type InterviewCreateManyManagerInput = {
   meetingLink?: string | null
   notes?: string | null
   status?: $Enums.InterviewStatus
+  reminderSentAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -713,6 +743,7 @@ export type InterviewUpdateWithoutManagerInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneRequiredWithoutInterviewNestedInput
@@ -726,6 +757,7 @@ export type InterviewUncheckedUpdateWithoutManagerInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -738,6 +770,7 @@ export type InterviewUncheckedUpdateManyWithoutManagerInput = {
   meetingLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInterviewStatusFieldUpdateOperationsInput | $Enums.InterviewStatus
+  reminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -753,6 +786,7 @@ export type InterviewSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   meetingLink?: boolean
   notes?: boolean
   status?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
@@ -768,6 +802,7 @@ export type InterviewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   meetingLink?: boolean
   notes?: boolean
   status?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
@@ -783,6 +818,7 @@ export type InterviewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   meetingLink?: boolean
   notes?: boolean
   status?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
@@ -798,11 +834,12 @@ export type InterviewSelectScalar = {
   meetingLink?: boolean
   notes?: boolean
   status?: boolean
+  reminderSentAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "managerId" | "scheduledAt" | "duration" | "meetingLink" | "notes" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["interview"]>
+export type InterviewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "managerId" | "scheduledAt" | "duration" | "meetingLink" | "notes" | "status" | "reminderSentAt" | "createdAt" | "updatedAt", ExtArgs["result"]["interview"]>
 export type InterviewInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   manager?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -831,6 +868,7 @@ export type $InterviewPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     meetingLink: string | null
     notes: string | null
     status: $Enums.InterviewStatus
+    reminderSentAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["interview"]>
@@ -1266,6 +1304,7 @@ export interface InterviewFieldRefs {
   readonly meetingLink: Prisma.FieldRef<"Interview", 'String'>
   readonly notes: Prisma.FieldRef<"Interview", 'String'>
   readonly status: Prisma.FieldRef<"Interview", 'InterviewStatus'>
+  readonly reminderSentAt: Prisma.FieldRef<"Interview", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Interview", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Interview", 'DateTime'>
 }

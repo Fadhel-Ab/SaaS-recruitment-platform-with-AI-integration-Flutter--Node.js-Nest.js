@@ -17,12 +17,15 @@ import { AiInterviewService } from '../ai-interview/ai-interview.service.js';
 import { ApplicationStatus, UserRole } from '../generated/prisma/enums.js';
 import type { CurrentUserData } from '../auth/interfaces/current-user.interface.js';
 import { StorageService } from '../common/storage/storage.service.js';
-import { findNextAvailableSlot } from '../scheduling/util/find-next-slot.js';
+import {
+  findNextAvailableSlot,
+  DEFAULT_MIN_NOTICE_HOURS,
+} from '../scheduling/util/find-next-slot.js';
 
 @Injectable()
 export class ApplicationsService {
   private readonly logger = new Logger(ApplicationsService.name);
-  private readonly MIN_NOTICE_HOURS = 12;
+  private readonly MIN_NOTICE_HOURS = DEFAULT_MIN_NOTICE_HOURS;
 
   constructor(
     private prisma: PrismaService,
@@ -361,18 +364,11 @@ export class ApplicationsService {
       });
 
       if (application.candidate.phone) {
-        const formatted = scheduledAt.toLocaleString('en-US', {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-        });
-
-        await this.twilio.sendWhatsApp(
+        await this.twilio.sendInterviewScheduledMessage(
           application.candidate.phone,
-          `Hi ${application.candidate.fullName}, great news! You've been shortlisted for "${application.job.title}".\n\n` +
-            `Your interview is scheduled for ${formatted}. We'll follow up with more details soon.`,
+          application.candidate.fullName,
+          application.job.title,
+          scheduledAt,
         );
       }
 

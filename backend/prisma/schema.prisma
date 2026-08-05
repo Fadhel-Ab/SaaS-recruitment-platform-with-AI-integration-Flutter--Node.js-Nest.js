@@ -123,6 +123,8 @@ model Interview {
 
   status InterviewStatus @default(PENDING)
 
+  reminderSentAt DateTime?
+
   application Application @relation(fields: [applicationId], references: [id])
 
   manager User @relation(fields: [managerId], references: [id])

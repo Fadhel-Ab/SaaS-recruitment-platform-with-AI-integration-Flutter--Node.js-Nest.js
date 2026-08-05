@@ -1,6 +1,10 @@
 import type { PrismaService } from '../../prisma/prisma.service.js';
 import { expandAvailabilityWindows } from './expand-availability-windows.js';
 
+// Shared with the interview-reminder cron (see NotificationsService), so the
+// reminder fires at the same notice window candidates were promised here.
+export const DEFAULT_MIN_NOTICE_HOURS = 12;
+
 export interface FindNextSlotOptions {
   jobId: string;
   managerId: string;
@@ -22,7 +26,7 @@ export async function findNextAvailableSlot(
     jobId,
     managerId,
     durationMinutes = 30,
-    minNoticeHours = 12,
+    minNoticeHours = DEFAULT_MIN_NOTICE_HOURS,
     from,
   }: FindNextSlotOptions,
 ): Promise<Date> {

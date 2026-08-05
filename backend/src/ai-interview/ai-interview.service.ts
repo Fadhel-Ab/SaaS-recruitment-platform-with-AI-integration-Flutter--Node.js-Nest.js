@@ -15,13 +15,10 @@ import { CompleteInterviewDto } from './dto/complete_interview.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { TwilioService } from '../twilio/twilio.service.js';
 import { ConfigService } from '@nestjs/config';
-import { findNextAvailableSlot } from '../scheduling/util/find-next-slot.js';
 
 @Injectable()
 export class AiInterviewService {
   private readonly logger = new Logger(AiInterviewService.name);
-  private readonly SLOT_DURATION_MINUTES = 30;
-  private readonly MIN_NOTICE_HOURS = 12;
 
   constructor(
     private prisma: PrismaService,
@@ -116,6 +113,10 @@ export class AiInterviewService {
     const threshold = this.config.get<number>('AI_INTERVIEW_THRESHOLD', 60);
 
     if (overallScore >= threshold) {
+      // Passing the AI interview no longer auto-books a slot - the manager
+      // still has to review and shortlist the candidate. Scheduling (and the
+      // candidate's "you're approved" WhatsApp message) happens from
+      // ApplicationsService.autoScheduleOnApproval once that happens.
       const application = await this.prisma.application.findUnique({
         where: {
           id: session.applicationId,
@@ -123,7 +124,7 @@ export class AiInterviewService {
 
         include: {
           candidate: true,
-          job: true,
+          job: { include: { manager: true } },
         },
       });
 
@@ -131,40 +132,7 @@ export class AiInterviewService {
         throw new Error('Application not found');
       }
 
-      const scheduledAt = await findNextAvailableSlot(this.prisma, {
-        jobId: application.job.id,
-        managerId: application.job.managerId,
-        durationMinutes: this.SLOT_DURATION_MINUTES,
-        minNoticeHours: this.MIN_NOTICE_HOURS,
-      });
-
-      await this.prisma.interview.create({
-        data: {
-          applicationId: session.applicationId,
-
-          managerId: application.job.managerId,
-
-          status: 'SCHEDULED',
-
-          scheduledAt,
-
-          duration: 30,
-        },
-      });
-
-      if (application.candidate.phone) {
-        await this.twilioService.sendWhatsApp(
-          application.candidate.phone,
-
-          `Hello ${application.candidate.fullName}, congratulations!
-
-You have passed our AI interview.
-
-Your final score: ${overallScore}%.
-
-We will contact you regarding the next interview step.`,
-        );
-      }
+      await this.notifyManagerOfAiInterviewPass(application, overallScore);
     }
 
     return {
@@ -176,6 +144,35 @@ We will contact you regarding the next interview step.`,
 
       recommendation: evaluation.recommendation,
     };
+  }
+
+  // Soft-failed like the other Twilio side-effects: a WhatsApp hiccup should never block interview evaluation.
+  private async notifyManagerOfAiInterviewPass(
+    application: {
+      candidate: { fullName: string };
+      job: { title: string; manager: { phone: string | null } };
+    },
+    overallScore: number,
+  ) {
+    try {
+      if (!application.job.manager.phone) {
+        this.logger.debug(
+          `Manager for job "${application.job.title}" has no phone on file - skipping AI interview pass notification`,
+        );
+        return;
+      }
+
+      await this.twilioService.sendWhatsApp(
+        application.job.manager.phone,
+        `${application.candidate.fullName} passed the AI interview for "${application.job.title}" with a score of ${overallScore}%.\n\n` +
+          `Review and shortlist them in your pipeline to schedule their interview.`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to notify manager of AI interview pass for application`,
+        error instanceof Error ? error.stack : error,
+      );
+    }
   }
 
   async saveAnswer(applicationId: string, answer: string) {

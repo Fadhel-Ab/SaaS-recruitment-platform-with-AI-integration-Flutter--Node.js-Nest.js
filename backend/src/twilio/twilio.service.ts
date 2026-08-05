@@ -71,4 +71,39 @@ export class TwilioService {
         `Reply with CALL to receive another interview call.`,
     });
   }
+
+  private formatInterviewTime(scheduledAt: Date) {
+    return scheduledAt.toLocaleString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  }
+
+  async sendInterviewScheduledMessage(
+    phone: string,
+    candidateName: string,
+    jobTitle: string,
+    scheduledAt: Date,
+  ) {
+    return this.sendWhatsApp(
+      phone,
+      `Hi ${candidateName}, great news! You've been approved to move forward for "${jobTitle}".\n\n` +
+        `Your interview is scheduled for ${this.formatInterviewTime(scheduledAt)}. We'll follow up with more details soon.`,
+    );
+  }
+
+  async sendInterviewReminder(
+    phone: string,
+    candidateName: string,
+    jobTitle: string,
+    scheduledAt: Date,
+  ) {
+    return this.sendWhatsApp(
+      phone,
+      `Hi ${candidateName}, this is a reminder that your interview for "${jobTitle}" is coming up on ${this.formatInterviewTime(scheduledAt)}. Good luck!`,
+    );
+  }
 }

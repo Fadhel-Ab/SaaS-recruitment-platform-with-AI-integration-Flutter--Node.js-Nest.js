@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -13,10 +14,16 @@ import { createDateFromSlot } from './util/scheduler.utils.js';
 import { expandAvailabilityWindows } from './util/expand-availability-windows.js';
 import { ConfirmScheduleDto } from './dto/confirm-schedule.dto.js';
 import { Interview } from '../generated/prisma/client.js';
+import { TwilioService } from '../twilio/twilio.service.js';
 
 @Injectable()
 export class SchedulingService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(SchedulingService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private twilioService: TwilioService,
+  ) {}
 
   async generate(managerId: string, jobId: string, duration: number) {
     const applications = await this.prisma.application.findMany({
@@ -108,8 +115,8 @@ export class SchedulingService {
 
   async confirm(managerId: string, dto: ConfirmScheduleDto) {
     // 1. Wrap EVERYTHING in a single transaction block
-    return this.prisma.$transaction(async (tx) => {
-      const results: Interview[] = [];
+    const results = await this.prisma.$transaction(async (tx) => {
+      const created: Interview[] = [];
 
       // 2. Loop sequentially so checks happen one after the other safely
       for (const item of dto.interviews) {
@@ -147,10 +154,48 @@ export class SchedulingService {
           },
         });
 
-        results.push(interview);
+        created.push(interview);
       }
 
-      return results; // Returns an array of created interviews
+      return created; // Returns an array of created interviews
     });
+
+    // Notified outside the transaction so a slow/failed WhatsApp send never
+    // holds the DB transaction open or rolls back interviews that were
+    // already committed.
+    await this.notifyCandidatesOfSchedule(results);
+
+    return results;
+  }
+
+  private async notifyCandidatesOfSchedule(interviews: Interview[]) {
+    for (const interview of interviews) {
+      try {
+        if (!interview.scheduledAt) {
+          continue;
+        }
+
+        const application = await this.prisma.application.findUnique({
+          where: { id: interview.applicationId },
+          include: { candidate: true, job: true },
+        });
+
+        if (!application?.candidate.phone) {
+          continue;
+        }
+
+        await this.twilioService.sendInterviewScheduledMessage(
+          application.candidate.phone,
+          application.candidate.fullName,
+          application.job.title,
+          interview.scheduledAt,
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to notify candidate of scheduled interview for application ${interview.applicationId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      }
+    }
   }
 }
