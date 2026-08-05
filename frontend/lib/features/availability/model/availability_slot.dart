@@ -92,7 +92,7 @@ class AvailabilitySlot {
 
   Map<String, dynamic> toJson() {
     return {
-      'jobId': jobId,
+      if (jobId != null) 'jobId': jobId,
       'recurrence': _recurrenceToApi(recurrence),
       if (recurrence == AvailabilityRecurrence.specific && date != null)
         'date': formatDate(date!),
