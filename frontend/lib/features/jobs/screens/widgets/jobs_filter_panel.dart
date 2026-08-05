@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 
 class JobsFilterPanel extends StatefulWidget {
   final void Function(List<String> types, String? location)? onFilterChanged;
+  final void Function(String sortOrder)? onSortChanged;
   final Set<String> selectedTypes;
   final String selectedLocation;
+  final String selectedSort;
   final List<String> locations;
 
   const JobsFilterPanel({
     super.key,
     this.onFilterChanged,
+    this.onSortChanged,
     this.selectedTypes = const {},
     this.selectedLocation = 'All Locations',
+    this.selectedSort = 'Newest first',
     this.locations = const ['All Locations'],
   });
 
@@ -21,6 +25,7 @@ class JobsFilterPanel extends StatefulWidget {
 class _JobsFilterPanelState extends State<JobsFilterPanel> {
   late final Set<String> _selectedTypes;
   late String _selectedLocation;
+  late String _selectedSort;
 
   final List<String> _employmentTypes = [
     'Full-time',
@@ -30,11 +35,14 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
     'Remote',
   ];
 
+  final List<String> _sortOptions = ['Newest first', 'Oldest first'];
+
   @override
   void initState() {
     super.initState();
     _selectedTypes = {...widget.selectedTypes};
     _selectedLocation = widget.selectedLocation;
+    _selectedSort = widget.selectedSort;
   }
 
   @override
@@ -46,6 +54,9 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
         ..clear()
         ..addAll(widget.selectedTypes);
       _selectedLocation = widget.selectedLocation;
+    }
+    if (oldWidget.selectedSort != widget.selectedSort) {
+      _selectedSort = widget.selectedSort;
     }
   }
 
@@ -94,8 +105,10 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
                     setState(() {
                       _selectedTypes.clear();
                       _selectedLocation = 'All Locations';
+                      _selectedSort = 'Newest first';
                     });
                     _notifyFiltersChanged();
+                    widget.onSortChanged?.call(_selectedSort);
                   },
                   child: const Text(
                     'Reset',
@@ -109,6 +122,42 @@ class _JobsFilterPanelState extends State<JobsFilterPanel> {
               ],
             ),
             const Divider(height: 24, color: Color(0xFFE5E7EB)),
+
+            // Filter Section: Sort by Date Posted
+            _buildSectionTitle('Sort By'),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE5E7EB)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedSort,
+                  isExpanded: true,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF6B7280),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF374151),
+                  ),
+                  items: _sortOptions.map((sort) {
+                    return DropdownMenuItem(value: sort, child: Text(sort));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedSort = val);
+                      widget.onSortChanged?.call(_selectedSort);
+                    }
+                  },
+                ),
+              ),
+            ),
+
+            const Divider(height: 32, color: Color(0xFFE5E7EB)),
 
             // Filter Section: Employment Type
             _buildSectionTitle('Employment Type'),

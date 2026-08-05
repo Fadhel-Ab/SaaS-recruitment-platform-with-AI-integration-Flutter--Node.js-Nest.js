@@ -216,8 +216,12 @@ class JobCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   if (job.isUrgent == true) ...[
-                    _buildUrgentBadge(compact: true),
-                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.local_fire_department,
+                      size: 14,
+                      color: Color(0xFFEA580C),
+                    ),
+                    const SizedBox(width: 4),
                   ],
                   _buildStatusPill(job.status ?? 'Active', compact: true),
                 ],

@@ -22,6 +22,7 @@ class _JobsScreenState extends State<JobsScreen> {
   final TextEditingController _searchController = TextEditingController();
   final Set<String> _selectedTypes = {};
   String _selectedLocation = 'All Locations';
+  String _selectedSort = 'Newest first';
   int _currentPage = 1;
 
   @override
@@ -42,6 +43,13 @@ class _JobsScreenState extends State<JobsScreen> {
         ..clear()
         ..addAll(types);
       _selectedLocation = location ?? 'All Locations';
+      _currentPage = 1;
+    });
+  }
+
+  void _handleSortChanged(String sortOrder) {
+    setState(() {
+      _selectedSort = sortOrder;
       _currentPage = 1;
     });
   }
@@ -81,6 +89,14 @@ class _JobsScreenState extends State<JobsScreen> {
     }).toList();
   }
 
+  List<JobModel> _sortJobs(List<JobModel> jobs) {
+    final sorted = [...jobs];
+    sorted.sort((a, b) => _selectedSort == 'Oldest first'
+        ? a.createdAt.compareTo(b.createdAt)
+        : b.createdAt.compareTo(a.createdAt));
+    return sorted;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.sizeOf(context).width > 900;
@@ -98,8 +114,10 @@ class _JobsScreenState extends State<JobsScreen> {
                 child: JobsFilterPanel(
                   selectedTypes: _selectedTypes,
                   selectedLocation: _selectedLocation,
+                  selectedSort: _selectedSort,
                   locations: availableLocations,
                   onFilterChanged: _handleFiltersChanged,
+                  onSortChanged: _handleSortChanged,
                 ),
               ),
             )
@@ -136,8 +154,10 @@ class _JobsScreenState extends State<JobsScreen> {
                           JobsFilterPanel(
                             selectedTypes: _selectedTypes,
                             selectedLocation: _selectedLocation,
+                            selectedSort: _selectedSort,
                             locations: availableLocations,
                             onFilterChanged: _handleFiltersChanged,
+                            onSortChanged: _handleSortChanged,
                           ),
                           const SizedBox(width: 18),
                         ],
@@ -220,7 +240,7 @@ class _JobsScreenState extends State<JobsScreen> {
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () => context.go('/jobs/${job.shareToken}'),
+                        onTap: () => context.push('/jobs/${job.shareToken}'),
                         child: Padding(
                           padding: const EdgeInsets.all(18),
                           child: Column(
@@ -397,7 +417,7 @@ class _JobsScreenState extends State<JobsScreen> {
               return const Center(child: Text('No jobs found'));
             }
 
-            final filteredJobs = _filterJobs(state.jobs);
+            final filteredJobs = _sortJobs(_filterJobs(state.jobs));
             if (filteredJobs.isEmpty) {
               return const Center(
                 child: Text('No jobs match your search or filters'),
@@ -434,7 +454,7 @@ class _JobsScreenState extends State<JobsScreen> {
                     job: urgentJobs.first,
                     index: 0,
                     isDesktop: isDesktop,
-                    onTap: () => context.go('/jobs/${urgentJobs.first.shareToken}'),
+                    onTap: () => context.push('/jobs/${urgentJobs.first.shareToken}'),
                   ),
                 ],
                 if (regularJobs.isNotEmpty) ...[
@@ -450,7 +470,7 @@ class _JobsScreenState extends State<JobsScreen> {
                           index: startIndex + index,
                           isDesktop: isDesktop,
                           onTap: () {
-                            context.go('/jobs/${job.shareToken}');
+                            context.push('/jobs/${job.shareToken}');
                           },
                         );
                       },

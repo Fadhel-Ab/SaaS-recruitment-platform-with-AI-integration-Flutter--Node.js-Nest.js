@@ -89,7 +89,13 @@ class JobDetailsScreen extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back, color: Color(0xFF111827)),
-            onPressed: () => context.pop(),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/jobs');
+              }
+            },
           ),
           Row(
             children: [
