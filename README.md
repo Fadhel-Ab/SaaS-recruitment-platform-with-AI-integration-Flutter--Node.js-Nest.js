@@ -434,3 +434,4 @@ The backend includes Jest unit test files beside most controllers/services and a
 - `StorageService` requires Supabase credentials at startup.
 - AI functionality depends on Gemini response formats being valid JSON for analysis operations.
 - The frontend currently has production backend URL configuration committed in code; consider environment-specific configuration before wider deployment.
+- AI interview phone calls sometimes take a couple of attempts to actually connect — this appears to be a long-distance/carrier-routing quirk on Twilio's side rather than an application bug. A missed first attempt isn't necessarily a sign of a problem; retrying (or having the candidate reply `CALL` on WhatsApp) usually gets it through.
