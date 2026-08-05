@@ -18,8 +18,8 @@ class AuthRepository {
     return result;
   }
 
-  Future<Map<String, dynamic>> register(String fullName, String email, String password, String role) async {
-    final result = await api.register(fullName, email, password, role);
+  Future<Map<String, dynamic>> register(String fullName, String email, String password, String role, {String? phone}) async {
+    final result = await api.register(fullName, email, password, role, phone: phone);
     await storage.saveToken(result['accessToken']);
     return result;
   }

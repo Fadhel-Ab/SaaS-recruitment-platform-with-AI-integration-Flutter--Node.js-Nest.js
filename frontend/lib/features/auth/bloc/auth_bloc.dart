@@ -46,6 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.email,
         event.password,
         event.role.name.toUpperCase(),
+        phone: event.phone,
       );
       final user = UserModel.fromJson(result['user']);
       emit(

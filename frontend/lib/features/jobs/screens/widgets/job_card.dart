@@ -65,14 +65,18 @@ class JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool urgent = job.isUrgent == true;
     return Card(
       elevation: 0,
       margin: EdgeInsets.only(bottom: isDesktop ? 16 : 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+        side: BorderSide(
+          color: urgent ? const Color(0xFFFDBA74) : const Color(0xFFE5E7EB),
+          width: urgent ? 1.5 : 1,
+        ),
       ),
-      color: Colors.white,
+      color: urgent ? const Color(0xFFFFF7ED) : Colors.white,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),

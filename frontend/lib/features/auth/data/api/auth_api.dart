@@ -16,10 +16,16 @@ class AuthApi {
     return response.data;
   }
 
-  Future<Map<String, dynamic>> register(String fullName, String email, String password, String role) async {
+  Future<Map<String, dynamic>> register(String fullName, String email, String password, String role, {String? phone}) async {
     final response = await dio.post(
       ApiConstants.register,
-      data: {'fullName': fullName, 'email': email, 'password': password, 'role': role},
+      data: {
+        'fullName': fullName,
+        'email': email,
+        'password': password,
+        'role': role,
+        if (phone != null && phone.isNotEmpty) 'phone': phone,
+      },
     );
     return response.data;
   }

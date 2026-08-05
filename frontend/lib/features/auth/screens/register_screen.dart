@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/applications/widgets/form_label.dart';
 import 'package:frontend/features/auth/data/models/user_role.dart';
@@ -20,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   UserRole _role = UserRole.candidate;
   bool _isPasswordObscured = true;
@@ -29,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -40,6 +43,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         role: _role,
+        phone: _role == UserRole.manager
+            ? '+973${_phoneController.text.trim()}'
+            : null,
       ),
     );
   }
@@ -164,6 +170,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
+
+                            if (_role == UserRole.manager) ...[
+                              const FormLabel(
+                                label: 'Phone Number',
+                                isRequired: false,
+                              ),
+                              TextFormField(
+                                controller: _phoneController,
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.next,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(8),
+                                ],
+                                decoration: const InputDecoration(
+                                  hintText: '3XXX XXXX',
+                                  helperText:
+                                      'Used for WhatsApp notifications, e.g. new applications.',
+                                  prefixIcon: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '🇧🇭',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          '+973',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF111827),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  prefixIconConstraints: BoxConstraints(
+                                    minWidth: 0,
+                                    minHeight: 0,
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (_role != UserRole.manager) return null;
+                                  final digits = (v ?? '').trim();
+                                  if (digits.isEmpty) {
+                                    return 'Phone number is mandatory';
+                                  }
+                                  if (digits.length != 8) {
+                                    return 'Enter a valid 8-digit Bahrain phone number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                            ],
 
                             // Full Name Input Group
                             const FormLabel(
