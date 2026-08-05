@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class PipelineChartCard extends StatelessWidget {
@@ -79,42 +81,50 @@ class PipelineChartCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCircularChart(int total) {
-    // How far the pipeline has moved past initial screening.
-    final double progress = total > 0 ? (total - pending) / total : 0.0;
+  // Colors here must match the legend rows in _buildPipelineLegend exactly,
+  // in the same order, so the donut segments correspond to their labels.
+  List<MapEntry<int, Color>> _segments() => [
+    MapEntry(pending, const Color(0xFF4F46E5)),
+    MapEntry(shortlisted, Colors.blue),
+    MapEntry(interviews, Colors.orange),
+    MapEntry(hired, Colors.green),
+    MapEntry(rejected, Colors.red),
+  ];
 
+  Widget _buildCircularChart(int total) {
     return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox(
-            width: 140,
-            height: 140,
-            child: CircularProgressIndicator(
-              value: progress,
-              strokeWidth: 16,
-              color: const Color(0xFF4F46E5),
-              backgroundColor: const Color(0xFFEEF2FF),
+      child: SizedBox(
+        width: 140,
+        height: 140,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: const Size(140, 140),
+              painter: _PipelineDonutPainter(
+                segments: _segments(),
+                strokeWidth: 16,
+              ),
             ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '$total',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF111827),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$total',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF111827),
+                  ),
                 ),
-              ),
-              const Text(
-                'Total',
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-              ),
-            ],
-          ),
-        ],
+                const Text(
+                  'Total',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -183,5 +193,54 @@ class PipelineChartCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _PipelineDonutPainter extends CustomPainter {
+  final List<MapEntry<int, Color>> segments;
+  final double strokeWidth;
+
+  _PipelineDonutPainter({required this.segments, required this.strokeWidth});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = (size.shortestSide - strokeWidth) / 2;
+    final arcRect = Rect.fromCircle(center: center, radius: radius);
+
+    final backgroundPaint = Paint()
+      ..color = const Color(0xFFEEF2FF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+    canvas.drawArc(arcRect, 0, 2 * math.pi, false, backgroundPaint);
+
+    final total = segments.fold<int>(0, (sum, entry) => sum + entry.key);
+    if (total <= 0) return;
+
+    double startAngle = -math.pi / 2; // 12 o'clock
+    for (final entry in segments) {
+      if (entry.key <= 0) continue;
+      final sweepAngle = (entry.key / total) * 2 * math.pi;
+      final segmentPaint = Paint()
+        ..color = entry.value
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.butt;
+      canvas.drawArc(arcRect, startAngle, sweepAngle, false, segmentPaint);
+      startAngle += sweepAngle;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PipelineDonutPainter oldDelegate) {
+    if (oldDelegate.strokeWidth != strokeWidth) return true;
+    if (oldDelegate.segments.length != segments.length) return true;
+    for (var i = 0; i < segments.length; i++) {
+      if (oldDelegate.segments[i].key != segments[i].key ||
+          oldDelegate.segments[i].value != segments[i].value) {
+        return true;
+      }
+    }
+    return false;
   }
 }
