@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:frontend/core/api/error_message.dart';
 import 'package:frontend/features/auth/bloc/auth_bloc.dart';
 import 'package:frontend/features/auth/bloc/auth_state.dart';
@@ -189,16 +190,26 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         }
 
         final result = state.result;
-        if (state.status == ApplicationStatus.success &&
-            result != null &&
-            result.shouldStartAiCall &&
-            result.aiScore != null) {
-          setState(() {
-            _aiScore = result.aiScore!;
-            _aiThreshold = result.threshold;
-            _applicationId = result.applicationId;
-            _showAiCallingInterface = true;
-          });
+        if (state.status == ApplicationStatus.success && result != null) {
+          if (result.shouldStartAiCall && result.aiScore != null) {
+            setState(() {
+              _aiScore = result.aiScore!;
+              _aiThreshold = result.threshold;
+              _applicationId = result.applicationId;
+              _showAiCallingInterface = true;
+            });
+          } else {
+            setState(() => _isSubmitting = false);
+            StatusDialog.show(
+              context: context,
+              isSuccess: true,
+              title: 'Application Submitted!',
+              message:
+                  "Thanks for applying — we've received your application and will be in touch if you're a good fit.",
+              primaryButtonText: 'Browse More Jobs',
+              onPrimaryPressed: () => context.go('/jobs'),
+            );
+          }
         }
 
         if (state.status == ApplicationStatus.failure) {
@@ -221,20 +232,26 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         ),
         body: _showAiCallingInterface
             ? Center(
-                child: Card(
-                  margin: const EdgeInsets.all(24),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: AiCallWaitingOverlay(
-                      score: _aiScore,
-                      threshold: _aiThreshold,
-                      isRequestingCall: _isRequestingCall,
-                      onStartCall: _requestCall,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Card(
+                      margin: EdgeInsets.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Color(0xFFE5E7EB)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: AiCallWaitingOverlay(
+                          score: _aiScore,
+                          threshold: _aiThreshold,
+                          isRequestingCall: _isRequestingCall,
+                          onStartCall: _requestCall,
+                        ),
+                      ),
                     ),
                   ),
                 ),

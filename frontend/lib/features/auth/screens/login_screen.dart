@@ -246,6 +246,53 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               },
                             ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                const Expanded(
+                                  child: Divider(color: Color(0xFFE5E7EB)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Text(
+                                    'or',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                const Expanded(
+                                  child: Divider(color: Color(0xFFE5E7EB)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                onPressed: () => context.go('/jobs'),
+                                icon: const Icon(
+                                  Icons.search_rounded,
+                                  size: 18,
+                                ),
+                                label: const Text('Browse Jobs Without an Account'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: const Color(0xFF4F46E5),
+                                  side: const BorderSide(
+                                    color: Color(0xFF4F46E5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),

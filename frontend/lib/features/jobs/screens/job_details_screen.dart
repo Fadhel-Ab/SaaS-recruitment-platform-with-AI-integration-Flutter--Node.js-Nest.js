@@ -321,7 +321,7 @@ class JobDetailsScreen extends StatelessWidget {
                     return;
                   }
 
-                  context.go('/apply/${job.shareToken}');
+                  context.push('/apply/${job.shareToken}');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(
