@@ -13,6 +13,30 @@ class ManagerJobsBloc extends Bloc<ManagerJobsEvent, ManagerJobsState> {
 
   ManagerJobsBloc(this.repository) : super(const ManagerJobsState()) {
     on<LoadManagerJobs>(_load);
+    on<DeleteManagerJob>(_delete);
+  }
+
+  FutureOr<void> _delete(
+    DeleteManagerJob event,
+    Emitter<ManagerJobsState> emit,
+  ) async {
+    // Ignore taps while another delete is still in flight.
+    if (state.deletingJobId != null) return;
+
+    emit(state.copyWith(deletingJobId: event.jobId));
+
+    try {
+      await repository.deleteJob(event.jobId);
+
+      // Remove it locally instead of reloading the whole list.
+      emit(
+        state.copyWith(
+          jobs: state.jobs.where((job) => job.id != event.jobId).toList(),
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(actionError: friendlyErrorMessage(e)));
+    }
   }
 
   FutureOr<void> _load(

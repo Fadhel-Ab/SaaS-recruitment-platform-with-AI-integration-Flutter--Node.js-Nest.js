@@ -80,6 +80,34 @@ export class JobsService {
     });
   }
 
+  async remove(userId: string, jobId: string) {
+    // Scoped to the manager, so another manager's job looks "not found"
+    // rather than revealing that it exists.
+    const job = await this.prisma.job.findFirst({
+      where: { id: jobId, managerId: userId },
+      select: { id: true },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+
+    // The schema has no cascade rules, so child rows are removed first.
+    // One transaction: if any step fails, nothing is deleted.
+    // Candidates (and their resumes) are kept; they may have applied elsewhere.
+    const ofThisJob = { application: { jobId } };
+    await this.prisma.$transaction([
+      this.prisma.aIScore.deleteMany({ where: ofThisJob }),
+      this.prisma.interview.deleteMany({ where: ofThisJob }),
+      this.prisma.aIInterviewSession.deleteMany({ where: ofThisJob }),
+      this.prisma.application.deleteMany({ where: { jobId } }),
+      this.prisma.availability.deleteMany({ where: { jobId } }),
+      this.prisma.job.delete({ where: { id: jobId } }),
+    ]);
+
+    return { id: jobId };
+  }
+
   async getDefaultAvailability(managerId: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

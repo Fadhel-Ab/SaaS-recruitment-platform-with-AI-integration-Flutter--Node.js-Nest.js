@@ -48,4 +48,8 @@ class JobsApi {
     final response = await dio.patch('/jobs/$id', data: data);
     return response.data;
   }
+
+  Future<void> deleteJob(String id) async {
+    await dio.delete('/jobs/$id');
+  }
 }

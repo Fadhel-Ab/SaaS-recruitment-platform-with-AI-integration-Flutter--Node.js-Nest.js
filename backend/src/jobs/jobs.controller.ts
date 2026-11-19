@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -52,6 +60,12 @@ export class JobsController {
     @Body() dto: UpdateJobDto,
   ) {
     return this.jobsService.update(user.id, id, dto);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.MANAGER)
+  remove(@CurrentUser() user, @Param('id') id: string) {
+    return this.jobsService.remove(user.id, id);
   }
 
   @Get(':id/applications')

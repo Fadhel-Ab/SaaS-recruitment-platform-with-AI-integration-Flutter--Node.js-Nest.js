@@ -29,7 +29,23 @@ class ManagerJobsScreen extends StatelessWidget {
         ],
       ),
 
-      body: BlocBuilder<ManagerJobsBloc, ManagerJobsState>(
+      body: BlocConsumer<ManagerJobsBloc, ManagerJobsState>(
+        // Fires once when a delete finishes (deletingJobId goes back to null).
+        listenWhen: (previous, current) =>
+            previous.deletingJobId != null && current.deletingJobId == null,
+        listener: (context, state) {
+          final failed = state.actionError != null;
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(failed ? state.actionError! : 'Job deleted'),
+                backgroundColor: failed
+                    ? const Color(0xFFDC2626)
+                    : const Color(0xFF111827),
+              ),
+            );
+        },
         builder: (context, state) {
           if (state.status == ManagerJobsStatus.loading) {
             return const Center(
@@ -107,6 +123,11 @@ class ManagerJobsScreen extends StatelessWidget {
                       context.read<ManagerJobsBloc>().add(LoadManagerJobs());
                     }
                   },
+                  isDeleting: state.deletingJobId == job.id,
+                  // Only one delete at a time.
+                  onDeleteTap: state.deletingJobId != null
+                      ? null
+                      : () => _confirmDelete(context, job),
                 );
               },
             ),
@@ -115,17 +136,56 @@ class ManagerJobsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _confirmDelete(BuildContext context, JobModel job) async {
+    final applicantsWarning = job.applications > 0
+        ? '\n\nIts ${job.applications} application(s), AI scores and '
+              'interviews will also be deleted.'
+        : '';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete job?'),
+        content: Text(
+          '"${job.title}" will be permanently deleted and its share link '
+          'will stop working.$applicantsWarning\n\nThis cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<ManagerJobsBloc>().add(DeleteManagerJob(job.id));
+    }
+  }
 }
 
 class _JobCard extends StatelessWidget {
   final JobModel job;
   final VoidCallback onCandidatesTap;
   final VoidCallback onEditTap;
+  final VoidCallback? onDeleteTap;
+  final bool isDeleting;
 
   const _JobCard({
     required this.job,
     required this.onCandidatesTap,
     required this.onEditTap,
+    required this.onDeleteTap,
+    required this.isDeleting,
   });
 
   @override
@@ -174,6 +234,28 @@ class _JobCard extends StatelessWidget {
                   tooltip: 'Edit job',
                   onPressed: onEditTap,
                 ),
+                if (isDeleting)
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFFDC2626),
+                      ),
+                    ),
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 20,
+                      color: Color(0xFFDC2626),
+                    ),
+                    tooltip: 'Delete job',
+                    onPressed: onDeleteTap,
+                  ),
               ],
             ),
 

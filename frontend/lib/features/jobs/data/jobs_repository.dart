@@ -38,6 +38,10 @@ class JobsRepository {
     return api.updateJob(id, data);
   }
 
+  Future<void> deleteJob(String id) {
+    return api.deleteJob(id);
+  }
+
   Future<List<String>> generateInterviewQuestions(
     CreateJobRequest request,
   ) async {
