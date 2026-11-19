@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Param,
   Post,
@@ -37,6 +38,16 @@ export class AiInterviewController {
   startCall(@Param('id') applicationId: string) {
     return this.aiInterviewService.startAiCall(applicationId);
   }
+  // Polled by the candidate's "we're calling you" screen. Public because
+  // candidates can apply without an account; it returns only the interview
+  // status/counts (no personal data) for an unguessable application UUID.
+  @Get(':id/status')
+  @Public()
+  @SkipThrottle()
+  getStatus(@Param('id') applicationId: string) {
+    return this.aiInterviewService.getInterviewStatus(applicationId);
+  }
+
   @Post('complete')
   complete(@Body() dto: CompleteInterviewDto) {
     return this.aiInterviewService.complete(dto.sessionId, dto.transcript);

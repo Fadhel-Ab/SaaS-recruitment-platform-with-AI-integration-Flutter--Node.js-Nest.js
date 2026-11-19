@@ -35,6 +35,11 @@ class ApplicationApi {
     await dio.post('/ai-interview/$applicationId/start-call');
   }
 
+  Future<Map<String, dynamic>> getAiInterviewStatus(String applicationId) async {
+    final response = await dio.get('/ai-interview/$applicationId/status');
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
   Future<List<dynamic>> getJobApplications(String jobId) async {
     final response = await dio.get('/applications/job/$jobId');
     return response.data as List<dynamic>;

@@ -67,6 +67,13 @@ class ApplicationRepository {
     return api.startAiCall(applicationId);
   }
 
+  /// Returns the AI interview status: IN_PROGRESS, COMPLETED or FAILED
+  /// (FAILED = the last call was missed or ended before any answer).
+  Future<String> getAiInterviewStatus(String applicationId) async {
+    final data = await api.getAiInterviewStatus(applicationId);
+    return data['status'] as String;
+  }
+
   Future<List<PipelineEntry>> getPipeline() async {
     final data = await api.getPipeline();
     return data

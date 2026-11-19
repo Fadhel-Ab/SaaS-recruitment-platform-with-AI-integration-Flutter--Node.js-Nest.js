@@ -7,12 +7,19 @@ class AiCallWaitingOverlay extends StatefulWidget {
   final VoidCallback onStartCall;
   final bool isRequestingCall;
 
+  /// Latest AI interview status from the backend: null / IN_PROGRESS while
+  /// calling, FAILED if the call was missed or ended early, COMPLETED when done.
+  final String? interviewStatus;
+  final VoidCallback? onDone;
+
   const AiCallWaitingOverlay({
     super.key,
     required this.score,
     required this.threshold,
     required this.onStartCall,
     this.isRequestingCall = false,
+    this.interviewStatus,
+    this.onDone,
   });
 
   @override
@@ -40,6 +47,18 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final isCompleted = widget.interviewStatus == 'COMPLETED';
+    final isFailed = widget.interviewStatus == 'FAILED';
+
+    if (isCompleted || isFailed) {
+      return _CallEndedView(
+        isCompleted: isCompleted,
+        isRequestingCall: widget.isRequestingCall,
+        onRetry: widget.onStartCall,
+        onDone: widget.onDone,
+      );
+    }
+
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
@@ -171,6 +190,112 @@ class _AiCallWaitingOverlayState extends State<AiCallWaitingOverlay>
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Shown once the call has ended: either the interview finished, or the call
+/// was missed / dropped before any answer (with a retry button).
+class _CallEndedView extends StatelessWidget {
+  final bool isCompleted;
+  final bool isRequestingCall;
+  final VoidCallback onRetry;
+  final VoidCallback? onDone;
+
+  const _CallEndedView({
+    required this.isCompleted,
+    required this.isRequestingCall,
+    required this.onRetry,
+    required this.onDone,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isCompleted
+        ? const Color(0xFF137333)
+        : const Color(0xFFB45309);
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: 0.12),
+            ),
+            child: Icon(
+              isCompleted ? Icons.check_circle_rounded : Icons.phone_missed,
+              size: 44,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 32),
+          Text(
+            isCompleted ? 'Interview Complete!' : "We Couldn't Reach You",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF111827),
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isCompleted
+                ? 'Thank you! Your answers have been submitted. The hiring team '
+                      'will review your results and be in touch.'
+                : 'The call was missed or ended before the interview started. '
+                      'Tap below to get another call.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF6B7280),
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 40),
+          SizedBox(
+            width: double.infinity,
+            child: isCompleted
+                ? ElevatedButton(
+                    onPressed: onDone,
+                    style: _buttonStyle(const Color(0xFF4F46E5)),
+                    child: const Text(
+                      'Browse More Jobs',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                    ),
+                  )
+                : ElevatedButton.icon(
+                    onPressed: isRequestingCall ? null : onRetry,
+                    icon: const Icon(Icons.phone_forwarded_rounded),
+                    label: Text(
+                      isRequestingCall ? 'Calling...' : 'Call Me Again',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    style: _buttonStyle(const Color(0xFF137333)),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ButtonStyle _buttonStyle(Color background) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: background,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 }

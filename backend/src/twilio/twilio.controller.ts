@@ -69,11 +69,38 @@ async callStatus(
 
   this.logger.log(`Call status for application ${applicationId}: ${status}`);
 
+  // Test calls have no application to update.
+  if (!applicationId || applicationId === 'undefined') {
+    return;
+  }
+
+  const duration = Number(body.CallDuration);
+  if (Number.isFinite(duration)) {
+    await this.aiInterviewService
+      .saveCallDuration(applicationId, duration)
+      .catch((error) => {
+        this.logger.error(
+          `Failed to save call duration for application ${applicationId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      });
+  }
+
   if (
     status === 'no-answer' ||
     status === 'busy' ||
-    status === 'failed'
+    status === 'failed' ||
+    status === 'canceled'
   ) {
+    // Lets the candidate's waiting screen show "missed - try again".
+    await this.aiInterviewService
+      .markCallEnded(applicationId, 'missed')
+      .catch((error) => {
+        this.logger.error(
+          `Failed to mark call as missed for application ${applicationId}`,
+          error instanceof Error ? error.stack : error,
+        );
+      });
 
     const application =
       await this.aiInterviewService.getApplication(applicationId);

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   bool _isRequestingCall = false;
   bool _isSubmitting = false;
 
+  // AI interview call tracking: polled from the backend while the
+  // "we're calling you" view is open. null / IN_PROGRESS = waiting,
+  // FAILED = missed or ended early, COMPLETED = interview done.
+  Timer? _statusTimer;
+  String? _interviewStatus;
+  bool _isCheckingStatus = false;
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +85,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   @override
   void dispose() {
+    _statusTimer?.cancel();
     fullNameController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -149,11 +158,48 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
+  void _startStatusPolling() {
+    _statusTimer?.cancel();
+    _statusTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _checkInterviewStatus(),
+    );
+  }
+
+  Future<void> _checkInterviewStatus() async {
+    final applicationId = _applicationId;
+    // Skip if a previous check is still in flight (slow network), or while a
+    // retry call is being placed (the server may still say FAILED for a moment).
+    if (applicationId == null || _isCheckingStatus || _isRequestingCall) return;
+
+    _isCheckingStatus = true;
+    try {
+      final status = await context
+          .read<ApplicationRepository>()
+          .getAiInterviewStatus(applicationId);
+      if (!mounted) return;
+
+      if (status != _interviewStatus) {
+        setState(() => _interviewStatus = status);
+      }
+      // Interview scored - nothing left to wait for.
+      if (status == 'COMPLETED') _statusTimer?.cancel();
+    } catch (_) {
+      // Transient network error: just try again on the next tick.
+    } finally {
+      _isCheckingStatus = false;
+    }
+  }
+
   Future<void> _requestCall() async {
     final applicationId = _applicationId;
     if (applicationId == null || _isRequestingCall) return;
 
-    setState(() => _isRequestingCall = true);
+    setState(() {
+      _isRequestingCall = true;
+      // Back to "calling you now" while the new call is placed.
+      _interviewStatus = null;
+    });
     try {
       await context.read<ApplicationRepository>().startAiCall(applicationId);
       if (!mounted) return;
@@ -198,6 +244,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               _applicationId = result.applicationId;
               _showAiCallingInterface = true;
             });
+            _startStatusPolling();
           } else {
             setState(() => _isSubmitting = false);
             StatusDialog.show(
@@ -250,6 +297,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                           threshold: _aiThreshold,
                           isRequestingCall: _isRequestingCall,
                           onStartCall: _requestCall,
+                          interviewStatus: _interviewStatus,
+                          onDone: () => context.go('/jobs'),
                         ),
                       ),
                     ),

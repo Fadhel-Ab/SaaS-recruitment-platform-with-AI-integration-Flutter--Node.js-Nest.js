@@ -195,6 +195,7 @@ export class AiInterviewService {
       this.logger.debug(
         `Call for application ${applicationId} ended with no recorded answers - skipping scoring`,
       );
+      await this.markCallEnded(applicationId, 'no-answers');
       return;
     }
 
@@ -203,6 +204,44 @@ export class AiInterviewService {
     );
 
     await this.complete(session.id, session.transcript);
+  }
+
+  /**
+   * Records how a call ended (from Twilio's status callback). Missed calls and
+   * calls that ended before any answer are marked FAILED so the candidate's
+   * screen can offer a retry; a scored (COMPLETED) interview is left alone.
+   */
+  async markCallEnded(applicationId: string, outcome: 'missed' | 'no-answers') {
+    await this.prisma.aIInterviewSession.updateMany({
+      where: { applicationId, status: AIInterviewStatus.IN_PROGRESS },
+      data: { status: AIInterviewStatus.FAILED },
+    });
+
+    this.logger.log(
+      `AI interview call for application ${applicationId} ended: ${outcome}`,
+    );
+  }
+
+  /** Stores the length (seconds) of the latest call, as reported by Twilio. */
+  async saveCallDuration(applicationId: string, durationSeconds: number) {
+    await this.prisma.aIInterviewSession.updateMany({
+      where: { applicationId },
+      data: { duration: durationSeconds },
+    });
+  }
+
+  /** Minimal, non-personal status the candidate's waiting screen polls. */
+  async getInterviewStatus(applicationId: string) {
+    const session = await this.prisma.aIInterviewSession.findUnique({
+      where: { applicationId },
+      select: { status: true, questionCount: true, duration: true },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Interview session not found');
+    }
+
+    return session;
   }
 
   async saveAnswer(applicationId: string, answer: string) {
@@ -264,6 +303,14 @@ export class AiInterviewService {
     if (!application) {
       throw new NotFoundException('Application not found');
     }
+
+    // A new call attempt: clear a previous FAILED (missed / ended-early)
+    // outcome so the candidate's screen goes back to "calling you now".
+    // Never reopen an interview that has already been scored.
+    await this.prisma.aIInterviewSession.updateMany({
+      where: { applicationId, status: AIInterviewStatus.FAILED },
+      data: { status: AIInterviewStatus.IN_PROGRESS },
+    });
 
     return this.twilioService.makeCall(
       this.config.get<string>('TWILIO_TEST_PHONE_NUMBER') ??
